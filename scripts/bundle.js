@@ -9,6 +9,18 @@ var Viewer = require('./viewer.js');
 
 document.querySelector("#render-button").addEventListener('click', function () {
     // This will trigger a rerender
+
+    var authorA = document.querySelector('#authorA').value || 'francamps';
+    var authorB = document.querySelector('#authorA').value || 'Paloma Arg';
+    var text = document.querySelector('#text').value || '';
+
+    var whatsapp = {
+      authorA: authorA,
+      authorB: authorB,
+      text: text
+    }
+
+    Viewer.init(whatsapp);
     Viewer.render();
 })
 
@@ -18,9 +30,9 @@ document.querySelector("#render-button").addEventListener('click', function () {
 function Conversation (data) {
 	this.datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p");
 	this.dayFormat = d3.time.format("%Y-%m-%d");
-	this.data = data || '';
-	this.authorA = 'francamps';
-	this.authorB = 'Paloma Arg';
+	this.data = data.text || '';
+	this.authorA = data.authorA;
+	this.authorB = data.authorB;
 
 	this.parseTextData();
 
@@ -32,6 +44,7 @@ Conversation.prototype = {
 		return this.messages;
 	},
 	calculateDateLimits: function () {
+    console.log(this)
 		var datetime0 = this.messages[0].datetime;
 		var datetimeF = this.messages[this.messages.length - 1].datetime;
 		this.date0 = this.dayFormat.parse(datetime0);
@@ -101,13 +114,11 @@ var datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p"),
 		dayFormat = d3.time.format("%Y-%m-%d");
 
 module.exports = {
-	init: function () {
-
+	init: function (whatsapp) {
+		this.data = whatsapp;
 	},
 	render: function () {
-		d3.text(dataFileForNow, function (data) {
-
-			var Convo = new Conversation(data);
+			var Convo = new Conversation(this.data);
 			var messages = Convo.getMessages();
 
 			var paloma = [],
@@ -211,7 +222,7 @@ module.exports = {
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
 
-		});
+	//	});
 	}
 }
 

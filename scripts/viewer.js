@@ -17,13 +17,11 @@ var datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p"),
 		dayFormat = d3.time.format("%Y-%m-%d");
 
 module.exports = {
-	init: function () {
-
+	init: function (whatsapp) {
+		this.data = whatsapp;
 	},
 	render: function () {
-		d3.text(dataFileForNow, function (data) {
-
-			var Convo = new Conversation(data);
+			var Convo = new Conversation(this.data);
 			var messages = Convo.getMessages();
 
 			var paloma = [],
@@ -127,6 +125,6 @@ module.exports = {
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
 
-		});
+	//	});
 	}
 }

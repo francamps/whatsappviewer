@@ -1,22 +1,29 @@
 <html>
 
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.12/d3.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+	<link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body style="background: #560935">
-	<div id="form">
+	<form id="form">
 		<label>
 			First author
-			<input type="text" placeholder="Author A">
+			<input id="authorA" type="text" placeholder="Author A">
 		</label>
 		<label>
 			Second author
-			<input type="text" placeholder="Author B">
+			<input id="authorB" type="text" placeholder="Author B">
 		</label>
-		<button id="render-button">View</button>
-	</div>
+		<label>
+			Conversation
+			<textarea id="text" type="text" rows="6" placeholder="Conversation text"></textarea>
+		</label>
+	</form>
+	<button id="render-button">View</button>
+
 	<div id="graph"></div>
 	<script type="text/javascript" src="./scripts/bundle.js"></script>
 	<!--script type="text/javascript" src="./conversation.js"></script>

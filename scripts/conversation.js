@@ -3,9 +3,9 @@
 function Conversation (data) {
 	this.datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p");
 	this.dayFormat = d3.time.format("%Y-%m-%d");
-	this.data = data || '';
-	this.authorA = 'francamps';
-	this.authorB = 'Paloma Arg';
+	this.data = data.text || '';
+	this.authorA = data.authorA;
+	this.authorB = data.authorB;
 
 	this.parseTextData();
 
@@ -17,6 +17,7 @@ Conversation.prototype = {
 		return this.messages;
 	},
 	calculateDateLimits: function () {
+    console.log(this)
 		var datetime0 = this.messages[0].datetime;
 		var datetimeF = this.messages[this.messages.length - 1].datetime;
 		this.date0 = this.dayFormat.parse(datetime0);
