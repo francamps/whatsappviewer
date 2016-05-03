@@ -10,8 +10,8 @@ var Viewer = require('./viewer.js');
 document.querySelector("#render-button").addEventListener('click', function () {
     // This will trigger a rerender
 
-    var authorA = document.querySelector('#authorA').value || 'francamps';
-    var authorB = document.querySelector('#authorA').value || 'Paloma Arg';
+    var authorA = document.querySelector('#authorA').value || 'AuthorA';
+    var authorB = document.querySelector('#authorA').value || 'AuthorB';
     var text = document.querySelector('#text').value || '';
 
     var whatsapp = {
@@ -31,8 +31,7 @@ function Conversation (data) {
 	this.datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p");
 	this.dayFormat = d3.time.format("%Y-%m-%d");
 	this.data = data.text || '';
-	this.authorA = data.authorA;
-	this.authorB = data.authorB;
+	this.authors = {};
 
 	this.parseTextData();
 
@@ -43,6 +42,7 @@ Conversation.prototype = {
 	getMessages: function () {
 		return this.messages;
 	},
+
 	calculateDateLimits: function () {
     console.log(this)
 		var datetime0 = this.messages[0].datetime;
@@ -50,15 +50,50 @@ Conversation.prototype = {
 		this.date0 = this.dayFormat.parse(datetime0);
 		this.dateF = this.dayFormat.parse(datetimeF);
 	},
+
+	parseDateFormat: function (date) {
+		var error = true;
+		var formats = [
+					d3.time.format("%-m/%-d/%-y, %-H:%M %p"),
+					d3.time.format("%-m/%-d/%-Y, %-H:%M %p"),
+					d3.time.format("%Y-%m-%d, %H:%M:%S"),
+					d3.time.format("%b %d, %Y, %H:%M %p")
+				],
+				i = 0;
+
+		while (i < formats.length || error === true) {
+			try {
+				if (formats[i].parse(date) !== null) {
+					error = false;
+					this.datetimeFormat = formats[i];
+					break;
+				}
+				i++;
+			} catch (e) {
+				if (e instanceof TypeError) {
+					i++;
+				}
+				console.log('Some other error');
+			}
+		}
+	},
+
+	parseAuthors: function () {
+		this.authorA = Object.keys(this.authors)[0];
+		this.authorA = Object.keys(this.authors)[1];
+	},
+
 	getDateRange: function () {
 		return d3.time.day.range(this.date0, this.dateF);
 	},
+
 	parseTextData: function () {
 		this.messages = [];
 
 		// It is a new line if it contains time and author
 		this.linesAuthored = this.data.split(' - ');
 		var previousDate = this.linesAuthored[0];
+		this.parseDateFormat(previousDate);
 
 		for (var i = 0; i < this.linesAuthored.length; i++) {
 			var allThisLine = this.linesAuthored[i],
@@ -72,6 +107,12 @@ Conversation.prototype = {
 			var author = allThisLine.split(': ')[0],
 					message = messageMinusAuthor.split(': ')[1];
 
+			if (author && !(author in this.authors)) {
+				this.authors[author] = true;
+			}
+
+			this.parseAuthors();
+
 			// TODO: Catch all weird cases
 			// Better parsing
 			if (datetime && author && message) {
@@ -83,6 +124,7 @@ Conversation.prototype = {
 			}
 		}
 	},
+
 	getConvFormat: function () {
 		return this.datetimeFormat;
 	}
@@ -121,11 +163,11 @@ module.exports = {
 			var Convo = new Conversation(this.data);
 			var messages = Convo.getMessages();
 
-			var paloma = [],
-					palomaDay = {};
+			var authorA = [],
+					authorAbyDay = {};
 
-			var franc = [],
-					francDay = {};
+			var authorB = [],
+					authorBbyDay = {};
 
 			// Separate data objects for paloma and Franc
 			// and bundle them by day
@@ -134,15 +176,15 @@ module.exports = {
 				var author = message.author;
 
 				if (author == Convo.authorA) {
-					if (!(day in francDay)) {
-						francDay[day] = [];
+					if (!(day in authorAbyDay)) {
+						authorAbyDay[day] = [];
 					}
-					francDay[day].push(message);
+					authorAbyDay[day].push(message);
 				} else {
-					if (!(day in palomaDay)) {
-						palomaDay[day] = [];
+					if (!(day in authorBbyDay)) {
+						authorBbyDay[day] = [];
 					}
-					palomaDay[day].push(message);
+					authorBbyDay[day].push(message);
 				}
 			});
 
@@ -153,20 +195,20 @@ module.exports = {
 				var date = dateRange[day];
 				var dayString = dayFormat(date)
 
-				if (dayString in francDay) {
-					franc.push(francDay[dayString]);
+				if (dayString in authorAbyDay) {
+					authorA.push(authorAbyDay[dayString]);
 				} else {
-					franc.push([{
+					authorA.push([{
 						author: Convo.authorA,
 						datetime: dayString,
 						text: ''
 					}]);
 				}
 
-				if (dayString in palomaDay) {
-					paloma.push(palomaDay[dayString]);
+				if (dayString in authorBbyDay) {
+					authorB.push(authorBbyDay[dayString]);
 				} else {
-					paloma.push([{
+					authorB.push([{
 						author: Convo.authorB,
 						datetime: dayString,
 						text: ''
@@ -210,19 +252,17 @@ module.exports = {
 				.x1(function(d) { return charScale(0); })
 				.interpolate("basis");
 
-			var palomaLine = svg.append("path")
-				.attr("d", lineFunction(paloma))
+			var lineA = svg.append("path")
+				.attr("d", lineFunction(authorA))
 				.attr("stroke", pink)
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
 
-			var francLine = svg.append("path")
-				.attr("d", lineFunction2(franc))
+			var lineB = svg.append("path")
+				.attr("d", lineFunction2(authorB))
 				.attr("stroke", pink)
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
-
-	//	});
 	}
 }
 

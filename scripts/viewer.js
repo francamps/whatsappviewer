@@ -24,11 +24,11 @@ module.exports = {
 			var Convo = new Conversation(this.data);
 			var messages = Convo.getMessages();
 
-			var paloma = [],
-					palomaDay = {};
+			var authorA = [],
+					authorAbyDay = {};
 
-			var franc = [],
-					francDay = {};
+			var authorB = [],
+					authorBbyDay = {};
 
 			// Separate data objects for paloma and Franc
 			// and bundle them by day
@@ -37,15 +37,15 @@ module.exports = {
 				var author = message.author;
 
 				if (author == Convo.authorA) {
-					if (!(day in francDay)) {
-						francDay[day] = [];
+					if (!(day in authorAbyDay)) {
+						authorAbyDay[day] = [];
 					}
-					francDay[day].push(message);
+					authorAbyDay[day].push(message);
 				} else {
-					if (!(day in palomaDay)) {
-						palomaDay[day] = [];
+					if (!(day in authorBbyDay)) {
+						authorBbyDay[day] = [];
 					}
-					palomaDay[day].push(message);
+					authorBbyDay[day].push(message);
 				}
 			});
 
@@ -56,20 +56,20 @@ module.exports = {
 				var date = dateRange[day];
 				var dayString = dayFormat(date)
 
-				if (dayString in francDay) {
-					franc.push(francDay[dayString]);
+				if (dayString in authorAbyDay) {
+					authorA.push(authorAbyDay[dayString]);
 				} else {
-					franc.push([{
+					authorA.push([{
 						author: Convo.authorA,
 						datetime: dayString,
 						text: ''
 					}]);
 				}
 
-				if (dayString in palomaDay) {
-					paloma.push(palomaDay[dayString]);
+				if (dayString in authorBbyDay) {
+					authorB.push(authorBbyDay[dayString]);
 				} else {
-					paloma.push([{
+					authorB.push([{
 						author: Convo.authorB,
 						datetime: dayString,
 						text: ''
@@ -113,18 +113,16 @@ module.exports = {
 				.x1(function(d) { return charScale(0); })
 				.interpolate("basis");
 
-			var palomaLine = svg.append("path")
-				.attr("d", lineFunction(paloma))
+			var lineA = svg.append("path")
+				.attr("d", lineFunction(authorA))
 				.attr("stroke", pink)
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
 
-			var francLine = svg.append("path")
-				.attr("d", lineFunction2(franc))
+			var lineB = svg.append("path")
+				.attr("d", lineFunction2(authorB))
 				.attr("stroke", pink)
 				.attr("stroke-width", 0)
 				.attr("fill", pink);
-
-	//	});
 	}
 }
