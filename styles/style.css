@@ -1,12 +1,69 @@
 body {
-  padding: 40px;
+  padding: 0;
+  margin: 0;
 }
 
-button {
-  padding: 10px;
-  background: white;
+header {
+  height: 84px;
+  font-family: open-sans, sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  background: rgb(44, 181, 63);
+  background: linear-gradient(-30deg, #78dc3a, #24d8cd);
+  color: white;
+}
+
+header a {
+  margin: 20px;
+  height: 20px;
+  float: left;
+  background: none;
   border-radius: 3px;
-  border: 0;
+  border: 2px solid #fff;
+}
+
+header a.view {
+  float: right;
+}
+
+.form-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 20px;
+  background: rgb(97, 210, 106);
+  transition: width 2s, padding 2s;
+  position: fixed;
+  top: 80px;
+  padding-top: 20px;
+  left: 0;
+  right: 0;
+  height: 100%;
+  opacity: 1;
+  transition: opacity .3s ease-in-out;
+}
+
+.form-container.hidden {
+  opacity: 0;
+  transition: opacity .3s ease-in-out;
+}
+
+.canvas {
+  padding: 30px;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#graph-viewer {
+  width: 100%;
+  float: right;
+  padding-top: 40px;
+}
+
+.graph-widget {
+  border-radius: 3px;
+  border: 2px solid rgb(44, 181, 63);
 }
 
 form label {
@@ -17,18 +74,50 @@ form label {
 
 form input {
   display: block;
-  width: 100%;
-  border: 0;
+  position: relative;
+  border: 1px solid #c0c0c0;
   border-radius: 3px;
   height: 40px;
+  outline: none;
   margin: 10px 0;
   padding: 10px;
+  min-width: 300px;
+  font-family: Open-sans, sans-serif;
+  font-size: 14px;
+  color: #888888;
 }
 
 form textarea {
   width: 100%;
   border: 0;
+  outline: none;
   border-radius: 3px;
+  border: 1px solid #c0c0c0;
   padding: 10px;
   margin: 10px 0;
+  font-family: Open-sans, sans-serif;
+  font-size: 14px;
+  color: #888888;
+  line-height: 18px;
+}
+
+form input:focus, form textarea:focus {
+  border-color: rgb(97, 210, 106);
+  box-shadow: 0 0 10px rgb(97, 210, 106);
+}
+
+a, button {
+  text-decoration: none;
+  font-family: open-sans, sans-serif;
+  padding: 10px;
+  background: white;
+  border-radius: 3px;
+  border: 0;
+  background: rgb(97, 210, 106);
+  cursor: pointer;
+  color: white;
+}
+
+a:hover {
+  background: rgb(44, 181, 63);
 }
