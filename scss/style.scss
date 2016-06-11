@@ -1,0 +1,266 @@
+$wapp-green: rgb(97, 210, 106);
+$mess-green: rgb(220, 248, 198);
+
+$mid-grey: #888;
+$verylight-grey: #efefef;
+$superlight-grey: #f8f8f8;
+$white: #fff;
+
+body {
+  padding: 0;
+  margin: 0;
+  background: $verylight-grey;
+}
+
+header {
+  height: 84px;
+  font-family: 'Lato', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  background: rgb(44, 181, 63);
+  background: linear-gradient(-30deg, #78dc3a, #24d8cd);
+  color: white;
+  box-shadow: 0px 3px 5px #dddddd;
+
+  a {
+    margin: 20px;
+    height: 20px;
+    float: left;
+    background: none;
+    border-radius: 3px;
+    border: 2px solid $white;
+    text-decoration: none;
+    font-family: 'Lato', sans-serif;
+    padding: 10px;
+    cursor: pointer;
+    color: white;
+
+    &.view {
+      float: right;
+    }
+
+    &:hover {
+      color: $wapp-green;
+      background: $white;
+    }
+  }
+}
+
+.page-wrap {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  margin: 0 auto;
+
+  @media (min-width: 900px) {
+      width: 800px;
+      padding: 0;
+  }
+
+
+    .widget {
+      h3 {
+        font-family: 'Merriweather';
+      }
+
+      background: $white;
+      box-sizing: border-box;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px sol2d $verylight-grey;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
+      min-height: 240px;
+
+      &::after {
+        position: relative;
+        float: right;
+        margin-right: -40px;
+        margin-top: -40px;
+      }
+
+      &:nth-child(even){
+          background:$mess-green;
+
+          &::after {
+            content: url('../bubbletic2.png');
+          }
+      }
+      &:nth-child(odd){
+          background:$white;
+
+          &::after {
+            transform: scaleX(-1);
+            content: url('../bubbletic.png');
+            float: left;
+            margin-left: -40px;
+          }
+      }
+    }  
+
+  .form-container {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0 20px;
+    transition: width 2s, padding 2s;
+    top: 80px;
+    padding-top: 20px;
+    opacity: 1;
+    transition: opacity .3s ease-in-out;
+
+    &.hidden {
+      opacity: 0;
+      transition: opacity .3s ease-in-out;
+    }
+
+    &.removed {
+      display: none;
+    }
+
+    .instructions {
+      font-family: 'Merriweather';
+      color: $mid-grey;
+      line-height: 25px;
+      margin-bottom: 60px;
+    }
+  }
+}
+
+form {
+  label {
+    color: #888;
+    font-family: 'Lato', sans-serif;
+    font-size: 20px;
+    letter-spacing: .05em;
+  }
+
+  input {
+    display: block;
+    position: relative;
+    border: 1px solid #c0c0c0;
+    border-radius: 3px;
+    height: 40px;
+    outline: none;
+    margin: 10px 0;
+    padding: 10px;
+    min-width: 300px;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: $mid-grey;
+  }
+
+  textarea {
+    width: 100%;
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid $verylight-grey;
+    padding: 10px;
+    margin: 10px 0;
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    color: $mid-grey;
+    line-height: 18px;
+    letter-spacing: .07em;
+  }
+
+  input:focus, textarea:focus {
+    border-color: $wapp-green;
+    box-shadow: 0 0 10px $wapp-green;
+  }
+}
+
+button {
+  text-decoration: none;
+  font-family: 'Lato', sans-serif;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid $wapp-green;
+  cursor: pointer;
+  color: $wapp-green;
+  font-size: 14px;
+  outline: none;
+  background: $white;
+
+  &:hover {
+    color: $white;
+    background: $wapp-green;
+  }
+}
+
+.canvas {
+  h2 {
+    font-family: 'Merriweather';
+    font-size: 30px;
+    text-align: center;
+  }
+
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+
+  &.hidden {
+    display: none;
+  }
+
+  .dashboard-title {
+  }
+
+  .legend {
+    text-align: center;
+    background: $white;
+    box-sizing: border-box;
+    padding: 20px;
+    margin-bottom: 40px;
+    border: 1px solid $verylight-grey;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
+
+    .legend-label {
+      font-family: 'Lato';
+    }
+
+    .legend-col {
+      width: 10px;
+      height: 10px;
+      margin-left: 40px;
+    }
+
+    .legend-label, .legend-col {
+      display: inline-block;
+    }
+  }
+
+  .data-table {
+    width: 80%;
+    margin: 0 auto;
+
+    .row {
+      box-sizing: border-box;
+      display: flex;
+      width: 100%;
+      padding: 26px;
+      font-size: 18px;
+      font-family: 'Lato', sans-serif;
+      border-bottom: 1px solid $verylight-grey;
+
+      .cell {
+        width: 35%;
+        text-align: center;
+      }
+
+      .metric-label {
+        width: 30%;
+        font-size: 11px;
+      }
+    }
+  }
+
+  svg {
+    .time-label {
+      font-family: 'Lato';
+      font-size: 11px;
+    }
+  }
+}

@@ -79,7 +79,6 @@ Conversation.prototype = {
 				if (formats[i].parse(date) !== null) {
 					error = false;
 					this.datetimeFormat = formats[i];
-					console.log('what')
 					break;
 				}
 				i++;
@@ -99,7 +98,7 @@ Conversation.prototype = {
 	},
 
 	getDateRange: function () {
-		return d3.time.day.range(this.date0, this.dateF);
+		return d3.time.day.range(this.date0, d3.time.day.offset(this.dateF, 1));
 	},
 
 	parseErrorHandler: function () {
@@ -236,6 +235,35 @@ Conversation.prototype = {
 		}
 	},
 
+	getCharactersByAuthorAndDay: function () {
+		var messages = this.getMessagesByAuthorAndDay();
+
+		var charsDayA = [],
+				charsDayB = [];
+
+		function getCharacters(day) {
+			var numChar = 0;
+			day.forEach(function (message) {
+				numChar += message.text.length;
+			});
+			return {
+				chars: numChar,
+				datetime: day[0].datetime
+			}
+		}
+
+		messages.authorA.forEach(function (day) {
+			charsDayA.push(getCharacters(day));
+		});
+		messages.authorB.forEach(function (day) {
+			charsDayB.push(getCharacters(day));
+		});
+		return {
+			authorA: charsDayA,
+			authorB: charsDayB
+		}
+	},
+
 	getMessageLengths: function () {
 		var lengths = [];
 		for (var i = 0; i < this.messages.length; i++) {
@@ -244,6 +272,57 @@ Conversation.prototype = {
 			}
 		}
 		return lengths;
+	},
+
+	getMessageWordCount: function () {
+		var countsA = [],
+				countsB = [];
+		for (var i = 0; i < this.messages.length; i++) {
+			var msg = this.messages[i]
+			if (msg.text.substr(0, 15) !== "<Media omitted>") {
+				if (msg.author === this.authorAName) {
+					countsA.push(msg.text.split(' ').length);
+				} else {
+					countsB.push(msg.text.split(' ').length);
+				}
+			}
+		}
+		// Sort response times
+		countsA.sort(function(a, b) {
+		  return a - b;
+		});
+		countsB.sort(function(a, b) {
+		  return a - b;
+		});
+
+		return {
+			authorA: countsA,
+			authorB: countsB
+		};
+	},
+
+	getMessageWordCountAverage: function () {
+		var counts = this.getMessageWordCount();
+		var avgA = 0,
+				avgB = 0;
+		counts.authorA.forEach(function (d) {
+			avgA += d;
+		});
+		counts.authorB.forEach(function (d) {
+			avgB += d;
+		});
+		return {
+			authorA: avgA / counts.authorA.length,
+			authorB: avgB / counts.authorB.length
+		};
+	},
+
+	getMessageWordCountMedian: function () {
+		var counts = this.getMessageWordCount();
+		return {
+			authorA: counts.authorA[Math.floor(counts.authorA.length/2)],
+			authorB: counts.authorB[Math.floor(counts.authorB.length/2)]
+		};
 	},
 
 	getMedianMessageLen: function () {
@@ -256,14 +335,12 @@ Conversation.prototype = {
 	},
 
 	getNumberOfMessagesByAuthor: function () {
-		var authorANum = 0,
-				authorBNum = 1;
-		for (var i = 0; i < this.messages.length; i++) {
-			if (this.messages[i].author === this.authors[0]) {
-				authorANum++;
-			} else {
-				authorBNum++;
-			}
+		var authorA = _.filter(this.messages, { author: this.authorAName }),
+				authorB = _.filter(this.messages, { author: this.authorBName });
+
+		return {
+			authorA: authorA.length,
+			authorB: authorB.length
 		}
 	},
 
@@ -294,13 +371,16 @@ Conversation.prototype = {
 		for (var i = 2; i < this.messages.length; i++) {
 			var responder = this.messages[i].author,
 					prompter = this.messages[i - 1].author;
+
 			if (responder !== prompter) {
 				var dateResp = this.messages[i].datetimeObj;
 				var dateOrig = this.messages[i - 1].datetimeObj;
+
 				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
+
 				if (responder === this.authorAName) {
 					authorAresps.push(diff);
-				} else {
+				} else if (responder === this.authorBName){
 					authorBresps.push(diff);
 				}
 			}
@@ -318,6 +398,55 @@ Conversation.prototype = {
 			authorA: authorAresps,
 			authorB: authorBresps
 		};
+	},
+
+	getResponseTimesByAuthorDay: function () {
+		var authorAresps = {},
+				authorBresps = {};
+
+		for (var i = 2; i < this.messages.length; i++) {
+			var responder = this.messages[i].author,
+					prompter = this.messages[i - 1].author;
+
+			var dayString = this.dayFormat(this.messages[i].datetimeObj);
+
+			if (responder !== prompter) {
+				var dateResp = this.messages[i].datetimeObj;
+				var dateOrig = this.messages[i - 1].datetimeObj;
+
+				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
+
+				if (diff < 60000 * 60 * 24) {
+					if (responder === this.authorAName) {
+						if (!(dayString in authorAresps)) {
+							authorAresps[dayString] = [];
+						}
+						authorAresps[dayString].push(diff);
+					} else if (responder === this.authorBName){
+						if (!(dayString in authorBresps)) {
+							authorBresps[dayString] = [];
+						}
+						authorBresps[dayString].push(diff);
+					}
+				}
+			}
+		}
+
+		function reduceResponseTimesPerDay(d, dayString) {
+			return {
+				responseTime: d.reduce(function(m, n) { return m + n; }) / d.length,
+				datetime: dayString
+			}
+		}
+
+		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
+		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
+
+		return {
+			authorA: authorArespsAvg,
+			authorB: authorBrespsAvg
+		};
+
 	}
 }
 

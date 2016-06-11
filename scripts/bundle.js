@@ -6,13 +6,17 @@
 
 var Viewer = require('./viewer.js');
 
-document.querySelector("#add-conversation").addEventListener('click', function () {
+/*document.querySelector("#add-conversation").addEventListener('click', function () {
   document.querySelector(".form-container").classList.toggle('hidden');
-});
+});*/
 
 document.querySelector("#render-button").addEventListener('click', function () {
     // This will trigger a rerender
     document.querySelector(".form-container").classList.add('hidden');
+    document.querySelector(".canvas").classList.remove('hidden');
+    window.setTimeout(function () {
+      document.querySelector(".form-container").classList.add('removed');
+    }, 1000);
 
     var authorA = 'AuthorA';
     var authorB = 'AuthorB';
@@ -110,7 +114,6 @@ Conversation.prototype = {
 				if (formats[i].parse(date) !== null) {
 					error = false;
 					this.datetimeFormat = formats[i];
-					console.log('what')
 					break;
 				}
 				i++;
@@ -130,7 +133,7 @@ Conversation.prototype = {
 	},
 
 	getDateRange: function () {
-		return d3.time.day.range(this.date0, this.dateF);
+		return d3.time.day.range(this.date0, d3.time.day.offset(this.dateF, 1));
 	},
 
 	parseErrorHandler: function () {
@@ -267,6 +270,35 @@ Conversation.prototype = {
 		}
 	},
 
+	getCharactersByAuthorAndDay: function () {
+		var messages = this.getMessagesByAuthorAndDay();
+
+		var charsDayA = [],
+				charsDayB = [];
+
+		function getCharacters(day) {
+			var numChar = 0;
+			day.forEach(function (message) {
+				numChar += message.text.length;
+			});
+			return {
+				chars: numChar,
+				datetime: day[0].datetime
+			}
+		}
+
+		messages.authorA.forEach(function (day) {
+			charsDayA.push(getCharacters(day));
+		});
+		messages.authorB.forEach(function (day) {
+			charsDayB.push(getCharacters(day));
+		});
+		return {
+			authorA: charsDayA,
+			authorB: charsDayB
+		}
+	},
+
 	getMessageLengths: function () {
 		var lengths = [];
 		for (var i = 0; i < this.messages.length; i++) {
@@ -275,6 +307,57 @@ Conversation.prototype = {
 			}
 		}
 		return lengths;
+	},
+
+	getMessageWordCount: function () {
+		var countsA = [],
+				countsB = [];
+		for (var i = 0; i < this.messages.length; i++) {
+			var msg = this.messages[i]
+			if (msg.text.substr(0, 15) !== "<Media omitted>") {
+				if (msg.author === this.authorAName) {
+					countsA.push(msg.text.split(' ').length);
+				} else {
+					countsB.push(msg.text.split(' ').length);
+				}
+			}
+		}
+		// Sort response times
+		countsA.sort(function(a, b) {
+		  return a - b;
+		});
+		countsB.sort(function(a, b) {
+		  return a - b;
+		});
+
+		return {
+			authorA: countsA,
+			authorB: countsB
+		};
+	},
+
+	getMessageWordCountAverage: function () {
+		var counts = this.getMessageWordCount();
+		var avgA = 0,
+				avgB = 0;
+		counts.authorA.forEach(function (d) {
+			avgA += d;
+		});
+		counts.authorB.forEach(function (d) {
+			avgB += d;
+		});
+		return {
+			authorA: avgA / counts.authorA.length,
+			authorB: avgB / counts.authorB.length
+		};
+	},
+
+	getMessageWordCountMedian: function () {
+		var counts = this.getMessageWordCount();
+		return {
+			authorA: counts.authorA[Math.floor(counts.authorA.length/2)],
+			authorB: counts.authorB[Math.floor(counts.authorB.length/2)]
+		};
 	},
 
 	getMedianMessageLen: function () {
@@ -287,14 +370,12 @@ Conversation.prototype = {
 	},
 
 	getNumberOfMessagesByAuthor: function () {
-		var authorANum = 0,
-				authorBNum = 1;
-		for (var i = 0; i < this.messages.length; i++) {
-			if (this.messages[i].author === this.authors[0]) {
-				authorANum++;
-			} else {
-				authorBNum++;
-			}
+		var authorA = _.filter(this.messages, { author: this.authorAName }),
+				authorB = _.filter(this.messages, { author: this.authorBName });
+
+		return {
+			authorA: authorA.length,
+			authorB: authorB.length
 		}
 	},
 
@@ -325,13 +406,16 @@ Conversation.prototype = {
 		for (var i = 2; i < this.messages.length; i++) {
 			var responder = this.messages[i].author,
 					prompter = this.messages[i - 1].author;
+
 			if (responder !== prompter) {
 				var dateResp = this.messages[i].datetimeObj;
 				var dateOrig = this.messages[i - 1].datetimeObj;
+
 				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
+
 				if (responder === this.authorAName) {
 					authorAresps.push(diff);
-				} else {
+				} else if (responder === this.authorBName){
 					authorBresps.push(diff);
 				}
 			}
@@ -349,6 +433,55 @@ Conversation.prototype = {
 			authorA: authorAresps,
 			authorB: authorBresps
 		};
+	},
+
+	getResponseTimesByAuthorDay: function () {
+		var authorAresps = {},
+				authorBresps = {};
+
+		for (var i = 2; i < this.messages.length; i++) {
+			var responder = this.messages[i].author,
+					prompter = this.messages[i - 1].author;
+
+			var dayString = this.dayFormat(this.messages[i].datetimeObj);
+
+			if (responder !== prompter) {
+				var dateResp = this.messages[i].datetimeObj;
+				var dateOrig = this.messages[i - 1].datetimeObj;
+
+				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
+
+				if (diff < 60000 * 60 * 24) {
+					if (responder === this.authorAName) {
+						if (!(dayString in authorAresps)) {
+							authorAresps[dayString] = [];
+						}
+						authorAresps[dayString].push(diff);
+					} else if (responder === this.authorBName){
+						if (!(dayString in authorBresps)) {
+							authorBresps[dayString] = [];
+						}
+						authorBresps[dayString].push(diff);
+					}
+				}
+			}
+		}
+
+		function reduceResponseTimesPerDay(d, dayString) {
+			return {
+				responseTime: d.reduce(function(m, n) { return m + n; }) / d.length,
+				datetime: dayString
+			}
+		}
+
+		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
+		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
+
+		return {
+			authorA: authorArespsAvg,
+			authorB: authorBrespsAvg
+		};
+
 	}
 }
 
@@ -362,188 +495,190 @@ var Conversation = require('./conversation.js');
 var pink = 'rgb(243, 38, 114)',
 		purple = 'rgb(71, 3, 166)';
 
-var w = (document.documentElement.clientWidth - 100) / 4,
-		h = (document.documentElement.clientHeight - 100) / 4,
-		smallH = 300,
-		hFactor = 1,
-		maxChar = 5000,
-		rW = 4;
+var w = document.querySelector(".page-wrap").offsetWidth - 40,
+		h = 400;
 
-var dayFormat = d3.time.format("%Y-%m-%d");
+var dayFormat = d3.time.format("%Y-%m-%d"),
+		labelFormat = d3.time.format("%b %d '%y");
 
 module.exports = {
 	init: function (whatsapp) {
 		this.data = whatsapp;
 		this.Convo = new Conversation(this.data);
 		this.messages = this.Convo.getMessages();
-		this.format();
-	},
-
-	format: function () {
-		var messages = this.messages;
-		var Convo = this.Convo;
-		var messagesInfo = Convo.getMessagesByAuthorAndDay();
-
-		this.authorA = messagesInfo.authorA;
-		this.authorB = messagesInfo.authorB;
 	},
 
 	spectrogram: function () {
-		var Convo = this.Convo;
+		var chars = this.Convo.getCharactersByAuthorAndDay();
 
-		d3.select('#graph svg').remove();
+		d3.select('#graph-viewer svg').remove();
 
-		var svg = d3.select('#graph-viewer').append('svg')
-								.attr('width', w * 4)
-								.attr('height', h * 2);
+		var svg = d3.select('#graph-viewer')
+								.append('svg')
+								.attr('width', w)
+								.attr('height', h);
 
 		var timeScale = d3.time.scale()
-											.domain([Convo.date0, Convo.dateF])
-											.range([0, w * 4]);
+											.domain([this.Convo.date0, this.Convo.dateF])
+											.range([0, w]);
+
+		var allChars = chars.authorA.concat(chars.authorB);
+		var maxChar = d3.max(allChars, function (d) {
+			return d.chars;
+		});
 
 		var charScale = d3.scale.linear()
 											.domain([0, maxChar])
-											.range([h, 0]);
-
-		function getCharacters(day) {
-			if (day) {
-				var numChar = 0;
-				day.forEach(function (message) {
-					numChar += message.text.length;
-				});
-				return numChar;
-			}
-		}
+											.range([h/2, 0]);
 
 		var lineFunction = d3.svg.area()
-			.x(function (d) { return timeScale(dayFormat.parse(d[0].datetime)); })
-			.y0(function (d) { return charScale(getCharacters(d)); })
+			.x(function (d) { return timeScale(dayFormat.parse(d.datetime)); })
+			.y0(function (d) { return charScale(d.chars); })
 			.y1(function (d) { return charScale(0); })
 			.interpolate("basis");
 
 		var lineFunction2 = d3.svg.area()
-			.x(function (d) { return timeScale(dayFormat.parse(d[0].datetime)); })
-			.y0(function (d) { return charScale(-getCharacters(d)) - 5; })
+			.x(function (d) { return timeScale(dayFormat.parse(d.datetime)); })
+			.y0(function (d) { return charScale(-d.chars); })
 			.y1(function (d) { return charScale(0); })
 			.interpolate("basis");
 
 		var lineA = svg.append("path")
-			.attr("d", lineFunction(this.authorA))
-			.attr("stroke", pink)
-			.attr("stroke-width", 0)
+			.attr("d", lineFunction(chars.authorA))
 			.attr("fill", pink);
 
 		var lineB = svg.append("path")
-			.attr("d", lineFunction2(this.authorB))
-			.attr("stroke", pink)
-			.attr("stroke-width", 0)
-			.attr("fill", pink);
+			.attr("d", lineFunction2(chars.authorB))
+			.attr("fill", purple);
+
+		// To highlight messages later on
+		this.spectrogram = {
+			svg: svg,
+			timeScale: timeScale,
+			charScale: charScale
+		}
+
+		svg.append("text")
+			.attr("class", "time-label")
+			.attr("x", 0)
+			.attr("y", h/4)
+			.text(labelFormat(this.Convo.date0));
+
+		svg.append("text")
+			.attr("class", "time-label")
+			.attr("x", timeScale(this.Convo.dateF))
+			.attr("y", h/4)
+			.style("text-anchor", "end")
+			.text(labelFormat(this.Convo.dateF));
 	},
 
-	lengthHistogram: function () {
-		var Convo = this.Convo;
+	authorsLegend: function (svg) {
+		document.querySelector("#author-A-col").style.background = pink;
+		document.querySelector("#author-B-col").style.background = purple;
+		document.querySelector("#author-A-leg-label").innerHTML = this.Convo.authorAName;
+		document.querySelector("#author-B-leg-label").innerHTML = this.Convo.authorBName;
+	},
 
-		d3.select('#widget-1 svg').remove();
+	// Flag days where those messages are sent
+	displaySomeMessages: function (messages) {
+		var svg = this.spectrogram.svg,
+				timeScale = this.spectrogram.timeScale,
+				charScale = this.spectrogram.charScale;
 
-		var svg = d3.select('#widget-1').append('svg')
-								.attr('width', w)
-								.attr('height', smallH);
-
-		var lengths = Convo.getMessageLengths();
-
-		var xScale = d3.scale.linear()
-							    .domain([0, 100])
-							    .range([0, w]);
-
-		var data = d3.layout.histogram()
-    						.bins(xScale.ticks(10))(lengths);
-
-		var yScale = d3.scale.linear()
-		    .domain([0, d3.max(data, function(d) { return d.y; })])
-		    .range([smallH - 20, 20]);
-
-				var bar = svg.selectAll(".bar")
-				    .data(data)
-				  .enter().append("g")
-				    .attr("class", "bar")
-				    .attr("transform", function(d) {
-							return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
-						});
-
-				bar.append("rect")
-				    .attr("x", 0)
-				    .attr("width", xScale(data[0].dx) - 2)
-				    .attr("height", function(d) { return (smallH - 20) - yScale(d.y); })
-						.style("fill", pink)
-						.style("border-radius", "3px");
+		if (svg) {
+			svg.selectAll('.selected-msg').remove();
+			svg.selectAll('.selected-msg')
+				.data(messages)
+				.enter().append('circle')
+				.attr('class', 'selected-msg')
+				.attr('cx', function (d) {
+					return timeScale(dayFormat.parse(d.datetime)); })
+				.attr('cy', 10)
+				.attr('r', 5)
+				.style('fill', purple);
+		}
 	},
 
 	responseTimes() {
 		var resps = this.Convo.getResponseTimes();
-		console.log(resps,
-			resps.authorA[Math.floor(resps.authorA.length/2)],
-			resps.authorB[Math.floor(resps.authorB.length/2)]);
+		var respsDay = this.Convo.getResponseTimesByAuthorDay();
 
-			var quartiles = d3.scale.quantile()
-				.range([0, 1, 2, 3, 4, 5]);
+		d3.select('#widget-3 svg').remove();
 
-		console.log(quartiles.domain(resps.authorA).quantiles());
-		console.log(quartiles.domain(resps.authorB).quantiles());
+		var h = 140;
 
-
-		d3.select('#widget-2 svg').remove();
-
-		var svg = d3.select('#widge2-1').append('svg')
+		var svg = d3.select('#widget-3').append('svg')
 								.attr('width', w)
-								.attr('height', smallH);
+								.attr('height', h);
 
-		var xScale = d3.scale.linear()
-							    .domain([0, 180000])
-							    .range([0, w]);
-
-		var data = d3.layout.histogram()
-    						.bins(xScale.ticks(10))(resps.authorA);
+		var timeScale = d3.time.scale()
+											.domain([d3.time.day.offset(this.Convo.date0, 1), this.Convo.dateF])
+											.range([0, w]);
 
 		var yScale = d3.scale.linear()
-		    .domain([0, d3.max(data, function(d) { return d.y; })])
-		    .range([smallH - 20, 20]);
+											.domain([0, 100000000])
+											.range([100, 0]);
 
-				var bar = svg.selectAll(".bar")
-				    .data(data)
-				  .enter().append("g")
-				    .attr("class", "bar")
-				    .attr("transform", function(d) {
-							return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")";
-						});
+		var linefunction = d3.svg.line()
+		    .x(function(d) {
+					return timeScale(dayFormat.parse(d.datetime));
+				})
+		    .y(function(d) {
+					return yScale(d.responseTime);
+				})
+				.interpolate("step-before");
 
-				bar.append("rect")
-				    .attr("x", 0)
-				    .attr("width", xScale(data[0].dx) - 2)
-				    .attr("height", function(d) { return (smallH - 20) - yScale(d.y); })
-						.style("fill", pink)
-						.style("border-radius", "3px");
+		svg.append("path")
+		      .datum(respsDay.authorA)
+		      .attr("class", "lineA respLine")
+		      .attr("d", linefunction)
+					.style("stroke", pink);
+
+		svg.append("path")
+		      .datum(respsDay.authorB)
+		      .attr("class", "lineB respLine")
+		      .attr("d", linefunction)
+					.style("stroke", purple)
+
+		d3.selectAll(".respLine")
+					.style("fill", "none")
+					.style("stroke-width", "2px");
+
+		svg.append("text")
+			.attr("class", "time-label")
+			.attr("x", 0)
+			.attr("y", h/4)
+			.text(labelFormat(this.Convo.date0));
+
+		svg.append("text")
+			.attr("class", "time-label")
+			.attr("x", timeScale(this.Convo.dateF))
+			.attr("y", h/4)
+			.style("text-anchor", "end")
+			.text(labelFormat(this.Convo.dateF));
 
 	},
 
 	timeofDay: function () {
 		var messageTimes = this.Convo.getMessageTimes();
 
-		d3.select('#widget-3 svg').remove();
+		d3.select('#widget-2 svg').remove();
 
-		var svg = d3.select('#widget-3').append('svg')
-								.attr('width', w * 4)
-								.attr('height', h);
+		var svg = d3.select('#widget-2').append('svg')
+								.attr('width', w)
+								.attr('height', 140);
 
-		var xScale = d3.scale.linear()
-									.domain([0, 24])
-									.range([0, w * 4]);
+		var r = 20;
+
+		var maxA = d3.max(messageTimes.authorATimes),
+				maxB = d3.max(messageTimes.authorBTimes);
 
 		var rScale = d3.scale.pow().exponent(.5)
-									.domain([0, d3.max(messageTimes.authorATimes)])
-									.range([0, (w * 4) / 25]);
+									.domain([0, maxA])
+									.range([1, 15]);
 
 		var cScale = d3.scale.pow().exponent(.5)
-									.domain([0, d3.max(messageTimes.authorBTimes)])
+									.domain([0, maxB])
 									.range([.2, .6]);
 
 		var bubbleA = svg.selectAll(".bubbleA")
@@ -551,39 +686,121 @@ module.exports = {
 				.enter().append("g")
 				.attr("class", "bubbleA bubble")
 				.attr("transform", function(d, i) {
-					return "translate(" + xScale(i) + ",0)";
+					return "translate(" + (20 + i * 30) + "," + (35) + ")";
 				});
 
 		bubbleA.append("circle")
 			.attr("r", function (d) { return rScale(d); })
 			.attr("cx", 0)
-			.attr("cy", 30)
-			.style("fill", function (d) { return d3.hsl(338, .95, cScale(d)).toString(); });
+			.attr("cy", 0)
+			.style("fill", function (d) {
+				return d3.hsl(338, .95, cScale(d)).toString();
+			});
 
 		var bubbleB = svg.selectAll(".bubbleB")
 			.data(messageTimes.authorBTimes)
 			.enter().append("g")
 			.attr("class", "bubbleB bubble")
 			.attr("transform", function(d, i) {
-				return "translate(" + xScale(i) + ", 100)";
+				return "translate(" + (20 + i * 30) + "," + (85) + ")";
 			});
 
 		bubbleB.append("circle")
 			.attr("r", function (d) { return rScale(d); })
 			.attr("cx", 0)
-			.attr("cy", 30)
-			.style("fill", function (d) { return d3.hsl(338, .95, cScale(d)).toString(); })
-			.style("stroke-width", 1)
-			.style("opacity", .85)
-			.style("stroke", "#fff");
+			.attr("cy", 0)
+			.style("fill", function (d) {
+				return d3.hsl(265, .97, cScale(d)).toString();
+			});
+
+		svg.selectAll(".time-labels")
+			.data(new Array(24))
+			.enter().append("text")
+			.attr("class", "time-label")
+			.attr("x", function (d, i) { return 20 + i * 30; })
+			.attr("y", 65)
+			.style("text-anchor", "middle")
+			.text(function (d, i) { return i + "h"; })
+	},
+
+	/*
+	*
+	* Get data from conversation and fill table
+	*
+	*/
+
+	fillDataTable: function () {
+		// Word count
+		var counts = this.wordCount();
+		document.querySelector("#word-count-A").innerHTML = counts.authorA.toFixed(2);
+		document.querySelector("#word-count-B").innerHTML = counts.authorB.toFixed(2);
+
+		// Number of messages
+		var messages = this.numberOfMessages();
+		document.querySelector("#message-num-A").innerHTML = messages.authorA;
+		document.querySelector("#message-num-B").innerHTML = messages.authorB;
+
+		// Authors
+		document.querySelector("#author-A").innerHTML = this.Convo.authorAName;
+		document.querySelector("#author-B").innerHTML = this.Convo.authorBName;
+	},
+
+	numberOfMessages: function () {
+		return this.Convo.getNumberOfMessagesByAuthor();
+	},
+
+	wordCount: function () {
+		return this.Convo.getMessageWordCountAverage();
+	},
+
+	/*
+	Events on the dashboard
+	*/
+
+	addEvents: function () {
+		var searchForm = document.getElementById("search-form");
+		searchForm.addEventListener('submit', function (e) {
+			e.preventDefault();
+		});
+
+		var searchBox = document.getElementById("search-box");
+		searchBox.addEventListener('keypress', searchText.bind(this, searchBox, 'a'));
 	},
 
 	render: function () {
+		this.authorsLegend();
 		this.spectrogram();
-		this.lengthHistogram();
-		this.responseTimes();
+		this.fillDataTable();
 		this.timeofDay();
+		this.responseTimes();
+		this.addEvents();
 	}
+}
+
+/*
+*
+* Other utility function
+*
+*/
+
+function searchText (searchBox, a, e) {
+	var messages = this.messages;
+
+	if(e.keyCode === 13){
+		var toDisplay = [];
+		var valueRE = new RegExp("(" + searchBox.value + ")");
+
+		for (var i = 0; i < messages.length; i++) {
+			if (messages[i].text.search(valueRE) !== -1) {
+				toDisplay.push(messages[i]);
+			};
+		}
+
+		if (toDisplay.length > 0) {
+			this.displaySomeMessages(toDisplay);
+		}
+	}
+	return false;
 }
 
 },{"./conversation.js":2}]},{},[1]);
