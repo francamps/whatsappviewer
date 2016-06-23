@@ -1,6 +1,9 @@
 $wapp-green: rgb(97, 210, 106);
 $mess-green: rgb(220, 248, 198);
+$dark-green: rgb(0, 134, 117);
+$wapp-blue: rgb(218, 240, 250);
 
+$dark-grey: #232323;
 $mid-grey: #575859;
 $lightish-grey: #c0c0c0;
 $verylight-grey: #efefef;
@@ -21,7 +24,7 @@ body {
   bottom: 0;
 
   background: $verylight-grey;
-  background-image: url('index.png');
+  background-image: url('background.png');
   background-repeat: repeat;
   background-size: 366.5px 666px;
 
@@ -32,12 +35,7 @@ body {
   line-height: 20px;
 
   @media (min-width: 900px) {
-    font-size: 16px;
-    line-height: 25px;
-  }
-
-  .page {
-    background: rgba(237, 233, 228, .9);
+    line-height: 22px;
   }
 }
 
@@ -61,10 +59,10 @@ h1 {
 h2 {
   font-size: 22px;
   font-weight: lighter;
+}
 
-  @media (min-width: 900px) {
-    font-size: 30px;
-  }
+h3 {
+  font-weight: lighter;
 }
 
 header {
@@ -72,14 +70,14 @@ header {
   font-family: 'Roboto', sans-serif;
   font-size: 18px;
   font-weight: bold;
-  background: rgb(44, 181, 63);
-  background: linear-gradient(-30deg, $electric-green, $skyblue);
+  background: $dark-green;
   color: white;
   box-shadow: 0px 3px 5px #dddddd;
 
   a {
     margin: 20px;
     height: 20px;
+    line-height: 20px;
     float: left;
     background: none;
     border-radius: 3px;
@@ -95,7 +93,7 @@ header {
     }
 
     &:hover {
-      color: $skyblue;
+      color: $dark-green;
       background: $white;
     }
   }
@@ -104,6 +102,7 @@ header {
 .page-wrap {
   width: 100%;
   box-sizing: border-box;
+  min-height: 100%;
   margin: 0 auto;
 
   @media (min-width: 900px) {
@@ -111,12 +110,30 @@ header {
       padding: 0;
   }
 
+  .widget-title {
+    margin-bottom: 20px;
+    text-align:center;
+
+    p {
+      background: $wapp-blue;
+      border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+      box-shadow: 0px 5px 5px -7px rgba(0,0,0,.75);
+      border-radius: 10px;
+      width: 150px;
+      margin: 0 auto;
+      text-transform: uppercase;
+      font-size: 14px;
+      padding: 5px;
+      font-weight: lighter;
+    }
+  }
+
   .widget {
     background: $white;
     box-sizing: border-box;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 4px 4px 6px -8px rgba(0,0,0,.75);
+    box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
     min-height: 240px;
     border: 1px solid;
     border-color: #e5e6e9 #dfe0e4 #d0d1d5;
@@ -197,7 +214,6 @@ form {
     font-size: 16px;
     color: $mid-grey;
     line-height: 18px;
-    letter-spacing: .07em;
   }
 
   textarea {
@@ -241,28 +257,25 @@ button {
   z-index: 0;
   box-sizing: border-box;
   width: 100%;
-  height: 100%;
   padding: 20px 20px 0 20px;
 
   &.hidden {
     display: none;
   }
 
-  .dashboard-title {
-  }
-
   .legend {
     text-align: center;
     background: $white;
     box-sizing: border-box;
-    padding: 20px;
-    margin-bottom: 40px;
+    padding: 10px;
     border: 1px solid $verylight-grey;
     border-radius: 10px;
     box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
+    min-height: 40px;
 
     .legend-label {
       font-family: 'Roboto';
+      text-transform: uppercase;
     }
 
     .legend-col {
@@ -282,15 +295,24 @@ button {
 
   .data-table {
     margin: 0 auto;
+    margin-bottom: 40px;
+    padding: 0;
+
+    @media (min-width: 900px) {
+      padding: 0 30px;
+    }
 
     .row {
       box-sizing: border-box;
       display: flex;
       width: 100%;
       padding: 26px;
-      font-size: 18px;
       font-family: 'Roboto', sans-serif;
-      border-bottom: 1px solid $verylight-grey;
+      border-bottom: 1px solid $lightish-grey;
+
+      &:first-child {
+        color: $dark-grey;
+      }
 
       .cell {
         width: 35%;
@@ -299,7 +321,6 @@ button {
 
       .metric-label {
         width: 30%;
-        font-size: 11px;
       }
     }
   }
@@ -308,6 +329,24 @@ button {
     .time-label {
       font-family: 'Roboto';
       font-size: 11px;
+    }
+  }
+}
+
+footer {
+  background: linear-gradient(-30deg, $electric-green, $skyblue);
+  color: white;
+  box-shadow: 0px -3px 5px #dddddd;
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 60px;
+
+  a {
+    text-decoration: none;
+    color: $white;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 }

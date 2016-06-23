@@ -148,6 +148,9 @@ Conversation.prototype = {
 			}
 			// Date limits
 			this.calculateDateLimits();
+
+			// Flag success
+			this.isParsed = true;
 		}
 	},
 

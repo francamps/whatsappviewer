@@ -28,7 +28,10 @@ module.exports = {
 	init: function (whatsapp) {
 		this.data = whatsapp;
 		this.Convo = new Conversation(this.data);
-		this.messages = this.Convo.getMessages();
+		if (this.Convo.isParsed) {
+			this.messages = this.Convo.getMessages();
+			return true;
+		}
 	},
 
 	// Get authors names from Conversation and display a legend

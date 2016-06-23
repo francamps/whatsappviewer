@@ -10,14 +10,18 @@ var Viewer = require('./viewer.js');
   document.querySelector(".form-container").classList.toggle('hidden');
 });*/
 
-document.querySelector("#render-button").addEventListener('click', function () {
-    // This will trigger a rerender
-    document.querySelector(".form-container").classList.add('hidden');
-    document.querySelector(".canvas").classList.remove('hidden');
-    window.setTimeout(function () {
-      document.querySelector(".form-container").classList.add('removed');
-    }, 1000);
+function switchState() {
+  // This will trigger a rerender
+  document.querySelector(".form-container").classList.add('hidden');
 
+  window.setTimeout(function () {
+    document.querySelector(".form-container").classList.add('removed');
+    document.querySelector(".canvas").classList.remove('hidden');
+    document.body.scrollTop = 0;
+  }, 1000);
+}
+
+document.querySelector("#render-button").addEventListener('click', function () {
     var authorA = 'AuthorA';
     var authorB = 'AuthorB';
     var text = document.querySelector('#text').value || '';
@@ -28,8 +32,11 @@ document.querySelector("#render-button").addEventListener('click', function () {
       text: text
     }
 
-    Viewer.init(whatsapp);
-    Viewer.render();
+    var isParsed = Viewer.init(whatsapp);
+    if (isParsed) {
+      Viewer.render();
+      switchState();
+    }
 });
 
 },{"./viewer.js":3}],2:[function(require,module,exports){
@@ -183,6 +190,9 @@ Conversation.prototype = {
 			}
 			// Date limits
 			this.calculateDateLimits();
+
+			// Flag success
+			this.isParsed = true;
 		}
 	},
 
@@ -518,7 +528,10 @@ module.exports = {
 	init: function (whatsapp) {
 		this.data = whatsapp;
 		this.Convo = new Conversation(this.data);
-		this.messages = this.Convo.getMessages();
+		if (this.Convo.isParsed) {
+			this.messages = this.Convo.getMessages();
+			return true;
+		}
 	},
 
 	// Get authors names from Conversation and display a legend
