@@ -499,7 +499,7 @@ var timeofDay = require('./views/time-of-day.js');
 var pink = 'rgb(243, 38, 114)',
 		purple = 'rgb(71, 3, 166)';
 
-var w = document.querySelector(".page-wrap").offsetWidth - 40,
+var w = document.querySelector(".page-wrap").offsetWidth - 80,
 		h = 400;
 
 var dayFormat = d3.time.format("%Y-%m-%d"),
@@ -652,13 +652,13 @@ module.exports = {
   	svg.append("text")
   		.attr("class", "time-label")
   		.attr("x", 0)
-  		.attr("y", h/4)
+  		.attr("y", 3 * h / 4 + 30)
   		.text(labelFormat(Convo.date0));
 
   	svg.append("text")
   		.attr("class", "time-label")
   		.attr("x", timeScale(Convo.dateF))
-  		.attr("y", h/4)
+  		.attr("y", 3 * h / 4 + 30)
   		.style("text-anchor", "end")
   		.text(labelFormat(Convo.dateF));
   }
@@ -781,8 +781,7 @@ module.exports = {
 	},
 
   searchText: function (searchBox, messages, e) {
-    console.log(e);
-    if(e.keyCode === 13){
+    if(e.keyCode === 13 && searchBox.value.length > 0){
       var toDisplay = [];
       var valueRE = new RegExp("(" + searchBox.value + ")");
 
@@ -792,9 +791,9 @@ module.exports = {
       	};
       }
 
-      if (toDisplay.length > 0) {
+      //if (toDisplay.length > 0) {
       	this.displaySomeMessages(toDisplay);
-      }
+      //}
       document.getElementById("search-box").blur()
     }
     return false;
@@ -871,10 +870,17 @@ module.exports = {
       .data(new Array(24))
       .enter().append("text")
       .attr("class", "time-label")
-      .attr("x", function (d, i) { return 20 + i * 30; })
+      .attr("x", function (d, i) {
+          return (margin + i * hourStep);
+      })
       .attr("y", 65)
       .style("text-anchor", "middle")
-      .text(function (d, i) { return i + "h"; })
+      .text(function (d, i) {
+        if (w > 600 || (i % 2 === 0)) {
+          return i + "h";
+        }
+        return "";
+      });
   }
 }
 

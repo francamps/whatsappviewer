@@ -8,95 +8,98 @@
 	<script src="resources/lodash.min.js"></script-->
 	<link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
-	<header>
-		<a href="./index.html">WhatsApp Conversation Explorer</a>
-	</header>
-	<div class="page-wrap">
-		<div id="form-container" class="form-container">
-			<h1>Explore and analyze your conversations</h1>
-			<div class="instructions widget">
-				<h2>How to use this</h2>
-				<p>To use this dashboard, you'll have to use your own whatsapp
-				app to email the conversation you'd like to explore to yourself.</p>
-				<ol>
-					<li>Open your Whatsapp and enter the conversation you'd like to explore.</li>
-					<li>On the top right, tap on the settings icon (a three-dot icon)
-						on the corner corner. </li>
-					<li>Tap on 'More', and then 'Email conversation'.</li>
-					<li>Write the email address you'd like to receive your file on
-						(such as your own email). Shortly	after, you will receive an email
-						with a *.txt attached. </li>
-					<li>Open that file and paste in the following form to start. </li>
-				</ol>
+	<div class="page">
+		<header>
+			<a href="./index.html">WhatsApp Conversation Explorer</a>
+		</header>
+		<div class="page-wrap">
+			<div id="form-container" class="form-container">
+				<h1>Explore and analyze your conversations</h1>
+				<div class="instructions widget">
+					<h2>How to use this</h2>
+					<p>To use this dashboard, you'll have to use your own whatsapp
+					app to email the conversation you'd like to explore to yourself.</p>
+					<ol>
+						<li>Open your Whatsapp and enter the conversation you'd like to explore.</li>
+						<li>On the top right, tap on the settings icon (a three-dot icon)
+							on the corner corner. </li>
+						<li>Tap on 'More', and then 'Email conversation'.</li>
+						<li>Write the email address you'd like to receive your file on
+							(such as your own email). Shortly	after, you will receive an email
+							with a *.txt attached. </li>
+						<li>Open that file and paste in the following form to start. </li>
+					</ol>
 
-				<p>And don't worry, your conversation won't even hit the server.
-					Everything happens in the frontend, so nothing to worry about privacy.</p>
-				<p></p>
-				<p></p>
-			</div>
-			<div class="widget">
-				<form id="form" class="form">
-					<label>
-						Paste your conversation text here:
-						<textarea id="text" type="text" rows="6" placeholder="Conversation text"></textarea>
-					</label>
-				</form>
-				<button id="render-button">Render</button>
-			</div>
-		</div>
-
-
-		<div id="canvas" class="canvas hidden">
-			<div id="dashboard-title" class="dashboard-title">
-				<h2>Your conversation</h2>
-			</div>
-			<div id="legend" class="legend">
-				<div id="author-A-col" class="legend-col"></div>
-				<div id="author-A-leg-label" class="legend-label">unknown</div>
-				<div id="author-B-col" class="legend-col"></div>
-				<div id="author-B-leg-label" class="legend-label">unknown</div>
-			</div>
-			<div class="widget">
-				<h3>Volume of messages over time</h3>
-				<div id="graph-viewer" class="graph-widget"></div>
-				<form id="search-form" class="form">
-					<input id="search-box" type="text" placeholder="Search"></input>
-				</form>
-			</div>
-			<div class="widget">
-				<h3>Additional metrics</h3>
-				<div class="data-table">
-					<div class="row">
-						<div id="author-A" class="cell"></div>
-						<div class="cell metric-label">Author</div>
-						<div id="author-B" class="cell"></div>
-					</div>
-					<div class="row">
-						<div id="word-count-A" class="cell">-</div>
-						<div class="cell metric-label">Words per message (avg)</div>
-						<div id="word-count-B" class="cell">-</div>
-					</div>
-					<div class="row">
-						<div id="message-num-A" class="cell">-</div>
-						<div class="cell metric-label">Number of messages</div>
-						<div id="message-num-B" class="cell">-fdfsd</div>
-					</div>
+					<p>And don't worry, your conversation won't even hit the server.
+						Everything happens in the frontend, so nothing to worry about privacy.</p>
+					<p></p>
+					<p></p>
+				</div>
+				<div class="widget">
+					<form id="form" class="form">
+						<label>
+							Paste your conversation text here:
+							<textarea id="text" type="text" rows="6" placeholder="Insert text"></textarea>
+						</label>
+					</form>
+					<button id="render-button">Render</button>
 				</div>
 			</div>
-			<div id="widget-2" class="widget">
-				<h3>Volume of messages per hour of day</h3>
-				<div></div>
-			</div>
-			<div id="widget-3" class="widget">
-				<h3>Average response time per day</h3>
+
+
+			<div id="canvas" class="canvas hidden">
+				<div id="dashboard-title" class="dashboard-title">
+					<h2>Your conversation</h2>
+				</div>
+				<div id="legend" class="legend">
+					<div id="author-A-col" class="legend-col"></div>
+					<div id="author-A-leg-label" class="legend-label">unknown</div>
+					<div id="author-B-col" class="legend-col"></div>
+					<div id="author-B-leg-label" class="legend-label">unknown</div>
+				</div>
+				<div class="widget">
+					<h3>Volume of messages over time</h3>
+					<div id="graph-viewer" class="graph-widget"></div>
+					<form id="search-form" class="form">
+						<input id="search-box" type="text" placeholder="Search"></input>
+					</form>
+				</div>
+				<div class="widget">
+					<h3>Additional metrics</h3>
+					<div class="data-table">
+						<div class="row">
+							<div id="author-A" class="cell"></div>
+							<div class="cell metric-label">Author</div>
+							<div id="author-B" class="cell"></div>
+						</div>
+						<div class="row">
+							<div id="word-count-A" class="cell">-</div>
+							<div class="cell metric-label">Words per message (avg)</div>
+							<div id="word-count-B" class="cell">-</div>
+						</div>
+						<div class="row">
+							<div id="message-num-A" class="cell">-</div>
+							<div class="cell metric-label">Number of messages</div>
+							<div id="message-num-B" class="cell">-fdfsd</div>
+						</div>
+					</div>
+				</div>
+				<div id="widget-2" class="widget">
+					<h3>Volume of messages per hour of day</h3>
+					<div></div>
+				</div>
+				<div id="widget-3" class="widget">
+					<h3>Average response time per day</h3>
+				</div>
 			</div>
 		</div>
 	</div>
 	<script type="text/javascript" src="./scripts/bundle.js"></script>
-	</body>
+</body>
 
 </html>

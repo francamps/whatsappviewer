@@ -55,13 +55,13 @@ module.exports = {
   	svg.append("text")
   		.attr("class", "time-label")
   		.attr("x", 0)
-  		.attr("y", h/4)
+  		.attr("y", 3 * h / 4 + 30)
   		.text(labelFormat(Convo.date0));
 
   	svg.append("text")
   		.attr("class", "time-label")
   		.attr("x", timeScale(Convo.dateF))
-  		.attr("y", h/4)
+  		.attr("y", 3 * h / 4 + 30)
   		.style("text-anchor", "end")
   		.text(labelFormat(Convo.dateF));
   }

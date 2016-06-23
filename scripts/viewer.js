@@ -9,7 +9,7 @@ var timeofDay = require('./views/time-of-day.js');
 var pink = 'rgb(243, 38, 114)',
 		purple = 'rgb(71, 3, 166)';
 
-var w = document.querySelector(".page-wrap").offsetWidth - 40,
+var w = document.querySelector(".page-wrap").offsetWidth - 80,
 		h = 400;
 
 var dayFormat = d3.time.format("%Y-%m-%d"),

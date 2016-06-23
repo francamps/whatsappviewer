@@ -67,9 +67,16 @@ module.exports = {
       .data(new Array(24))
       .enter().append("text")
       .attr("class", "time-label")
-      .attr("x", function (d, i) { return 20 + i * 30; })
+      .attr("x", function (d, i) {
+          return (margin + i * hourStep);
+      })
       .attr("y", 65)
       .style("text-anchor", "middle")
-      .text(function (d, i) { return i + "h"; })
+      .text(function (d, i) {
+        if (w > 600 || (i % 2 === 0)) {
+          return i + "h";
+        }
+        return "";
+      });
   }
 }

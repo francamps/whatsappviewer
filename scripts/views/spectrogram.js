@@ -114,8 +114,7 @@ module.exports = {
 	},
 
   searchText: function (searchBox, messages, e) {
-    console.log(e);
-    if(e.keyCode === 13){
+    if(e.keyCode === 13 && searchBox.value.length > 0){
       var toDisplay = [];
       var valueRE = new RegExp("(" + searchBox.value + ")");
 
@@ -125,9 +124,9 @@ module.exports = {
       	};
       }
 
-      if (toDisplay.length > 0) {
+      //if (toDisplay.length > 0) {
       	this.displaySomeMessages(toDisplay);
-      }
+      //}
       document.getElementById("search-box").blur()
     }
     return false;

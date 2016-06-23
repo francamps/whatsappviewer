@@ -1,20 +1,51 @@
 body {
+  position: absolute;
+  overflow: auto;
+  width: 100%;
   padding: 0;
   margin: 0;
+  top: 0;
+  bottom: 0;
   background: #efefef;
+  background-image: url("index.png");
+  background-repeat: repeat;
+  background-size: 366.5px 666px;
   color: #575859;
-  font-size: 16px; }
+  font-family: 'Roboto';
+  font-size: 14px;
+  font-kerning: auto;
+  line-height: 20px; }
+  @media (min-width: 900px) {
+    body {
+      font-size: 16px;
+      line-height: 25px; } }
+  body .page {
+    background: rgba(237, 233, 228, 0.9); }
 
 h1, h2, h3 {
-  font-family: 'Merriweather'; }
+  margin-top: 0;
+  line-height: 1.2em; }
+
+h1 {
+  font-size: 24px;
+  text-align: center;
+  text-transform: capitalize; }
+  @media (min-width: 900px) {
+    h1 {
+      font-size: 30px;
+      margin-top: 20px;
+      margin-bottom: 30px; } }
 
 h2 {
-  font-size: 30px;
-  text-align: center; }
+  font-size: 22px;
+  font-weight: lighter; }
+  @media (min-width: 900px) {
+    h2 {
+      font-size: 30px; } }
 
 header {
   height: 84px;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 18px;
   font-weight: bold;
   background: #2cb53f;
@@ -29,7 +60,7 @@ header {
     border-radius: 3px;
     border: 2px solid #fff;
     text-decoration: none;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Roboto', sans-serif;
     padding: 10px;
     cursor: pointer;
     color: white; }
@@ -41,7 +72,6 @@ header {
 
 .page-wrap {
   width: 100%;
-  padding: 20px;
   box-sizing: border-box;
   margin: 0 auto; }
   @media (min-width: 900px) {
@@ -57,7 +87,8 @@ header {
     min-height: 240px;
     border: 1px solid;
     border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-    border-radius: 10px; }
+    border-radius: 10px;
+    overflow: auto; }
     .page-wrap .widget::after {
       position: relative;
       float: right;
@@ -74,15 +105,16 @@ header {
         content: url("../bubbletic.png");
         float: left;
         margin-left: -40px; }
+    .page-wrap .widget button {
+      float: right; }
   .page-wrap .form-container {
     height: 100%;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 0 20px;
+    padding: 20px 20px 0 20px;
     transition: width 2s, padding 2s;
     top: 80px;
-    padding-top: 20px;
     opacity: 1;
     transition: opacity .3s ease-in-out; }
     .page-wrap .form-container.hidden {
@@ -91,13 +123,11 @@ header {
     .page-wrap .form-container.removed {
       display: none; }
     .page-wrap .form-container .instructions {
-      font-family: 'Merriweather';
       color: #575859;
       line-height: 25px; }
 
 form label {
-  color: #575859;
-  font-family: 'Merriweather', sans-serif; }
+  color: #575859; }
 
 form input {
   width: 100%;
@@ -106,7 +136,7 @@ form input {
   border: 1px solid #efefef;
   padding: 10px;
   margin: 20px 0 0 0;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
   color: #575859;
   line-height: 18px;
@@ -119,11 +149,10 @@ form textarea {
   border: 1px solid #efefef;
   padding: 10px;
   margin: 10px 0;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
   color: #575859;
-  line-height: 18px;
-  letter-spacing: .07em; }
+  line-height: 18px; }
 
 form input:focus, form textarea:focus {
   border-color: #61d26a;
@@ -131,7 +160,7 @@ form input:focus, form textarea:focus {
 
 button {
   text-decoration: none;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Roboto', sans-serif;
   padding: 10px;
   border-radius: 3px;
   border: 1px solid #61d26a;
@@ -146,8 +175,10 @@ button {
 
 .canvas {
   z-index: 0;
+  box-sizing: border-box;
   width: 100%;
-  height: 100%; }
+  height: 100%;
+  padding: 20px 20px 0 20px; }
   .canvas.hidden {
     display: none; }
   .canvas .legend {
@@ -160,15 +191,16 @@ button {
     border-radius: 10px;
     box-shadow: 0px 4px 10px -8px rgba(0, 0, 0, 0.75); }
     .canvas .legend .legend-label {
-      font-family: 'Lato'; }
+      font-family: 'Roboto'; }
     .canvas .legend .legend-col {
       width: 10px;
       height: 10px;
       margin-left: 40px; }
+      .canvas .legend .legend-col:first-child {
+        margin-left: 0; }
     .canvas .legend .legend-label, .canvas .legend .legend-col {
       display: inline-block; }
   .canvas .data-table {
-    width: 80%;
     margin: 0 auto; }
     .canvas .data-table .row {
       box-sizing: border-box;
@@ -176,7 +208,7 @@ button {
       width: 100%;
       padding: 26px;
       font-size: 18px;
-      font-family: 'Lato', sans-serif;
+      font-family: 'Roboto', sans-serif;
       border-bottom: 1px solid #efefef; }
       .canvas .data-table .row .cell {
         width: 35%;
@@ -185,5 +217,5 @@ button {
         width: 30%;
         font-size: 11px; }
   .canvas svg .time-label {
-    font-family: 'Lato';
+    font-family: 'Roboto';
     font-size: 11px; }
