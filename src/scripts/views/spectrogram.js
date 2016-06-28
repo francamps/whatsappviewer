@@ -66,19 +66,19 @@ module.exports = {
       .style("text-anchor", "end")
       .text(labelFormat(Convo.dateF));
 
-    svg.append("rect")
-      .attr("class", "dot")
-      .attr("x", marginH)
-  		.attr("y", h / 4 + 10)
-      .attr("height", 50)
-      .attr("width", "1px");
+      svg.append("line")
+        .attr("class", "tick")
+        .attr("x1", marginH)
+        .attr("y1", h / 4 + 10)
+        .attr("x2", marginH)
+        .attr("y2", h / 4 + 60);
 
-    svg.append("rect")
-      .attr("class", "dot")
-      .attr("x", timeScale(Convo.dateF))
-      .attr("y", h / 4 + 10)
-      .attr("height", 50)
-      .attr("width", "1px");
+    svg.append("line")
+      .attr("class", "tick")
+      .attr("x1", timeScale(Convo.dateF))
+      .attr("y1", h / 4 + 10)
+      .attr("x2", timeScale(Convo.dateF))
+      .attr("y2", h / 4 + 60);
 
     // To highlight messages later on
     this.svg = svg;
@@ -88,15 +88,18 @@ module.exports = {
 
   // Flag days where those messages are sent
 	displaySomeMessages: function (messages) {
-		var svg = this.svg,
+    var svg = this.svg,
 				timeScale = this.timeScale,
 				charScale = this.charScale,
         dayFormat = this.args.options.dayFormat,
         purple = this.args.options.purple,
-        h = this.args.options.h,
-        date0 = dayFormat.parse(messages[0].datetime),
-        date1 = d3.time.day.offset(date0, 1),
-        w = timeScale(date1) - timeScale(date0);
+        h = this.args.options.h;
+
+    if (messages.length > 0) {
+      var date0 = dayFormat.parse(messages[0].datetime),
+          date1 = d3.time.day.offset(date0, 1),
+          w = timeScale(date1) - timeScale(date0);
+    }
 
 		if (svg) {
 			svg.selectAll('.selected-msg').remove();
@@ -140,9 +143,7 @@ module.exports = {
       	};
       }
 
-      //if (toDisplay.length > 0) {
-      	this.displaySomeMessages(toDisplay);
-      //}
+      this.displaySomeMessages(toDisplay);
       document.getElementById("search-box").blur()
     }
     return false;

@@ -67,6 +67,7 @@ Conversation.prototype = {
 
 		this.date0 = this.dayFormat.parse(datetime0);
 		this.dateF = this.dayFormat.parse(datetimeF);
+		this.daysNum = (this.dateF.getTime() - this.date0.getTime()) / 86400000;
 	},
 
 	parseDateFormat: function (date) {
@@ -86,7 +87,7 @@ Conversation.prototype = {
 				if (e instanceof TypeError) {
 					i++;
 				}
-				console.log('Some other error');
+				console.log('Unknown error.');
 			}
 		}
 		return error;
@@ -129,21 +130,23 @@ Conversation.prototype = {
 				var author = allThisLine.split(': ')[0],
 						message = messageMinusAuthor.split(': ')[1];
 
-				if (author && !(author in this.authors)) {
-					this.authors[author] = true;
-				}
+				if (author && message) {
+					if (!(author in this.authors)) {
+						this.authors[author] = true;
+					}
 
-				this.parseAuthors();
+					this.parseAuthors();
 
-				// TODO: Catch all weird cases
-				// Better parsing
-				if (datetime && author && message) {
-					this.messages.push({
-						'datetime': this.dayFormat(this.datetimeFormat.parse(datetime)),
-						'datetimeObj': this.datetimeFormat.parse(datetime),
-						'author': author,
-						'text': message
-					});
+					// TODO: Catch all weird cases
+					// TODO: More resilient parsing, please!
+					if (datetime && author && message) {
+						this.messages.push({
+							'datetime': this.dayFormat(this.datetimeFormat.parse(datetime)),
+							'datetimeObj': this.datetimeFormat.parse(datetime),
+							'author': author,
+							'text': message
+						});
+					}
 				}
 			}
 			// Date limits
@@ -159,6 +162,9 @@ Conversation.prototype = {
 	},
 
 	getMessagesByDay: function (day) {
+		// If already computed, return it
+		if (this.messagesByDay) return this.messagesByDay;
+
 		// Variable day needs to be of type date
 		var messages = [];
 		if (Object.prototype.toString.call(day) === "[object Date]") {
@@ -168,11 +174,15 @@ Conversation.prototype = {
 					messages.push(this.messages[i]);
 				}
 			}
-			return messages;
 		}
+		this.messagesByDay = messages;
+		return this.messagesByDay;
 	},
 
 	getMessagesByAuthorAndDay: function () {
+		// If already computed, return it
+		if (this.messagesByAuthorAndDay) return this.messagesByAuthorAndDay;
+
 		var messages = this.getMessages();
 
 		var authorA = [],
@@ -185,20 +195,17 @@ Conversation.prototype = {
 		// and bundle them by day
 		var self = this;
 
-		messages.forEach(function (message) {
-			var day = message.datetime;
-			var author = message.author;
-
-			if (author === self.authorAName) {
-				if (!(day in authorAbyDay)) {
-					authorAbyDay[day] = [];
+		messages.forEach(function (msg) {
+			if (msg.author === self.authorAName) {
+				if (!(msg.day in authorAbyDay)) {
+					authorAbyDay[msg.day] = [];
 				}
-				authorAbyDay[day].push(message);
+				authorAbyDay[msg.day].push(msg);
 			} else {
-				if (!(day in authorBbyDay)) {
-					authorBbyDay[day] = [];
+				if (!(msg.day in authorBbyDay)) {
+					authorBbyDay[msg.day] = [];
 				}
-				authorBbyDay[day].push(message);
+				authorBbyDay[msg.day].push(msg);
 			}
 		});
 
@@ -212,6 +219,7 @@ Conversation.prototype = {
 			if (dayString in authorAbyDay) {
 				authorA.push(authorAbyDay[dayString]);
 			} else {
+				// Fill day item with empty text
 				authorA.push([{
 					author: this.authorAName,
 					datetime: dayString,
@@ -230,15 +238,20 @@ Conversation.prototype = {
 			}
 		}
 
-		return {
+		this.messagesByAuthorAndDay = {
 			authorA: authorA,
 			authorB: authorB,
 			authorAbyDay: authorAbyDay,
 			authorBbyDay: authorBbyDay
-		}
+		};
+
+		return this.messagesByAuthorAndDay;
 	},
 
 	getCharactersByAuthorAndDay: function () {
+		// If already computed, return it
+		if (this.charactersByAuthorAndDay) return this.charactersByAuthorAndDay;
+
 		var messages = this.getMessagesByAuthorAndDay();
 
 		var charsDayA = [],
@@ -261,23 +274,33 @@ Conversation.prototype = {
 		messages.authorB.forEach(function (day) {
 			charsDayB.push(getCharacters(day));
 		});
-		return {
+
+		this.charactersByAuthorAndDay = {
 			authorA: charsDayA,
 			authorB: charsDayB
 		}
+
+		return this.charactersByAuthorAndDay;
 	},
 
 	getMessageLengths: function () {
+		// If already computed, return it
+		if (this.messageLengths) return this.messageLengths;
+
 		var lengths = [];
 		for (var i = 0; i < this.messages.length; i++) {
 			if (this.messages[i].text.substr(0, 15) !== "<Media omitted>") {
 				lengths.push(this.messages[i].text.length);
 			}
 		}
-		return lengths;
+		this.messageLengths = lengths;
+		return this.messageLengths;
 	},
 
 	getMessageWordCount: function () {
+		// If already computed, return it
+		if (this.messageWordCount) return this.messageWordCount;
+
 		var countsA = [],
 				countsB = [];
 		for (var i = 0; i < this.messages.length; i++) {
@@ -298,13 +321,18 @@ Conversation.prototype = {
 		  return a - b;
 		});
 
-		return {
+		this.messageWordCount = {
 			authorA: countsA,
 			authorB: countsB
 		};
+
+		return this.messageWordCount;
 	},
 
 	getMessageWordCountAverage: function () {
+		// If already computed, return it
+		if (this.messageWordCountAverage) return this.messageWordCountAverage;
+
 		var counts = this.getMessageWordCount();
 		var avgA = 0,
 				avgB = 0;
@@ -314,40 +342,60 @@ Conversation.prototype = {
 		counts.authorB.forEach(function (d) {
 			avgB += d;
 		});
-		return {
+
+		this.messageWordCountAverage = {
 			authorA: avgA / counts.authorA.length,
 			authorB: avgB / counts.authorB.length
 		};
+
+		return this.messageWordCountAverage;
 	},
 
 	getMessageWordCountMedian: function () {
+		// If already computed, return it
+		if (this.messageWordCountMedian) return this.messageWordCountMedian;
+
 		var counts = this.getMessageWordCount();
-		return {
+		this.messageWordCountMedian = {
 			authorA: counts.authorA[Math.floor(counts.authorA.length/2)],
 			authorB: counts.authorB[Math.floor(counts.authorB.length/2)]
 		};
+
+		return this.messageWordCountMedian;
 	},
 
 	getMedianMessageLen: function () {
+		// If already computed, return it
+		if (this.medianMessageLen) return this.medianMessageLen;
+
 		var lens = this.getMessageLengths();
 		if (lens.length % 2 === 0) {
 			var halfLen = Math.floor(lens/2);
 			return (lens[halfLen - 1] + lens[halfLen + 1]) / 2;
 		}
-		return lens[Math.floor(lens.length / 2) + 1];
+		this.medianMessageLen = lens[Math.floor(lens.length / 2) + 1];
+		return this.medianMessageLen;
 	},
 
 	getNumberOfMessagesByAuthor: function () {
+		// If already computed, return it
+		if (this.numberOfMessagesByAuthor) return this.numberOfMessagesByAuthor;
+
 		var authorA = _.filter(this.messages, { author: this.authorAName }),
 				authorB = _.filter(this.messages, { author: this.authorBName });
 
-		return {
+		this.numberOfMessagesByAuthor = {
 			authorA: authorA.length,
 			authorB: authorB.length
-		}
+		};
+
+		return this.numberOfMessagesByAuthor;
 	},
 
 	getMessageTimes: function () {
+		// If already computed, return it
+		if (this.messageTimes) return this.messageTimes;
+
 		var timeformat = d3.time.format('%H');
 		var authorA = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
 		var authorB = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
@@ -361,13 +409,19 @@ Conversation.prototype = {
 				authorB[hour] += 1;
 			}
 		}
-		return {
+
+		this.messageTimes = {
 			authorATimes: authorA,
 			authorBTimes: authorB
-		}
+		};
+
+		return this.messageTimes;
 	},
 
 	getResponseTimes: function () {
+		// If already computed, return it
+		if (this.responseTimes) return this.responseTimes;
+
 		var authorAresps = [],
 				authorBresps = [];
 
@@ -397,15 +451,26 @@ Conversation.prototype = {
 		  return a - b;
 		});
 
-		return {
+		this.responseTimes = {
 			authorA: authorAresps,
 			authorB: authorBresps
 		};
+
+		return this.responseTimes;
 	},
 
 	getResponseTimesByAuthorDay: function () {
+		// If already calculated, return it
+		if (this.responseTimesByAuthorDay) return this.responseTimesByAuthorDay;
+
 		var authorAresps = {},
 				authorBresps = {};
+
+		for (var i = 0; i < this.daysNum + 2; i++) {
+			var thisDate = this.dayFormat(d3.time.day.offset(this.date0, i));
+			authorAresps[thisDate] = [0];
+			authorBresps[thisDate] = [0];
+		}
 
 		for (var i = 2; i < this.messages.length; i++) {
 			var responder = this.messages[i].author,
@@ -421,14 +486,8 @@ Conversation.prototype = {
 
 				if (diff < 60000 * 60 * 24) {
 					if (responder === this.authorAName) {
-						if (!(dayString in authorAresps)) {
-							authorAresps[dayString] = [];
-						}
 						authorAresps[dayString].push(diff);
 					} else if (responder === this.authorBName){
-						if (!(dayString in authorBresps)) {
-							authorBresps[dayString] = [];
-						}
 						authorBresps[dayString].push(diff);
 					}
 				}
@@ -442,22 +501,24 @@ Conversation.prototype = {
 			}
 		}
 
+		var respsAvgDiff = [];
 		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
 		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
-		authorArespsAvg.push({
-			responseTime:0,
-			datetime: this.dayFormat(d3.time.day.offset(this.dateF, 1))
-		});
-		authorBrespsAvg.push({
-			responseTime:0,
-			datetime: this.dayFormat(d3.time.day.offset(this.dateF, 1))
-		});
+		for (var i = 0; i < authorArespsAvg.length; i++) {
+			var diff = authorArespsAvg[i].responseTime - authorBrespsAvg[i].responseTime;
+			respsAvgDiff.push({
+				responseTimeDifference: diff,
+				datetime: dayString
+			});
+		}
 
-		return {
+		this.responseTimesByAuthorDay = {
 			authorA: authorArespsAvg,
-			authorB: authorBrespsAvg
+			authorB: authorBrespsAvg,
+			difference: respsAvgDiff
 		};
 
+		return this.responseTimesByAuthorDay;
 	}
 }
 

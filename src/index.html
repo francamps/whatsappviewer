@@ -1,10 +1,10 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.12/d3.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-		<!--script src="resources/d3.min.js"></script>
-		<script src="resources/lodash.min.js"></script-->
+		<!--script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.12/d3.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script-->
+		<script src="../resources/d3.min.js"></script>
+		<script src="../resources/lodash.min.js"></script>
 		<link href='https://fonts.googleapis.com/css?family=Merriweather' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
@@ -68,7 +68,7 @@
 					<div></div>
 				</div>
 				<div id="widget-3" class="widget">
-					<h3>Average response time per day</h3>
+					<h3>Difference in response times per day (average)</h3>
 				</div>
 				<div class="widget">
 					<h3>Additional metrics</h3>
@@ -87,6 +87,11 @@
 							<div id="message-num-A" class="cell">-</div>
 							<div class="cell metric-label">Number of messages</div>
 							<div id="message-num-B" class="cell">-</div>
+						</div>
+						<div class="row">
+							<div id="resp-times-A" class="cell">-</div>
+							<div class="cell metric-label">Response times</div>
+							<div id="resp-times-B" class="cell">-</div>
 						</div>
 					</div>
 				</div>

@@ -81,8 +81,6 @@ header {
     line-height: 20px;
     float: left;
     background: none;
-    border-radius: 3px;
-    border: 2px solid $white;
     text-decoration: none;
     font-family: 'Roboto', sans-serif;
     padding: 10px;
@@ -94,8 +92,7 @@ header {
     }
 
     &:hover {
-      color: $dark-green;
-      background: $white;
+      color: $electric-green;
     }
   }
 }
@@ -323,8 +320,9 @@ button {
       fill: $mid-grey;
     }
 
-    .dot {
-      fill: $mid-grey;
+    .tick {
+      stroke: $mid-grey;
+      stroke-width: 1px;
     }
   }
 }

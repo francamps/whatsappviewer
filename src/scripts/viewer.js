@@ -1,11 +1,15 @@
 'use strict';
 
+// Model
 var Conversation = require('./conversation.js');
 
+// Views
 var spectrogram = require('./views/spectrogram.js');
-var responseTimes = require('./views/response-times.js');
+var responseTimesTime = require('./views/response-times-day.js');
+var responseTimesHist = require('./views/response-times-hist.js');
 var timeofDay = require('./views/time-of-day.js');
 
+// View configuration data
 var pink = 'rgb(243, 38, 114)',
 		purple = 'rgb(71, 3, 166)';
 
@@ -54,17 +58,28 @@ module.exports = {
 		spectrogram.addEvents(this.messages);
 	},
 
+	// Response times over time
 	responseTimes: function () {
 		var Convo = this.Convo;
-		responseTimes.render.call(this, {
+		responseTimesTime.render.call(this, {
 			Convo: Convo,
 			options: opts
 		});
 	},
 
+	// Volume of messages per time of day
 	timeofDay: function () {
 		var Convo = this.Convo;
 		timeofDay.render.call(this, {
+			Convo: Convo,
+			options: opts
+		});
+	},
+
+	// Distribution of response times per author
+	responseTimesHist: function () {
+		var Convo = this.Convo;
+		responseTimesHist.render({
 			Convo: Convo,
 			options: opts
 		});
@@ -106,5 +121,6 @@ module.exports = {
 		this.fillDataTable();
 		this.timeofDay();
 		this.responseTimes();
+		this.responseTimesHist();
 	}
 }
