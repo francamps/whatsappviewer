@@ -101,7 +101,19 @@ module.exports = {
 		responseTimesHist.render({
 			Convo: Convo,
 			options: opts
-		});
+		}, "#resp-times-A");
+		responseTimesHist.render({
+			Convo: Convo,
+			options: opts
+		}, "#resp-times-B");
+		responseTimesHist.render({
+			Convo: Convo,
+			options: opts
+		}, "#resp-times-chat-A");
+		responseTimesHist.render({
+			Convo: Convo,
+			options: opts
+		}, "#resp-times-chat-B");
 	},
 
 	/*

@@ -1,8 +1,8 @@
 module.exports = {
-  render: function (args) {
+  render: function (args, svgID) {
     var w = 200,
-        marginH = args.options.marginH,
-        h = 80,
+        marginH = 10,//args.options.marginH,
+        h = 120,
         pink = args.options.pink,
         purple = args.options.purple,
         dayFormat = args.options.dayFormat,
@@ -11,45 +11,88 @@ module.exports = {
 
     var resps = Convo.getResponseTimes();
 
-    var bucketsA = this.bucketify(resps.authorA);
-    var bucketsB = this.bucketify(resps.authorB);
+    var bucketsA = this.bucketify(resps.authorA).buckets;
+    var bucketsB = this.bucketify(resps.authorB).buckets;
+    var bucketsAchat = this.bucketify(resps.authorA).buckets15m;
+    var bucketsBchat = this.bucketify(resps.authorB).buckets15m;
 
-    d3.select('#resp-times-A svg').remove();
-    d3.select('#resp-times-B svg').remove();
+    var yMax = d3.max([d3.max(bucketsA), d3.max(bucketsB)]);
+    var yMaxChat = d3.max([d3.max(bucketsAchat), d3.max(bucketsBchat)]);
 
-  	var svg = d3.select('#resp-times-A').append('svg')
+    var labels = ["15'-", "1-", "2-", "4-", "12-", ">24h"],
+        labelsLow = ["1h", "2h", "4h", "12h", "24h"];
+
+    switch (svgID) {
+      case "#resp-times-A":
+        var buckets = bucketsA,
+            color = pink;
+        break;
+      case "#resp-times-B":
+        var buckets = bucketsB,
+            color = purple;
+        break;
+      case  "#resp-times-chat-A":
+        var buckets = bucketsAchat,
+            color = pink,
+            yMax = yMaxChat,
+            labels = ["<2'", "2'-", "5'-", "10'-"],
+            labelsLow = ["", "5'", "10'", "15'"];
+        break;
+      case "#resp-times-chat-B":
+        var buckets = bucketsBchat,
+            color = purple,
+            yMax = yMaxChat,
+            labels = ["<2'", "2'-", "5'-", "10'-"],
+            labelsLow = ["", "5'", "10'", "15'"];
+        break;
+    }
+
+    d3.select(svgID + " svg").remove();
+
+  	var svg = d3.select(svgID).append('svg')
   							.attr('width', w)
   							.attr('height', h);
 
-    var svgB = d3.select('#resp-times-B').append('svg')
-                .attr('width', w)
-                .attr('height', h);
-
   	var timeScale = function (value) {
-      return marginH + value * (w - 2 * marginH) / bucketsA.buckets.length;
+      return marginH + value * (w - 2 * marginH) / buckets.length;
     }
 
   	var yScale = d3.scaleLinear()
-      							.domain([0, d3.max(bucketsA.buckets), d3.max(bucketsB.buckets)])
-      							.range([h / 4, 0]);
+      							.domain([0, yMax])
+      							.range([0, h - 30]);
+
+    var colW = (w - 2 * marginH) / buckets.length - 2;
 
     svg.selectAll('.barsHist')
-      .data(bucketsA.buckets)
+      .data(buckets)
       .enter().append('rect')
       .attr("x", function (d, i) { return timeScale(i); })
-      .attr("y", function (d, i) { return yScale(d); })
-      .attr("width", (w - 2 * marginH) / bucketsA.buckets.length - 2)
-      .attr("height", function (d, i) { return h - yScale(d); })
-      .style("fill", pink);
+      .attr("y", function (d, i) { return h - 30 - yScale(d); })
+      .attr("width", colW)
+      .attr("height", function (d, i) { return yScale(d); })
+      .style("fill", color);
 
-    svgB.selectAll('.barsHist')
-      .data(bucketsB.buckets)
-      .enter().append('rect')
-      .attr("x", function (d, i) { return timeScale(i); })
-      .attr("y", function (d, i) { return yScale(d); })
-      .attr("width", (w - 2 * marginH) / bucketsB.buckets.length - 2)
-      .attr("height", function (d, i) { return h - yScale(d); })
-      .style("fill", purple);
+    svg.selectAll(".label")
+      .data(labels)
+      .enter().append("text")
+      .attr("class", "label")
+      .attr("x", function (d, i) { return timeScale(i) + colW / 2; })
+      .attr("y", function (d, i) { return h - 17; })
+      .style("font-size", "10px")
+      .style("font-weight", "lighter")
+      .style("text-anchor", "middle")
+      .text(function (d, i) { return labels[i]; })
+
+    svg.selectAll(".labelLow")
+      .data(labelsLow)
+      .enter().append("text")
+      .attr("class", "labelLow")
+      .attr("x", function (d, i) { return timeScale(i) + colW / 2; })
+      .attr("y", function (d, i) { return h - 5; })
+      .style("font-size", "10px")
+      .style("font-weight", "lighter")
+      .style("text-anchor", "middle")
+      .text(function (d, i) { return labelsLow[i]; })
 
   },
 
