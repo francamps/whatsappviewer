@@ -511,8 +511,8 @@ Conversation.prototype = {
 
 		for (var i = 0; i < this.daysNum + 2; i++) {
 			var thisDate = d3.timeFormat(this.dayFormat)(d3.timeDay.offset(this.date0, i));
-			authorAresps[thisDate] = [0];
-			authorBresps[thisDate] = [0];
+			authorAresps[thisDate] = [];
+			authorBresps[thisDate] = [];
 		}
 
 		for (var i = 2; i < this.messages.length; i++) {
@@ -538,9 +538,11 @@ Conversation.prototype = {
 		}
 
 		function reduceResponseTimesPerDay(d, dayString) {
-			return {
-				responseTime: d.reduce(function(m, n) { return m + n; }) / d.length,
-				datetime: dayString
+			if (d.length > 0) {
+				return {
+					responseTime: d.reduce(function(m, n) { return m + n; }) / d.length,
+					datetime: dayString
+				}
 			}
 		}
 
@@ -548,8 +550,13 @@ Conversation.prototype = {
 		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
 		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
 
-		for (var i = 0; i < authorArespsAvg.length; i++) {
-			var diff = authorArespsAvg[i].responseTime - authorBrespsAvg[i].responseTime;
+		for (var i = 0; i < this.daysNum; i++) {
+			var diff = undefined;
+			if (authorArespsAvg[i] && authorBrespsAvg[i]) {
+				diff = authorArespsAvg[i].responseTime - authorBrespsAvg[i].responseTime;
+			}
+			var dayString = d3.timeFormat(this.dayFormat)(d3.timeDay.offset(this.date0, i));
+
 			respsAvgDiff.push({
 				responseTimeDifference: diff,
 				datetime: dayString
@@ -559,6 +566,8 @@ Conversation.prototype = {
 		this.responseTimesByAuthorDay = {
 			authorA: authorArespsAvg,
 			authorB: authorBrespsAvg,
+			authorAAll: authorAresps,
+			authorBAll: authorBresps,
 			difference: respsAvgDiff
 		};
 

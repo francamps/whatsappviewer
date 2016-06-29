@@ -5,6 +5,7 @@ module.exports = {
         h = args.options.h,
         pink = args.options.pink,
         purple = args.options.purple,
+        gold = args.options.gold,
         dayFormat = args.options.dayFormat,
         labelFormat = args.options.labelFormat,
         Convo = args.Convo;
@@ -19,77 +20,93 @@ module.exports = {
   							.attr('width', w)
   							.attr('height', h);
 
-  	var timeScale = d3.scaleLinear()
-  										.domain([0, respsDay.difference.length])
-  										.range([marginH, w - marginH]);
+  	var timeScale = d3.scaleTime()
+                      .domain([Convo.date0, Convo.dateF])
+                      .range([marginH, w - marginH]);
 
   	var yScale = d3.scaleLinear()
   										.domain([0, 86400000])
   										.range([0, h/2]);
 
-    var columnWidth = w / respsDay.difference.length;
+    var colW = timeScale(d3.timeDay.offset(Convo.date0, 1)) - timeScale(Convo.date0);
 
-    var lineFunction = d3.area()
-      .x(function (d, i) { return timeScale(i); })
-      .y0(function (d) { return h / 2; })
-      .y1(function (d) { return h / 2 - yScale(d.responseTime); })
-      .curve(d3.curveMonotoneX);
+    var parse = d3.timeParse(dayFormat);
 
-    svg//.selectAll(".lineA")
-  	      /*.data(respsDay.authorA)
+    svg.selectAll(".lineA")
+  	      .data(respsDay.authorA.filter(Boolean))
           .enter().append("rect")
   	      .attr("class", "lineA respLine")
-  	      .attr("x", function (d, i) { return i * w / respsDay.authorA.length; })
-          .attr("y", function (d) { return h / 2 - yScale(d.responseTime) - 10; })
+  	      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
+          .attr("y", function (d) { return h / 2 - yScale(d.responseTime); })
           .attr("width", w / respsDay.authorA.length - 2)
-          .attr("height", function (d) { return yScale(d.responseTime); })*/
-          .append("path")
-  	      .attr("class", "lineA respLine")
-  	      .attr("d", lineFunction(respsDay.authorA))
-  				.style("fill", "none")
-          .style("stroke", pink)
-          .style("stroke-width", "2px");
+          .attr("height", function (d) { return yScale(d.responseTime); })
+  				.style("fill", pink);
 
-    svg/*.selectAll(".lineB")
-  	      .data(respsDay.authorB)
+    svg.selectAll(".lineB")
+  	      .data(respsDay.authorB.filter(Boolean))
           .enter().append("rect")
   	      .attr("class", "lineB respLine")
-  	      .attr("x", function (d, i) { return i * w / respsDay.authorB.length; })
-          .attr("y", function (d) { return h / 2 - yScale(d.responseTime) - 10; })
-          .attr("width", w / respsDay.authorB.length - 2)
-          .attr("height", function (d) { return yScale(d.responseTime); })*/
-          .append("path")
-          .attr("class", "lineA respLine")
-          .attr("d", lineFunction(respsDay.authorB))
-  				.style("fill", "none")
-          .style("stroke", purple)
-          .style("stroke-width", "2px");
+  	      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
+          .attr("y", function (d) { return h / 2; })
+          .attr("width", colW - 2)
+          .attr("height", function (d) { return yScale(d.responseTime); })
+      		.style("fill", purple)
 
-    /*svg.selectAll(".lineD")
-  	      .data(respsDay.difference)
-          .enter().append("rect")
-  	      .attr("class", "lineD respLine")
-  	      .attr("x", function (d, i) { return i * columnWidth; })
-          .attr("y", function (d) {
-            // > 0 means A > B
-            if (d.responseTimeDifference > 0) {
-              return h / 2 - yScale(d.responseTimeDifference) - 10;
-            }
-            return h / 2 + 10;
-          })
-          .attr("width", w / respsDay.difference.length)
-          .attr("height", function (d) {
-            if (d.responseTimeDifference > 0) {
-              return yScale(d.responseTimeDifference);
-            }
-            return yScale(-d.responseTimeDifference);
-          })
-  				.style("fill", function (d) {
-            if (d.responseTimeDifference > 0) {
-              return pink;
-            }
-            return purple;
-          });*/
+    svg.selectAll(".respLine")
+      .style("stroke", "none");
+
+    var lineFn = d3.line()
+      .x(function (d, i) { return timeScale(parse(d.datetime)) + colW / 2; })
+      .y(function (d) { return h / 2 - yScale(d.responseTimeDifference); })
+      .defined(function (d) {
+        return (d.responseTimeDifference);
+      })
+      .curve(d3.curveMonotoneX);
+
+    svg.append("path")
+      .attr("d", lineFn(respsDay.difference))
+      .style("stroke", gold)
+      .style("stroke-width", "2px")
+      .style("fill", "none");
+
+    var msgs = svg.append("g");
+
+    var daysA = msgs.selectAll(".day-message-circles")
+      .data(d3.map(respsDay.authorAAll).entries())
+      .enter().append("g");
+
+    var daysB = msgs.selectAll(".day-message-circles")
+      .data(d3.map(respsDay.authorBAll).entries())
+      .enter().append("g");
+
+    daysA.each(function (d, i) {
+        d3.select(this)
+          .selectAll(".message-circle")
+          .data(d.value)
+          .enter().append("circle")
+          .attr("class", "message-circle")
+          .attr("cx", marginH + (i + 1/2) * colW)
+          .attr("cy", function (b) { return h / 2 - yScale(b); })
+          .attr("r", 2)
+          .style("fill", pink);
+      });
+
+    daysB.each(function (d, i) {
+        d3.select(this)
+          .selectAll(".message-circle")
+          .data(d.value)
+          .enter().append("circle")
+          .attr("class", "message-circle")
+          .attr("cx", marginH + (i + 1/2) * colW)
+          .attr("cy", function (b) { return h / 2 + yScale(b); })
+          .attr("r", 2)
+          .style("fill", purple);
+      });
+
+    d3.selectAll(".message-circle")
+      .style("stroke-width", "1")
+      .style("opacity", .6)
+      .style("stroke", "white");
 
     var silences = svg.append("g");
 
@@ -98,7 +115,7 @@ module.exports = {
       .enter().append("circle")
       .attr("class", "waitingLine")
       .attr("cx", function (d, i) {
-        return (i + 1) * columnWidth - columnWidth / 2;
+        return (i + 1) * colW - colW / 2;
       })
       .attr("cy", h / 2)
       .attr("r", 5)

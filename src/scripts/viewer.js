@@ -10,10 +10,12 @@ var responseTimesHist = require('./views/response-times-hist.js');
 var timeofDay = require('./views/time-of-day.js');
 
 // View configuration data
-//var pink = 'rgb(243, 38, 114)',
+var pink = "rgb(243, 38, 114)",
+		purple = "rgb(71, 3, 166)",
+		gold = "rgb(253, 199, 20)"
 
-var pink = "rgb(253, 199, 20)",//"rgb(36, 216, 205)",
-		purple = "rgb(71, 3, 166)";
+//var pink = "rgb(253, 199, 20)", // gold
+//		purple = "rgb(71, 3, 166)";
 
 var w = document.querySelector(".widget").offsetWidth - 44,
 		h = 400,
@@ -25,6 +27,7 @@ var dayFormat = d3.timeFormat("%Y-%m-%d"),
 var opts = {
 	pink: pink,
 	purple: purple,
+	gold: gold,
 	w: w,
 	h: h,
 	marginH: marginH,
@@ -58,8 +61,10 @@ module.exports = {
 	authorsLegend: function (svg) {
 		document.querySelector("#author-A-col").style.background = pink;
 		document.querySelector("#author-B-col").style.background = purple;
-		document.querySelector("#author-A-leg-label").innerHTML = this.Convo.authorAName;
-		document.querySelector("#author-B-leg-label").innerHTML = this.Convo.authorBName;
+		document.querySelector("#author-A-leg-label").innerHTML =
+				this.Convo.authorAName;
+		document.querySelector("#author-B-leg-label").innerHTML =
+				this.Convo.authorBName;
 	},
 
 	// Volume of messages over time
@@ -107,9 +112,12 @@ module.exports = {
 
 	fillDataTable: function () {
 		// Word count
-		var counts = this.wordCount();
-		document.querySelector("#word-count-A").innerHTML = counts.authorA.toFixed(2);
-		document.querySelector("#word-count-B").innerHTML = counts.authorB.toFixed(2);
+		var countsAvg = this.wordCountAvg();
+		var countsMed = this.wordCountMedian();
+		document.querySelector("#word-count-A").innerHTML =
+				countsAvg.authorA.toFixed(2) + " / " + countsMed.authorA.toFixed(2);
+		document.querySelector("#word-count-B").innerHTML =
+				countsAvg.authorB.toFixed(2) + " / " + countsMed.authorB.toFixed(2);
 
 		// Number of messages
 		var messages = this.numberOfMessages();
@@ -125,7 +133,11 @@ module.exports = {
 		return this.Convo.getNumberOfMessagesByAuthor();
 	},
 
-	wordCount: function () {
+	wordCountAvg: function () {
+		return this.Convo.getMessageWordCountAverage();
+	},
+
+	wordCountMedian: function () {
 		return this.Convo.getMessageWordCountMedian();
 	},
 
