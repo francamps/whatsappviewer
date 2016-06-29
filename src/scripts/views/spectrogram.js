@@ -19,7 +19,7 @@ module.exports = {
                 .attr('width', w)
                 .attr('height', h);
 
-    var timeScale = d3.time.scale()
+    var timeScale = d3.scaleTime()
                       .domain([Convo.date0, Convo.dateF])
                       .range([marginH, w - marginH]);
 
@@ -28,21 +28,21 @@ module.exports = {
       return d.chars;
     });
 
-    var charScale = d3.scale.linear()
+    var charScale = d3.scaleLinear()
                       .domain([0, maxChar])
                       .range([h/2, 0]);
 
-    var lineFunction = d3.svg.area()
-      .x(function (d) { return timeScale(dayFormat.parse(d.datetime)); })
+    var lineFunction = d3.area()
+      .x(function (d) { return timeScale(d3.timeParse(dayFormat)(d.datetime)); })
       .y0(function (d) { return charScale(d.chars); })
       .y1(function (d) { return charScale(0); })
-      .interpolate("basis");
+      .curve(d3.curveBasis);
 
-    var lineFunction2 = d3.svg.area()
-      .x(function (d) { return timeScale(dayFormat.parse(d.datetime)); })
+    var lineFunction2 = d3.area()
+      .x(function (d) { return timeScale(d3.timeParse(dayFormat)(d.datetime)); })
       .y0(function (d) { return charScale(-d.chars); })
       .y1(function (d) { return charScale(0); })
-      .interpolate("basis");
+      .curve(d3.curveBasis);
 
     var lineA = svg.append("path")
       .attr("d", lineFunction(chars.authorA))

@@ -10,15 +10,17 @@ var responseTimesHist = require('./views/response-times-hist.js');
 var timeofDay = require('./views/time-of-day.js');
 
 // View configuration data
-var pink = 'rgb(243, 38, 114)',
-		purple = 'rgb(71, 3, 166)';
+//var pink = 'rgb(243, 38, 114)',
+
+var pink = "rgb(253, 199, 20)",//"rgb(36, 216, 205)",
+		purple = "rgb(71, 3, 166)";
 
 var w = document.querySelector(".widget").offsetWidth - 44,
 		h = 400,
 		marginH = 20;
 
-var dayFormat = d3.time.format("%Y-%m-%d"),
-		labelFormat = d3.time.format("%b %d '%y");
+var dayFormat = d3.timeFormat("%Y-%m-%d"),
+		labelFormat = d3.timeFormat("%b %d '%y");
 
 var opts = {
 	pink: pink,
@@ -31,14 +33,26 @@ var opts = {
 }
 
 module.exports = {
-	init: function (whatsapp) {
-		this.data = whatsapp;
-		this.Convo = new Conversation(this.data);
+	/*
+	* Initialize conversation
+	* Parse text and create model
+	*
+	*/
+	init: function (text) {
+		this.Convo = new Conversation(text);
 		if (this.Convo.isParsed) {
 			this.messages = this.Convo.getMessages();
 			return true;
+		} else if (this.Convo.parsingError) {
+			this.notifyParsingError(this.Convo.parsingError);
 		}
 	},
+
+	/*
+	*
+	* Render different chart views
+	*
+	*/
 
 	// Get authors names from Conversation and display a legend
 	authorsLegend: function (svg) {
@@ -61,7 +75,7 @@ module.exports = {
 	// Response times over time
 	responseTimes: function () {
 		var Convo = this.Convo;
-		responseTimesTime.render.call(this, {
+		responseTimesTime.render({
 			Convo: Convo,
 			options: opts
 		});
@@ -113,6 +127,11 @@ module.exports = {
 
 	wordCount: function () {
 		return this.Convo.getMessageWordCountMedian();
+	},
+
+	notifyParsingError: function (message) {
+		document.querySelector("#notification").innerHTML = message;
+		document.querySelector("#notification").classList.remove('hidden');
 	},
 
 	render: function () {

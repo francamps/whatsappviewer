@@ -3,6 +3,8 @@ $mess-green: rgb(220, 248, 198);
 $dark-green: rgb(0, 134, 117);
 $wapp-blue: rgb(218, 240, 250);
 
+$warn-pink: rgb(254, 117, 113);
+
 $dark-grey: #232323;
 $mid-grey: #888888;
 $lightish-grey: #c0c0c0;
@@ -147,25 +149,29 @@ header {
 
     &:nth-child(even){
       background:$mess-green;
-
-      /*&::after {
-        content: url('../bubbletic2.png');
-      }*/
     }
 
     &:nth-child(odd){
       background:$white;
-
-      /*&::after {
-        transform: scaleX(-1);
-        content: url('../bubbletic.png');
-        float: left;
-        margin-left: -40px;
-      }*/
     }
 
     button {
       float: right;
+    }
+
+    .graph-widget + form {
+      margin: 10px 0 0 0;
+    }
+  }
+
+  .notification {
+    background: $warn-pink !important;
+    min-height: 60px;
+    color: white;
+    text-align: center;
+
+    &.hidden {
+      display: none;
     }
   }
 
@@ -302,6 +308,11 @@ button {
       .cell {
         width: 35%;
         text-align: center;
+
+        &.metric {
+          font-size: 20px;
+          font-weight: bolder;
+        }
       }
 
       .metric-label {

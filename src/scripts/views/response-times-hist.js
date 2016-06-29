@@ -29,7 +29,7 @@ module.exports = {
       return marginH + value * (w - 2 * marginH) / bucketsA.buckets.length;
     }
 
-  	var yScale = d3.scale.linear()
+  	var yScale = d3.scaleLinear()
       							.domain([0, d3.max(bucketsA.buckets), d3.max(bucketsB.buckets)])
       							.range([h / 4, 0]);
 

@@ -23,11 +23,11 @@ module.exports = {
     var maxA = d3.max(messageTimes.authorATimes),
         maxB = d3.max(messageTimes.authorBTimes);
 
-    var rScale = d3.scale.pow().exponent(.5)
+    var rScale = d3.scalePow().exponent(.5)
                   .domain([0, maxA])
                   .range([1, 15]);
 
-    var cScale = d3.scale.pow().exponent(.5)
+    var cScale = d3.scalePow().exponent(.5)
                   .domain([0, maxB])
                   .range([.2, .6]);
 

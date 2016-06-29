@@ -2,9 +2,9 @@
 
 function Conversation (data) {
 	// Some initializing functions
-	this.datetimeFormat = d3.time.format("%-m/%-d/%-y, %-H:%M %p");
-	this.dayFormat = d3.time.format("%Y-%m-%d");
-	this.data = data.text || '';
+	this.datetimeFormat = "%-m/%-d/%-y, %-H:%M %p";
+	this.dayFormat = "%Y-%m-%d";
+	this.data = data || '';
 	this.authors = {};
 
 	// Initial, neurtal parsing
@@ -17,56 +17,56 @@ Conversation.prototype = {
 	},
 	dateFormats: [
 		/* 6/15/2009 */
-		d3.time.format("%d/%m/%Y"),
-		d3.time.format("%-d/%-m/%Y"),
+		"%d/%m/%Y",
+		"%-d/%-m/%Y",
 		/* 15/06/2009 */
-		d3.time.format("%m/%d/%Y"),
-		d3.time.format("%-m/%-d/%Y"),
+		"%m/%d/%Y",
+		"%-m/%-d/%Y",
 		/* 2009/06/15 */
-		d3.time.format("%Y/%m/%d"),
-		d3.time.format("%Y/%-m/%-d"),
+		"%Y/%m/%d",
+		"%Y/%-m/%-d",
 		/* Monday, June 15, 2009 */
-		d3.time.format("%b %d, %Y"),
-		d3.time.format("%b, %d, %Y"),
+		"%b %d, %Y",
+		"%b, %d, %Y",
 		/* Monday, June 15, 2009 1:45 PM */
-		d3.time.format("%b %d, %Y, %H:%M %p"),
-		d3.time.format("%b, %d, %Y, %H:%M %p"),
+		"%b %d, %Y, %H:%M %p",
+		"%b, %d, %Y, %H:%M %p",
 		/* Monday, June 15, 2009 1:45:30 PM */
-		d3.time.format("%b %d, %Y, %H:%M:%S %p"),
-		d3.time.format("%b, %d, %Y, %H:%M:%S %p"),
+		"%b %d, %Y, %H:%M:%S %p",
+		"%b, %d, %Y, %H:%M:%S %p",
 		/* 6/15/2009 1:45 PM */
-		d3.time.format("%-m/%-d/%-y, %-I:%M %p"),
+		"%-m/%-d/%-y, %-I:%M %p",
 		/* 15/06/2009 13:45 */
-		d3.time.format("%-m/%-d/%-y, %H:%M"),
+		"%-m/%-d/%-y, %H:%M",
 		/* 06/15/2009 13:45 */
-		d3.time.format("%-d/%-m/%-y, %H:%M %p"),
+		"%-d/%-m/%-y, %H:%M %p",
 		/* 2009/6/15 13:45 */
-		d3.time.format("%Y/%-m/%-d, %H:%M"),
+		"%Y/%-m/%-d, %H:%M",
 		/* 15/06/2009 13:45:30 */
-		d3.time.format("%-d/%-m/%Y, %H:%M:%S"),
+		"%-d/%-m/%Y, %H:%M:%S",
 		/* 6/15/2009 1:45:30 PM */
-		d3.time.format("%m/%-d/%Y, %I:%M:%S %p"),
+		"%m/%-d/%Y, %I:%M:%S %p",
 		/* 2009/6/15 13:45:30 */
-		d3.time.format("%Y/%m/%-d, %H:%M:%S"),
+		"%Y/%m/%-d, %H:%M:%S",
 		/* 2009-06-15T13:45:30 */
-		d3.time.format("%Y-%-m-%-dT%H:%M:%S"),
+		"%Y-%-m-%-dT%H:%M:%S",
 		/* 2009-06-15 13:45:30Z */
-		d3.time.format("%Y-%-m-%-d %H:%M:%SZ"),
+		"%Y-%-m-%-d %H:%M:%SZ",
 		/* Monday, June 15, 2009 8:45:30 PM */
-		d3.time.format("%b, %m %d, %H:%M:%S %p"),
+		"%b, %m %d, %H:%M:%S %p",
 		/* */
-		d3.time.format("%-m/%-d/%-y, %-H:%M %p"),
-		d3.time.format("%-m/%-d/%-Y, %-H:%M %p"),
-		d3.time.format("%Y-%m-%d, %H:%M:%S"),
-		d3.time.format("%b %d, %Y, %H:%M %p")
+		"%-m/%-d/%-y, %-H:%M %p",
+		"%-m/%-d/%-Y, %-H:%M %p",
+		"%Y-%m-%d, %H:%M:%S",
+		"%b %d, %Y, %H:%M %p"
 	],
 
 	calculateDateLimits: function () {
     var datetime0 = this.messages[0].datetime,
 				datetimeF = this.messages[this.messages.length - 1].datetime;
 
-		this.date0 = this.dayFormat.parse(datetime0);
-		this.dateF = this.dayFormat.parse(datetimeF);
+		this.date0 = d3.timeParse(this.dayFormat)(datetime0);
+		this.dateF = d3.timeParse(this.dayFormat)(datetimeF);
 		this.daysNum = (this.dateF.getTime() - this.date0.getTime()) / 86400000;
 	},
 
@@ -77,13 +77,14 @@ Conversation.prototype = {
 
 		while (i < formats.length && error === true) {
 			try {
-				if (formats[i].parse(date) !== null) {
+				if (d3.timeParse(formats[i])(date) !== null) {
 					error = false;
 					this.datetimeFormat = formats[i];
 					break;
 				}
 				i++;
 			} catch (e) {
+				console.log(e);
 				if (e instanceof TypeError) {
 					i++;
 				}
@@ -99,11 +100,11 @@ Conversation.prototype = {
 	},
 
 	getDateRange: function () {
-		return d3.time.day.range(this.date0, d3.time.day.offset(this.dateF, 1));
+		return d3.timeDays(this.date0, d3.timeDay.offset(this.dateF, 1));
 	},
 
 	parseErrorHandler: function () {
-		window.alert('There was an error parsing the dates of your text. Sorry :/');
+		this.parsingError = "There was an error parsing the text. Sorry :/";
 	},
 
 	parseTextData: function () {
@@ -141,8 +142,8 @@ Conversation.prototype = {
 					// TODO: More resilient parsing, please!
 					if (datetime && author && message) {
 						this.messages.push({
-							'datetime': this.dayFormat(this.datetimeFormat.parse(datetime)),
-							'datetimeObj': this.datetimeFormat.parse(datetime),
+							'datetime': d3.timeFormat(this.dayFormat)(d3.timeParse(this.datetimeFormat)(datetime)),
+							'datetimeObj': d3.timeParse(this.datetimeFormat)(datetime),
 							'author': author,
 							'text': message
 						});
@@ -168,7 +169,7 @@ Conversation.prototype = {
 		// Variable day needs to be of type date
 		var messages = [];
 		if (Object.prototype.toString.call(day) === "[object Date]") {
-			var dayStr = this.dayFormat(day);
+			var dayStr = d3.timeFormat(this.dayFormat)(day);
 			for (var i = 0; i < this.messages.length; i++) {
 				if (this.messages[i].datetime === dayStr) {
 					messages.push(this.messages[i]);
@@ -196,16 +197,17 @@ Conversation.prototype = {
 		var self = this;
 
 		messages.forEach(function (msg) {
+			var day = msg.datetime;
 			if (msg.author === self.authorAName) {
-				if (!(msg.day in authorAbyDay)) {
-					authorAbyDay[msg.day] = [];
+				if (!(msg.datetime in authorAbyDay)) {
+					authorAbyDay[msg.datetime] = [];
 				}
-				authorAbyDay[msg.day].push(msg);
+				authorAbyDay[msg.datetime].push(msg);
 			} else {
-				if (!(msg.day in authorBbyDay)) {
-					authorBbyDay[msg.day] = [];
+				if (!(msg.datetime in authorBbyDay)) {
+					authorBbyDay[msg.datetime] = [];
 				}
-				authorBbyDay[msg.day].push(msg);
+				authorBbyDay[msg.datetime].push(msg);
 			}
 		});
 
@@ -214,7 +216,7 @@ Conversation.prototype = {
 
 		for (var day in dateRange) {
 			var date = dateRange[day];
-			var dayString = this.dayFormat(date)
+			var dayString = d3.timeFormat(this.dayFormat)(date)
 
 			if (dayString in authorAbyDay) {
 				authorA.push(authorAbyDay[dayString]);
@@ -396,7 +398,7 @@ Conversation.prototype = {
 		// If already computed, return it
 		if (this.messageTimes) return this.messageTimes;
 
-		var timeformat = d3.time.format('%H');
+		var timeformat = d3.timeFormat('%H');
 		var authorA = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
 		var authorB = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
 		var messages = this.messages;
@@ -459,6 +461,47 @@ Conversation.prototype = {
 		return this.responseTimes;
 	},
 
+	getSilences: function () {
+		// If already calculated, return it
+		if (this.silences) return this.silences;
+
+		var messages = this.getMessagesByAuthorAndDay();
+		var dateRange = this.getDateRange();
+
+		var self = this;
+		var authorA = messages.authorAbyDay;
+		var authorB = messages.authorBbyDay;
+		var silenceHeldBy;
+		var lastChattyDate = d3.timeFormat(this.dayFormat)(dateRange[0]);
+		var silences = {}
+		dateRange.forEach(function (date) {
+			var day = d3.timeFormat(self.dayFormat)(date);
+			silences[day] = false;
+			if (day in authorA || day in authorB) {
+				lastChattyDate = day;
+			} else {
+				// Find last one to talk
+				if (lastChattyDate in authorA && !(lastChattyDate in authorB)) {
+					silences[day] = self.authorAName;
+				} else if (lastChattyDate in authorB && !(lastChattyDate in authorA)) {
+					silences[day] = self.authorBName;
+				} else if (lastChattyDate in authorA && lastChattyDate in authorB) {
+					var msgTimeA = _.last(authorA[lastChattyDate]).datetimeObj.getTime();
+					var msgTimeB = _.last(authorB[lastChattyDate]).datetimeObj.getTime();
+					if (msgTimeA > msgTimeB) {
+						silences[day] = self.authorAName;
+					} else {
+						silences[day] = self.authorBName;
+					}
+				}
+			}
+		});
+		this.silences = _.map(silences, function (d, dayString) {
+			return d;
+		});
+		return this.silences;
+	},
+
 	getResponseTimesByAuthorDay: function () {
 		// If already calculated, return it
 		if (this.responseTimesByAuthorDay) return this.responseTimesByAuthorDay;
@@ -467,7 +510,7 @@ Conversation.prototype = {
 				authorBresps = {};
 
 		for (var i = 0; i < this.daysNum + 2; i++) {
-			var thisDate = this.dayFormat(d3.time.day.offset(this.date0, i));
+			var thisDate = d3.timeFormat(this.dayFormat)(d3.timeDay.offset(this.date0, i));
 			authorAresps[thisDate] = [0];
 			authorBresps[thisDate] = [0];
 		}
@@ -476,7 +519,7 @@ Conversation.prototype = {
 			var responder = this.messages[i].author,
 					prompter = this.messages[i - 1].author;
 
-			var dayString = this.dayFormat(this.messages[i].datetimeObj);
+			var dayString = d3.timeFormat(this.dayFormat)(this.messages[i].datetimeObj);
 
 			if (responder !== prompter) {
 				var dateResp = this.messages[i].datetimeObj;
@@ -484,7 +527,7 @@ Conversation.prototype = {
 
 				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
 
-				if (diff < 60000 * 60 * 24) {
+				if (diff < 86400000) {
 					if (responder === this.authorAName) {
 						authorAresps[dayString].push(diff);
 					} else if (responder === this.authorBName){
@@ -504,6 +547,7 @@ Conversation.prototype = {
 		var respsAvgDiff = [];
 		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
 		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
+
 		for (var i = 0; i < authorArespsAvg.length; i++) {
 			var diff = authorArespsAvg[i].responseTime - authorBrespsAvg[i].responseTime;
 			respsAvgDiff.push({
