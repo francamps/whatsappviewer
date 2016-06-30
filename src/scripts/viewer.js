@@ -7,10 +7,11 @@ var Conversation = require('./conversation.js');
 var spectrogram = require('./views/spectrogram.js');
 var responseTimesTime = require('./views/response-times-day.js');
 var responseTimesHist = require('./views/response-times-hist.js');
-var timeofDay = require('./views/time-of-day.js');
+//var timeofDay = require('./views/time-of-day.js');
+import TimeOfDay from './views/time-of-day';
 
 // View configuration data
-var pink = "rgb(243, 38, 114)",
+const pink = "rgb(243, 38, 114)",
 		purple = "rgb(71, 3, 166)",
 		gold = "rgb(253, 199, 20)"
 
@@ -89,10 +90,11 @@ module.exports = {
 	// Volume of messages per time of day
 	timeofDay: function () {
 		var Convo = this.Convo;
-		timeofDay.render.call(this, {
+		let TimeOfDayView = new TimeOfDay({
 			Convo: Convo,
 			options: opts
 		});
+		TimeOfDayView.render();
 	},
 
 	// Distribution of response times per author

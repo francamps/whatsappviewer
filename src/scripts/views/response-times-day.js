@@ -16,7 +16,7 @@ module.exports = {
 
   	d3.select('#widget-3 svg').remove();
 
-    colW = 10;
+    var colW = 10;
     w = colW * Convo.daysNum;
 
   	var svg = d3.select("#widget-3 .svg").append("svg")

@@ -2,9 +2,13 @@ var gulp = require('gulp');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var sass = require('gulp-sass');
+var babelify = require('babelify');
 
 gulp.task('browserify', function() {
     return browserify('./src/scripts/app.js')
+        .transform(babelify, {
+          presets: ['es2015']
+        })
         .bundle()
         //Pass desired output filename to vinyl-source-stream
         .pipe(source('bundle.js'))

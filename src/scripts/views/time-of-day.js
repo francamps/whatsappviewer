@@ -1,82 +1,106 @@
-module.exports = {
-  render: function (args) {
-    var w = args.options.w,
-        h = 140,
-        pink = args.options.pink,
-        purple = args.options.purple,
-        dayFormat = args.options.dayFormat,
-        labelFormat = args.options.labelFormat,
-        Convo = args.Convo;
+export default class TimeOfDay {
+  constructor (args) {
+    this.w = args.options.w;
+    this.h = 140;
+    this.pink = args.options.pink;
+    this.purple = args.options.purple;
+    this.r = 20;
+    this.mg = 30;
+    this.hourStep = (this.w - this.mg) / 24;
 
-    var messageTimes = Convo.getMessageTimes();
+    this.messageTimes = args.Convo.getMessageTimes();
+  }
 
+  render () {
     d3.select('#widget-2 svg').remove();
 
-    var svg = d3.select('#widget-2').append('svg')
-                .attr('width', w)
-                .attr('height', h);
+    this.svg = d3.select('#widget-2').append('svg')
+                .attr('width', this.w)
+                .attr('height', this.h);
 
-    var r = 20;
-    var margin = 30;
-    var hourStep = (w - (margin)) / 24;
+    let messageTimesA = this.messageTimes.authorATimes,
+        messageTimesB = this.messageTimes.authorBTimes;
 
-    var maxA = d3.max(messageTimes.authorATimes),
-        maxB = d3.max(messageTimes.authorBTimes);
+    let maxA = d3.max(messageTimesA),
+        maxB = d3.max(messageTimesB);
 
-    var rScale = d3.scalePow().exponent(.5)
+    let rScale = d3.scalePow().exponent(.5)
                   .domain([0, maxA])
                   .range([1, 15]);
 
-    var cScale = d3.scalePow().exponent(.5)
+    let cScale = d3.scalePow().exponent(.5)
                   .domain([0, maxB])
                   .range([.2, .6]);
 
-    var bubbleA = svg.selectAll(".bubbleA")
-        .data(messageTimes.authorATimes)
-        .enter().append("g")
+    let bubbles = this.svg.append("g")
+                    .attr("class", "bubbles");
+
+    let bubblesA = bubbles.append("g")
+        .attr("class", "bubblesA");
+
+    let bubblesB = bubbles.append("g")
+      .attr("class", "bubblesB");
+
+    // Add bubbles and their classes
+    bubblesA.selectAll(".bubbleA")
+        .data(messageTimesA)
+        .enter().append("circle")
         .attr("class", "bubbleA bubble")
-        .attr("transform", function(d, i) {
-          return "translate(" + (margin + i * hourStep) + "," + (h / 4) + ")";
-        });
 
-    bubbleA.append("circle")
-      .attr("r", function (d) { return rScale(d); })
+    bubblesB.selectAll(".bubbleB")
+      .data(messageTimesB)
+      .enter().append("circle")
+      .attr("class", "bubbleB bubble");
+
+    // Position and size them
+    bubbles.selectAll(".bubble")
       .attr("cx", 0)
       .attr("cy", 0)
-      .style("fill", function (d) {
-        return d3.hsl(338, .95, cScale(d)).toString();
+      .attr("r", (d) => rScale(d));
+
+    bubblesA.selectAll(".bubbleA")
+      .attr("transform", (d, i) => {
+        let x = this.mg + i * this.hourStep,
+            y = this.h / 4;
+        return `translate(${x}, ${y})`;
       });
 
-    var bubbleB = svg.selectAll(".bubbleB")
-      .data(messageTimes.authorBTimes)
-      .enter().append("g")
-      .attr("class", "bubbleB bubble")
-      .attr("transform", function(d, i) {
-        return "translate(" + (margin + i * hourStep) + "," + (3 * h / 4) + ")";
+    bubblesB.selectAll(".bubbleB")
+      .attr("transform", (d, i) => {
+        let x = this.mg + i * this.hourStep,
+            y = 3 * this.h / 4;
+        return `translate(${x}, ${y})`;
       });
 
-    bubbleB.append("circle")
-      .attr("r", function (d) { return rScale(d); })
-      .attr("cx", 0)
-      .attr("cy", 0)
-      .style("fill", function (d) {
-        return d3.hsl(265, .97, cScale(d)).toString();
-      });
+    // Paint bubbles
+    bubblesA.selectAll(".bubbleA")
+      .style("fill", (d) => d3.hsl(265, .97, cScale(d)).toString());
 
-    svg.selectAll(".time-labels")
+    bubblesB.selectAll(".bubbleB")
+      .style("fill", (d) => d3.hsl(338, .95, cScale(d)).toString());
+
+    // Render time labels
+    this.renderTimeLabels();
+  }
+
+  renderTimeLabels () {
+    let timeLabels = this.svg.append("g")
+                        .attr("class", "time-labels");
+
+    timeLabels.selectAll(".time-label")
       .data(new Array(24))
       .enter().append("text")
       .attr("class", "time-label")
-      .attr("x", function (d, i) {
-          return (margin + i * hourStep);
-      })
-      .attr("y", h / 2 + 5)
-      .style("text-anchor", "middle")
-      .text(function (d, i) {
-        if (w > 600 || (i % 2 === 0)) {
+      .text((d, i) => {
+        if (this.w > 600 || (i % 2 === 0)) {
           return i + "h";
         }
         return "";
       });
+
+    timeLabels.selectAll(".time-label")
+      .attr("x", (d, i) => (this.mg + i * this.hourStep))
+      .attr("y", this.h / 2 + 5)
+      .style("text-anchor", "middle");
   }
 }

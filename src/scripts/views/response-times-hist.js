@@ -131,7 +131,7 @@ module.exports = {
         buckets[5]++;
       }
     }
-    buckets15m = this.bucketify15m(times15m);
+    let buckets15m = this.bucketify15m(times15m);
     return {
       buckets: buckets,
       buckets15m: buckets15m
