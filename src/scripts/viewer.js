@@ -4,11 +4,10 @@
 var Conversation = require('./conversation.js');
 
 // Views
-var spectrogram = require('./views/spectrogram.js');
+import VolumeTime from './views/volume-time';
+import TimeOfDay from './views/time-of-day';
 var responseTimesTime = require('./views/response-times-day.js');
 var responseTimesHist = require('./views/response-times-hist.js');
-//var timeofDay = require('./views/time-of-day.js');
-import TimeOfDay from './views/time-of-day';
 
 // View configuration data
 const pink = "rgb(243, 38, 114)",
@@ -69,13 +68,14 @@ module.exports = {
 	},
 
 	// Volume of messages over time
-	spectrogram: function () {
-		var Convo = this.Convo;
-		spectrogram.render({
+	volumeTime: function () {
+		let Convo = this.Convo;
+		let VolumeTimeView = new VolumeTime({
 			Convo: Convo,
 			options: opts
-		});
-		spectrogram.addEvents(this.messages);
+		})
+		VolumeTimeView.render();
+		VolumeTimeView.addEvents(this.messages);
 	},
 
 	// Response times over time
@@ -89,7 +89,7 @@ module.exports = {
 
 	// Volume of messages per time of day
 	timeofDay: function () {
-		var Convo = this.Convo;
+		let Convo = this.Convo;
 		let TimeOfDayView = new TimeOfDay({
 			Convo: Convo,
 			options: opts
@@ -162,7 +162,7 @@ module.exports = {
 
 	render: function () {
 		this.authorsLegend();
-		this.spectrogram();
+		this.volumeTime();
 		this.fillDataTable();
 		this.timeofDay();
 		this.responseTimes();

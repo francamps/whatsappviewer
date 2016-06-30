@@ -12,18 +12,23 @@ export default class TimeOfDay {
   }
 
   render () {
+    // Make sure there is not one already
+    // TODO: This is dirty, fix it
     d3.select('#widget-2 svg').remove();
 
+    // Append SVG to div
     this.svg = d3.select('#widget-2').append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
 
+    // Get response times
     let messageTimesA = this.messageTimes.authorATimes,
         messageTimesB = this.messageTimes.authorBTimes;
 
     let maxA = d3.max(messageTimesA),
         maxB = d3.max(messageTimesB);
 
+    // Define scale functions
     let rScale = d3.scalePow().exponent(.5)
                   .domain([0, maxA])
                   .range([1, 15]);
@@ -32,6 +37,7 @@ export default class TimeOfDay {
                   .domain([0, maxB])
                   .range([.2, .6]);
 
+    // Groups of bubbles
     let bubbles = this.svg.append("g")
                     .attr("class", "bubbles");
 
@@ -52,7 +58,7 @@ export default class TimeOfDay {
       .enter().append("circle")
       .attr("class", "bubbleB bubble");
 
-    // Position and size them
+    // Position and size bubbles within each group
     bubbles.selectAll(".bubble")
       .attr("cx", 0)
       .attr("cy", 0)
