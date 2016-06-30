@@ -303,6 +303,8 @@ button {
 
       &:first-child {
         color: $dark-grey;
+        font-size: 16px;
+        font-weight: bolder;
       }
 
       .cell {
@@ -310,13 +312,13 @@ button {
         text-align: center;
 
         &.metric {
-          font-size: 20px;
-          font-weight: bolder;
+          font-size: 16px;
         }
       }
 
       .metric-label {
         width: 30%;
+        font-size: 12px;
       }
     }
   }
