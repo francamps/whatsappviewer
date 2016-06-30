@@ -1,13 +1,18 @@
 module.exports = {
   render: function (args, svgID) {
     var w = 200,
-        marginH = 10,//args.options.marginH,
+        marginH = args.options.marginH,
         h = 120,
         pink = args.options.pink,
         purple = args.options.purple,
         dayFormat = args.options.dayFormat,
         labelFormat = args.options.labelFormat,
         Convo = args.Convo;
+
+    if (document.querySelector(".page-wrap").offsetWidth < 800) {
+      w = 100;
+      marginH = 5;
+    }
 
     var resps = Convo.getResponseTimes();
 

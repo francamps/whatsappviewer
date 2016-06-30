@@ -16,9 +16,12 @@ module.exports = {
 
   	d3.select('#widget-3 svg').remove();
 
-  	var svg = d3.select('#widget-3').append('svg')
-  							.attr('width', w)
-  							.attr('height', h);
+    colW = 10;
+    w = colW * Convo.daysNum;
+
+  	var svg = d3.select("#widget-3 .svg").append("svg")
+  							.attr("width", w)
+  							.attr("height", h);
 
   	var timeScale = d3.scaleTime()
                       .domain([Convo.date0, Convo.dateF])
@@ -28,31 +31,40 @@ module.exports = {
   										.domain([0, 86400000])
   										.range([0, h/2]);
 
-    var colW = timeScale(d3.timeDay.offset(Convo.date0, 1)) - timeScale(Convo.date0);
+    // If width too narrow, make it extend to full width
+    if (w < args.options.w) {
+      w = args.options.w;
+      svg.attr("width", args.options.w)
+      timeScale.range([marginH, w - marginH]);
+      colW = timeScale(d3.timeDay.offset(Convo.date0, 1)) - timeScale(Convo.date0);
+    }
 
     var parse = d3.timeParse(dayFormat);
 
-    svg.selectAll(".lineA")
+    var respsA = svg.append("g")
+      .attr("class", "respsA");
+
+    var respsB = svg.append("g")
+      .attr("class", "respsA");
+
+    respsA.selectAll(".lineA")
   	      .data(respsDay.authorA.filter(Boolean))
           .enter().append("rect")
   	      .attr("class", "lineA respLine")
-  	      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
           .attr("y", function (d) { return h / 2 - yScale(d.responseTime); })
-          .attr("width", w / respsDay.authorA.length - 2)
-          .attr("height", function (d) { return yScale(d.responseTime); })
   				.style("fill", pink);
 
-    svg.selectAll(".lineB")
+    respsB.selectAll(".lineB")
   	      .data(respsDay.authorB.filter(Boolean))
           .enter().append("rect")
   	      .attr("class", "lineB respLine")
-  	      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
           .attr("y", function (d) { return h / 2; })
-          .attr("width", colW - 2)
-          .attr("height", function (d) { return yScale(d.responseTime); })
-      		.style("fill", purple)
+      		.style("fill", purple);
 
     svg.selectAll(".respLine")
+      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
+      .attr("width", colW - 2)
+      .attr("height", function (d) { return yScale(d.responseTime); })
       .style("stroke", "none");
 
     var lineFn = d3.line()
@@ -87,7 +99,6 @@ module.exports = {
           .attr("class", "message-circle")
           .attr("cx", marginH + (i + 1/2) * colW)
           .attr("cy", function (b) { return h / 2 - yScale(b); })
-          .attr("r", 2)
           .style("fill", pink);
       });
 
@@ -99,11 +110,18 @@ module.exports = {
           .attr("class", "message-circle")
           .attr("cx", marginH + (i + 1/2) * colW)
           .attr("cy", function (b) { return h / 2 + yScale(b); })
-          .attr("r", 2)
           .style("fill", purple);
       });
 
+    var axis = d3.axisBottom(timeScale);
+
+    svg.append("g")
+      .attr("class", "axis-g")
+      .attr("transform", "translate(0," + h / 2 + ")")
+      .call(axis);
+
     d3.selectAll(".message-circle")
+      .attr("r", 2)
       .style("stroke-width", "1")
       .style("opacity", .6)
       .style("stroke", "white");
@@ -128,35 +146,4 @@ module.exports = {
         }
         return purple;
       });
-  },
-
-  ticksAndLabels: function () {
-    svg.append("text")
-      .attr("class", "time-label")
-      .attr("x", marginH)
-      .attr("y", h / 4 - 10)
-      .style("text-anchor", "start")
-      .text(labelFormat(Convo.date0));
-
-    svg.append("line")
-      .attr("class", "tick")
-      .attr("x1", marginH)
-      .attr("x2", marginH)
-      .attr("y1", h / 4 + 10)
-      .attr("y2", h / 4 + 60);
-
-    svg.append("text")
-      .attr("class", "time-label")
-      .attr("x", timeScale(respsDay.difference.length))
-      .attr("y", h / 4 - 10)
-      .style("text-anchor", "end")
-      .text(labelFormat(Convo.dateF));
-
-    svg.append("line")
-      .attr("class", "tick")
-      .attr("x1", timeScale(respsDay.difference.length))
-      .attr("x2", timeScale(respsDay.difference.length))
-      .attr("y1", h / 4 + 10)
-      .attr("y2", h / 4 + 60);
-  }
-}
+  }}
