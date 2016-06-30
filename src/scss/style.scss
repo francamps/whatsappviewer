@@ -1,20 +1,7 @@
-$wapp-green: rgb(97, 210, 106);
-$mess-green: rgb(220, 248, 198);
-$dark-green: rgb(0, 134, 117);
-$wapp-blue: rgb(218, 240, 250);
-
-$warn-pink: rgb(254, 117, 113);
-
-$dark-grey: #232323;
-$mid-grey: #888888;
-$lightish-grey: #c0c0c0;
-$verylight-grey: #efefef;
-$superlight-grey: #f8f8f8;
-$white: #fff;
-
-// Gradient
-$electric-green: #78dc3a;
-$skyblue: #24d8cd;
+@import 'colors';
+@import 'button';
+@import 'footer';
+@import 'header';
 
 body {
   position: absolute;
@@ -65,38 +52,6 @@ h2 {
 
 h3 {
   font-weight: lighter;
-}
-
-header {
-  height: 84px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 18px;
-  font-weight: lighter;
-  background: $dark-green;
-  color: white;
-  box-shadow: 0px 3px 5px #dddddd;
-  text-transform: uppercase;
-
-  a {
-    margin: 20px;
-    height: 20px;
-    line-height: 20px;
-    float: left;
-    background: none;
-    text-decoration: none;
-    font-family: 'Roboto', sans-serif;
-    padding: 10px;
-    cursor: pointer;
-    color: white;
-
-    &.view {
-      float: right;
-    }
-
-    &:hover {
-      color: $electric-green;
-    }
-  }
 }
 
 .page-wrap {
@@ -197,10 +152,6 @@ header {
 }
 
 form {
-  label {
-    color: $mid-grey;
-  }
-
   input, textarea {
     width: 100%;
     outline: none;
@@ -223,24 +174,6 @@ form {
   input:focus, textarea:focus {
     border-color: $wapp-green;
     box-shadow: 0 0 10px $wapp-green;
-  }
-}
-
-button {
-  text-decoration: none;
-  font-family: 'Roboto', sans-serif;
-  padding: 10px;
-  border-radius: 3px;
-  border: 1px solid $wapp-green;
-  cursor: pointer;
-  color: $wapp-green;
-  font-size: 14px;
-  outline: none;
-  background: $white;
-
-  &:hover {
-    color: $white;
-    background: $wapp-green;
   }
 }
 
@@ -337,23 +270,31 @@ button {
       stroke: $mid-grey;
       stroke-width: 1px;
     }
+
+    .axis-g {
+      .domain {
+        stroke: #a0a0a0;
+        stroke-dasharray: 2px 5px;
+      }
+
+      line {
+        stroke: $mid-grey;
+      }
+
+      text {
+        stroke: none;
+        fill: $mid-grey;
+      }
+    }
   }
-}
 
-footer {
-  background: linear-gradient(-30deg, $electric-green, $skyblue);
-  color: white;
-  box-shadow: 0px -3px 5px #dddddd;
-  text-align: center;
-  padding: 30px 0;
-  margin-top: 60px;
+  .svg {
+    overflow: scroll;
+    border: 1px solid rgba($dark-green, 0.15);
+    border-radius: 5px;
 
-  a {
-    text-decoration: none;
-    color: $white;
-
-    &:hover {
-      text-decoration: underline;
+    svg {
+      border: none;
     }
   }
 }

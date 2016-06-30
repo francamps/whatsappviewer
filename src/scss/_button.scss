@@ -1,0 +1,17 @@
+button {
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid $wapp-green;
+  cursor: pointer;
+  color: $wapp-green;
+  font-size: 14px;
+  outline: none;
+  background: $white;
+
+  &:hover {
+    color: $white;
+    background: $wapp-green;
+  }
+}
