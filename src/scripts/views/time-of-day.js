@@ -8,7 +8,11 @@ export default class TimeOfDay {
     this.mg = 30;
     this.hourStep = (this.w - this.mg) / 24;
 
-    this.messageTimes = args.Convo.getMessageTimes();
+    // Get response times
+    let messageTimes = args.Convo.getMessageTimes();
+
+    this.messageTimesA = messageTimes.authorATimes;
+    this.messageTimesB = messageTimes.authorBTimes;
   }
 
   render () {
@@ -17,29 +21,34 @@ export default class TimeOfDay {
     d3.select('#widget-2 svg').remove();
 
     // Append SVG to div
-    this.svg = d3.select('#widget-2').append('svg')
+    this.svg = d3.select('#widget-2')
+                .append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
 
-    // Get response times
-    let messageTimesA = this.messageTimes.authorATimes,
-        messageTimesB = this.messageTimes.authorBTimes;
+    this.computeScaleFns();
+    this.addBubbles();
+    this.renderTimeLabels();
+  }
 
-    let maxA = d3.max(messageTimesA),
-        maxB = d3.max(messageTimesB);
+  computeScaleFns () {
+    this.maxA = d3.max(this.messageTimesA),
+    this.maxB = d3.max(this.messageTimesB);
 
     // Define scale functions
     let rScale = d3.scalePow().exponent(.5)
-                  .domain([0, maxA])
+                  .domain([0, this.maxA])
                   .range([1, 15]);
 
     let cScale = d3.scalePow().exponent(.5)
-                  .domain([0, maxB])
+                  .domain([0, this.maxB])
                   .range([.2, .6]);
+  }
 
+  addBubbles () {
     // Groups of bubbles
     let bubbles = this.svg.append("g")
-                    .attr("class", "bubbles");
+                      .attr("class", "bubbles");
 
     let bubblesA = bubbles.append("g")
         .attr("class", "bubblesA");
@@ -49,12 +58,12 @@ export default class TimeOfDay {
 
     // Add bubbles and their classes
     bubblesA.selectAll(".bubbleA")
-        .data(messageTimesA)
+        .data(this.messageTimesA)
         .enter().append("circle")
         .attr("class", "bubbleA bubble")
 
     bubblesB.selectAll(".bubbleB")
-      .data(messageTimesB)
+      .data(this.messageTimesB)
       .enter().append("circle")
       .attr("class", "bubbleB bubble");
 
@@ -62,7 +71,7 @@ export default class TimeOfDay {
     bubbles.selectAll(".bubble")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", (d) => rScale(d));
+      .attr("r", (d) => this.rScale(d));
 
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
@@ -80,23 +89,24 @@ export default class TimeOfDay {
 
     // Paint bubbles
     bubblesA.selectAll(".bubbleA")
-      .style("fill", (d) => d3.hsl(265, .97, cScale(d)).toString());
+      .style("fill", (d) => d3.hsl(265, .97, this.cScale(d)).toString());
 
     bubblesB.selectAll(".bubbleB")
-      .style("fill", (d) => d3.hsl(338, .95, cScale(d)).toString());
-
-    // Render time labels
-    this.renderTimeLabels();
+      .style("fill", (d) => d3.hsl(338, .95, this.cScale(d)).toString());
   }
 
   renderTimeLabels () {
-    let timeLabels = this.svg.append("g")
-                        .attr("class", "time-labels");
+    let timeLabels =
+        this.svg
+            .append("g")
+            .attr("class", "time-labels");
 
-    timeLabels.selectAll(".time-label")
+    let timeLabel = timeLabels.selectAll(".time-label")
       .data(new Array(24))
       .enter().append("text")
       .attr("class", "time-label")
+
+    timeLabel
       .text((d, i) => {
         if (this.w > 600 || (i % 2 === 0)) {
           return i + "h";
@@ -104,7 +114,7 @@ export default class TimeOfDay {
         return "";
       });
 
-    timeLabels.selectAll(".time-label")
+    timeLabel
       .attr("x", (d, i) => (this.mg + i * this.hourStep))
       .attr("y", this.h / 2 + 5)
       .style("text-anchor", "middle");
