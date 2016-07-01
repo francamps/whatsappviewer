@@ -1,149 +1,239 @@
-module.exports = {
-  render: function (args) {
-    var w = args.options.w,
-        marginH = args.options.marginH,
-        h = args.options.h,
-        pink = args.options.pink,
-        purple = args.options.purple,
-        gold = args.options.gold,
-        dayFormat = args.options.dayFormat,
-        labelFormat = args.options.labelFormat,
-        Convo = args.Convo;
+export default class ResponseTimesTime {
+  constructor (args) {
+    this.w = args.options.w;
+    this.mg = args.options.marginH;
+    this.h = args.options.h;
+    this.pink = args.options.pink;
+    this.purple = args.options.purple;
+    this.gold = args.options.gold;
+    this.dayFormat = args.options.dayFormat;
+    this.labelFormat = args.options.labelFormat;
+    this.Convo = args.Convo;
 
-    var resps = Convo.getResponseTimes();
-  	var respsDay = Convo.getResponseTimesByAuthorDay();
-    var silences = Convo.getSilences();
+    this.resps = args.Convo.getResponseTimes();
+  	this.respsDay = args.Convo.getResponseTimesByAuthorDay();
+    this.silences = args.Convo.getSilences();
 
-  	d3.select('#widget-3 svg').remove();
+    this.dayFormatParse = d3.timeParse(this.dayFormat);
+  }
 
-    var colW = 10;
-    w = colW * Convo.daysNum;
+  render () {
+    this.initializeSVG();
 
-  	var svg = d3.select("#widget-3 .svg").append("svg")
-  							.attr("width", w)
-  							.attr("height", h);
+    this.computeScaleFns();
+    this.adjustSizeIfNeeded();
+    this.addEachResponseTime()
+    this.addDiffLine();
+    this.addMessageDots();
+    this.addAxis();
+    //this.addSilences();
+  }
 
-  	var timeScale = d3.scaleTime()
-                      .domain([Convo.date0, Convo.dateF])
-                      .range([marginH, w - marginH]);
+  initializeSVG () {
+    // Please find a better way to do this
+  	d3.select('#widget-3 svg')
+      .remove();
 
-  	var yScale = d3.scaleLinear()
-  										.domain([0, 86400000])
-  										.range([0, h/2]);
+    // Append SVG to the DOM
+  	this.svg =
+      d3.select("#widget-3 .svg")
+        .append("svg")
+        .attr("class", "dailyRT-svg")
+  			.attr("width", this.w)
+  			.attr("height", this.h);
+  }
+
+  // Compute scale functions for x axis (time) and y axis (response time)
+  computeScaleFns () {
+    this.timeScale =
+        d3.scaleTime()
+          .domain([this.Convo.date0, this.Convo.dateF])
+          .range([this.mg, this.w - this.mg]);
+
+  	this.yScale =
+        d3.scaleLinear()
+					.domain([0, 86400000])
+					.range([0, this.h / 2]);
+  }
+
+  adjustSizeIfNeeded () {
+    // Minimum width of columns to be perceived well
+    let minColW = 10,
+        minimumW = minColW * this.Convo.daysNum;
+
+    this.colW = minColW;
 
     // If width too narrow, make it extend to full width
-    if (w < args.options.w) {
-      w = args.options.w;
-      svg.attr("width", args.options.w)
-      timeScale.range([marginH, w - marginH]);
-      colW = timeScale(d3.timeDay.offset(Convo.date0, 1)) - timeScale(Convo.date0);
+    if (this.w < minimumW) {
+      this.w = minimumW;
+      // Update SVG to minimum width
+      this.initializeSVG();
+
+      // Update the time scale as well
+      this.computeScaleFns();
+
+      // Update the column width
+      let date0 = this.Convo.date0,
+          date1 = d3.timeDay.offset(this.Convo.date0, 1);
+
+      this.colW = this.timeScale(date1) - this.timeScale(date0);
+    }
+  }
+
+  // Add response times column bar
+  addEachResponseTime () {
+    /* Author A */
+    // Add RT for author A, grouped
+    let respsA =
+        this.svg.append("g")
+            .attr("class", "respsA");
+
+    // Append columns per each day with response time daya
+    let lineA = respsA.selectAll(".lineA")
+      .data(this.respsDay.authorA.filter(Boolean))
+      .enter().append("rect")
+      .attr("class", "lineA respLine")
+
+    // Positioning and sizing
+    lineA
+      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("y", (d) => this.h / 2 - this.yScale(d.responseTime))
+      .attr("width", this.colW - 2)
+      .attr("height", (d) => this.yScale(d.responseTime));
+
+    // Styling for RT columns
+    lineA
+			.style("fill", this.pink);
+
+    /* Author B */
+    // Add RT for author B, grouped
+    let respsB =
+        this.svg.append("g")
+            .attr("class", "respsA");
+
+    // Append columns per each day with response time daya
+    let lineB = respsB.selectAll(".lineB")
+      .data(this.respsDay.authorB.filter(Boolean))
+      .enter().append("rect")
+      .attr("class", "lineB respLine")
+
+    // Positioning and sizing
+    lineB
+      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("y", (d) => this.h / 2)
+      .attr("width", this.colW - 2)
+      .attr("height", (d) => this.yScale(d.responseTime))
+
+    // Styling, please move to stylesheet
+    lineB
+  		.style("fill", this.purple);
+  }
+
+  // Add difference between each author's response time per day
+  addDiffLine () {
+    // functions for positioning
+    let x = (d) => {
+      let parsedDate = this.dayFormatParse(d.datetime);
+      return this.timeScale(parsedDate) + this.colW / 2;
     }
 
-    var parse = d3.timeParse(dayFormat);
+    let y = (d) => {
+      return this.h / 2 - this.yScale(d.responseTimeDifference);
+    }
 
-    var respsA = svg.append("g")
-      .attr("class", "respsA");
-
-    var respsB = svg.append("g")
-      .attr("class", "respsA");
-
-    respsA.selectAll(".lineA")
-  	      .data(respsDay.authorA.filter(Boolean))
-          .enter().append("rect")
-  	      .attr("class", "lineA respLine")
-          .attr("y", function (d) { return h / 2 - yScale(d.responseTime); })
-  				.style("fill", pink);
-
-    respsB.selectAll(".lineB")
-  	      .data(respsDay.authorB.filter(Boolean))
-          .enter().append("rect")
-  	      .attr("class", "lineB respLine")
-          .attr("y", function (d) { return h / 2; })
-      		.style("fill", purple);
-
-    svg.selectAll(".respLine")
-      .attr("x", function (d, i) { return timeScale(parse(d.datetime)); })
-      .attr("width", colW - 2)
-      .attr("height", function (d) { return yScale(d.responseTime); })
-      .style("stroke", "none");
-
-    var lineFn = d3.line()
-      .x(function (d, i) { return timeScale(parse(d.datetime)) + colW / 2; })
-      .y(function (d) { return h / 2 - yScale(d.responseTimeDifference); })
-      .defined(function (d) {
-        return (d.responseTimeDifference);
-      })
+    // Line function
+    let lineFn = d3.line()
+      .x(x)
+      .y(y)
+      .defined((d) => d.responseTimeDifference)
       .curve(d3.curveMonotoneX);
 
-    svg.append("path")
-      .attr("d", lineFn(respsDay.difference))
-      .style("stroke", gold)
-      .style("stroke-width", "2px")
-      .style("fill", "none");
+    // Append the line as a path
+    let diffLine = this.svg.append("path")
+      .attr("class", "diffLine")
+      .attr("d", lineFn(this.respsDay.difference))
 
-    var msgs = svg.append("g");
+    // Please move this to a stylesheet
+    diffLine
+      .style("fill", "none")
+      .style("stroke", this.gold);
+  }
 
-    var daysA = msgs.selectAll(".day-message-circles")
-      .data(d3.map(respsDay.authorAAll).entries())
+  // Individual messages dot, to see variance
+  addMessageDots () {
+    let msgs =
+        this.svg.append("g")
+            .attr("class", "message-circles");
+
+    let allMessagesA = d3.map(this.respsDay.authorAAll).entries(),
+        allMessagesB = d3.map(this.respsDay.authorBAll).entries();
+
+    // Add messages for author A
+    // grouping them per day
+    let daysA = msgs.selectAll(".day-message-circles")
+      .data(allMessagesA)
       .enter().append("g");
 
-    var daysB = msgs.selectAll(".day-message-circles")
-      .data(d3.map(respsDay.authorBAll).entries())
+
+    daysA.each((d, i, nodes) => {
+      let circle = d3.select(nodes[i]).selectAll(".message-circle")
+        .data(d.value)
+        .enter().append("circle")
+        .attr("class", "message-circle")
+
+      // Position and dimension
+      circle
+        .attr("cx", this.mg + (i + 1/2) * this.colW)
+        .attr("cy", (b) => this.h / 2 - this.yScale(b))
+        .attr("r", 2)
+
+      // Styling, please move to stylesheet
+      circle
+        .style("fill", this.pink);
+    });
+
+    // Add messages for author B
+    // grouping them per day
+    let daysB = msgs.selectAll(".day-message-circles")
+      .data(allMessagesB)
       .enter().append("g");
 
-    daysA.each(function (d, i) {
-        d3.select(this)
-          .selectAll(".message-circle")
-          .data(d.value)
-          .enter().append("circle")
-          .attr("class", "message-circle")
-          .attr("cx", marginH + (i + 1/2) * colW)
-          .attr("cy", function (b) { return h / 2 - yScale(b); })
-          .style("fill", pink);
-      });
+    daysB.each((d, i, nodes) => {
+      // A circle per message
+      let circle = d3.select(nodes[i]).selectAll(".message-circle")
+        .data(d.value)
+        .enter().append("circle")
+        .attr("class", "message-circle")
 
-    daysB.each(function (d, i) {
-        d3.select(this)
-          .selectAll(".message-circle")
-          .data(d.value)
-          .enter().append("circle")
-          .attr("class", "message-circle")
-          .attr("cx", marginH + (i + 1/2) * colW)
-          .attr("cy", function (b) { return h / 2 + yScale(b); })
-          .style("fill", purple);
-      });
+      // Position and dimension
+      circle
+        .attr("cx", this.mg + (i + 1/2) * this.colW)
+        .attr("cy", (b) => this.h / 2 + this.yScale(b))
+        .attr("r", 2)
 
-    var axis = d3.axisBottom(timeScale);
-
-    svg.append("g")
-      .attr("class", "axis-g")
-      .attr("transform", "translate(0," + h / 2 + ")")
-      .call(axis);
+      // Styling, please move to stylesheet
+      circle
+        .style("fill", this.purple);
+    });
 
     d3.selectAll(".message-circle")
-      .attr("r", 2)
       .style("stroke-width", "1")
       .style("opacity", .6)
       .style("stroke", "white");
+  }
 
-    var silences = svg.append("g");
+  addAxis () {
+    let axis = d3.axisBottom(this.timeScale);
 
-    silences.selectAll('.waitingLine')
-      .data(silences)
-      .enter().append("circle")
-      .attr("class", "waitingLine")
-      .attr("cx", function (d, i) {
-        return (i + 1) * colW - colW / 2;
-      })
-      .attr("cy", h / 2)
-      .attr("r", 5)
-      .style("opacity", .15)
-      .style("fill", function (d, i) {
-        if (!d) {
-          return "none";
-        } else if (d === Convo.authorAName){
-          return pink;
-        }
-        return purple;
-      });
-  }}
+    let midH = this.h / 2;
+
+    this.svg.append("g")
+      .attr("class", "axis-g")
+      .attr("transform", `translate(0, ${midH})`)
+      .call(axis);
+  }
+
+  addSilences () {
+    // TODO: Do something with the silences at somepoint
+  }
+}

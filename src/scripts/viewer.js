@@ -6,8 +6,8 @@ var Conversation = require('./conversation.js');
 // Views
 import VolumeTime from './views/volume-time';
 import TimeOfDay from './views/time-of-day';
-var responseTimesTime = require('./views/response-times-day.js');
 import ResponseTimesHist from './views/response-times-hist';
+import ResponseTimesTime from './views/response-times-day';
 
 // View configuration data
 const pink = "rgb(243, 38, 114)",
@@ -80,10 +80,11 @@ module.exports = {
 	// Response times over time
 	responseTimes: function () {
 		var Convo = this.Convo;
-		responseTimesTime.render({
+		let ResponseTimesTimeView = new ResponseTimesTime({
 			Convo: Convo,
 			options: opts
 		});
+		ResponseTimesTimeView.render();
 	},
 
 	// Volume of messages per time of day

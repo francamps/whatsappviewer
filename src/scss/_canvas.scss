@@ -131,6 +131,21 @@ svg {
       text-anchor: middle;
     }
   }
+
+  &.dailyRT-svg {
+    rect {
+      &.respLine {
+        stroke: none;
+      }
+    }
+
+    path {
+      &.diffLine {
+        stroke-width: 2px;
+        fill: none;
+      }
+    }
+  }
 }
 
 .svg {
