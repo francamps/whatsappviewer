@@ -1,0 +1,144 @@
+.canvas {
+  z-index: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 20px 20px 0 20px;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+
+/* Legend Widgte
+/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.legend {
+  text-align: center;
+  background: $white;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid $verylight-grey;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
+  min-height: 40px;
+
+  .legend-label {
+    font-family: 'Roboto';
+    text-transform: uppercase;
+  }
+
+  .legend-col {
+    width: 10px;
+    height: 10px;
+    margin-left: 40px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  .legend-label, .legend-col {
+    display: inline-block;
+  }
+}
+
+
+/* Table for metrics
+/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+
+.data-table {
+  margin: 0 auto;
+  margin-bottom: 40px;
+  padding: 0;
+
+  @media (min-width: 900px) {
+    padding: 0 30px;
+  }
+
+  .row {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    padding: 26px;
+    font-family: 'Roboto', sans-serif;
+    border-bottom: 1px solid $dark-green;
+
+    &:first-child {
+      color: $dark-grey;
+      font-size: 16px;
+      font-weight: bolder;
+    }
+
+    .cell {
+      width: 35%;
+      text-align: center;
+
+      &.metric {
+        font-size: 16px;
+      }
+    }
+
+    .metric-label {
+      width: 30%;
+      font-size: 12px;
+    }
+  }
+}
+
+/* SVG Styling
+/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+svg {
+  border: 1px solid rgba($dark-green, 0.15);
+  border-radius: 5px;
+
+  .time-label {
+    font-family: 'Roboto';
+    font-size: 11px;
+    fill: $mid-grey;
+  }
+
+  .tick {
+    stroke: $mid-grey;
+    stroke-width: 1px;
+  }
+
+  .axis-g {
+    .domain {
+      stroke: $light-grey;
+      stroke-dasharray: 2px 5px;
+    }
+
+    line {
+      stroke: $mid-grey;
+    }
+
+    text {
+      stroke: none;
+      fill: $mid-grey;
+    }
+  }
+
+  /*
+  * -- Response Times Histogram ------ */
+
+  &.histoRT-svg {
+    .label {
+      font-size: 10px;
+      font-weight: lighter;
+      text-anchor: middle;
+    }
+  }
+}
+
+.svg {
+  overflow: scroll;
+  border: 1px solid rgba($dark-green, 0.15);
+  border-radius: 5px;
+
+  svg {
+    border: none;
+  }
+}

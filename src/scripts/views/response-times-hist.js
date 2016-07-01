@@ -23,6 +23,8 @@ export default class ResponseTimesHist {
   }
 
   getBuckets () {
+    // Buckitfy times on chat mode or not
+    // INFO: Chat mode means any response time under 15 minutes
     if (this.chatMode) {
       this.bucketsA = this.bucketify15m(this.resps.authorA);
       this.bucketsB = this.bucketify15m(this.resps.authorB);
@@ -31,16 +33,19 @@ export default class ResponseTimesHist {
       this.bucketsB = this.bucketify(this.resps.authorB);
     }
 
+    // Y axis limits depend on both author A and B
+    this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
+
+    // Buckets to display in this render
     if (this.author === "A") {
       this.buckets = this.bucketsA;
     } else {
       this.buckets = this.bucketsB;
     }
-
-    this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
   }
 
   viewTypeAdjustments () {
+    // Choos labels of histogram based on either chatMode or not
     if (this.chatMode) {
       this.labels = ["<2'", "2'-", "5'-", "10'-"];
       this.labelsLow = ["", "5'", "10'", "15'"];
@@ -55,9 +60,6 @@ export default class ResponseTimesHist {
     } else {
       this.color = this.purple;
     }
-
-    // Adjust column width based on type of buckets
-    this.colW = (this.w - 2 * this.mg) / this.buckets.length - 2;
   }
 
   computeScaleFns () {
@@ -70,20 +72,28 @@ export default class ResponseTimesHist {
       d3.scaleLinear()
 				.domain([0, this.yMax])
 				.range([0, this.h - 30]);
+
+    // Adjust column width based on type of buckets
+    this.colW = (this.w - 2 * this.mg) / this.buckets.length - 2;
   }
 
   render () {
+    // Please find a better way to do this
     d3.select(this.svgID + " svg").remove();
 
+    // Append SVG to div
   	this.svg = d3.select(this.svgID).append('svg')
+                .attr("class", "histoRT-svg")
   							.attr('width', this.w)
   							.attr('height', this.h);
 
+    // Do the thing
     this.computeScaleFns();
     this.addBars();
     this.addLabels();
   }
 
+  // Apend the bars on the histogram
   addBars () {
     let barsHist = this.svg.selectAll('.barsHist')
       .data(this.buckets)
@@ -104,32 +114,23 @@ export default class ResponseTimesHist {
     let labelsHigh = this.svg.selectAll(".labelHigh")
       .data(this.labels)
       .enter().append("text")
-      .attr("class", "labelHigh label")
+      .attr("class", "labelHigh label");
 
     labelsHigh
       .attr("x", (d, i) => this.timeScale(i) + this.colW / 2)
       .attr("y", (d, i) => this.h - 17)
-      .text((d, i) => this.labels[i])
+      .text((d, i) => this.labels[i]);
 
     // Second row of labels
     let labelsLow = this.svg.selectAll(".labelLow")
       .data(this.labelsLow)
       .enter().append("text")
-      .attr("class", "labelLow label")
+      .attr("class", "labelLow label");
 
     labelsLow
       .attr("x", (d, i) => this.timeScale(i) + this.colW / 2)
       .attr("y", (d, i) => this.h - 5)
-      .text((d, i) => this.labelsLow[i])
-
-    // Some styling
-    // TODO: Move this to stylesheet!!
-    let labels = this.svg.selectAll(".label");
-
-    labels
-      .style("font-size", "10px")
-      .style("font-weight", "lighter")
-      .style("text-anchor", "middle");
+      .text((d, i) => this.labelsLow[i]);
   }
 
   bucketify (times) {
