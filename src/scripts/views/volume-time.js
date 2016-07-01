@@ -106,43 +106,6 @@ export default class VolumeTime {
       .attr("y2", this.h / 4 + 60);
   }
 
-  // Flag days where those messages are sent
-	displaySomeMessages (messages) {
-    let selectedMsg =
-        this.svg.selectAll('.selected-msg')
-            .data(messages)
-
-    // Remove previously selected messages
-    selectedMsg
-            .exit().remove()
-
-    // Add new ones, if there are any
-    if (messages.length > 0) {
-      let width = this.getDayWidth();
-
-      // X position
-      let x = (d) => {
-        let parsedDate = this.dayFormatParse(d.datetime);
-        return this.timeScale(parsedDate) - width / 2;
-      }
-
-      // Add new messages
-  		selectedMsg
-  				.enter().append('rect')
-  				.attr('class', 'selected-msg');
-
-      selectedMsg
-  				.attr('x', x)
-  				.attr('y', 0)
-  				.attr('width', width)
-  				.attr('height', this.h);
-
-      selectedMsg
-          .style('fill', this.purple)
-  				.style('opacity', .2);
-    }
-	}
-
   /*
 	Search utilities on the dashboard
 	*/
@@ -184,6 +147,43 @@ export default class VolumeTime {
     }
     return false;
   }
+
+  // Flag days where those messages are sent
+	displaySomeMessages (messages) {
+    let selectedMsg =
+        this.svg.selectAll('.selected-msg')
+            .data(messages)
+
+    // Remove previously selected messages
+    selectedMsg
+            .exit().remove()
+
+    // Add new ones, if there are any
+    if (messages.length > 0) {
+      let width = this.getDayWidth();
+
+      // X position
+      let x = (d) => {
+        let parsedDate = this.dayFormatParse(d.datetime);
+        return this.timeScale(parsedDate) - width / 2;
+      }
+
+      // Add new messages
+  		selectedMsg
+  				.enter().append('rect')
+  				.attr('class', 'selected-msg');
+
+      selectedMsg
+  				.attr('x', x)
+  				.attr('y', 0)
+  				.attr('width', width)
+  				.attr('height', this.h);
+
+      selectedMsg
+          .style('fill', this.purple)
+  				.style('opacity', .2);
+    }
+	}
 
   blurSearchField () {
     // Blur focus from input field

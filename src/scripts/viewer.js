@@ -7,7 +7,7 @@ var Conversation = require('./conversation.js');
 import VolumeTime from './views/volume-time';
 import TimeOfDay from './views/time-of-day';
 var responseTimesTime = require('./views/response-times-day.js');
-var responseTimesHist = require('./views/response-times-hist.js');
+import ResponseTimesHist from './views/response-times-hist';
 
 // View configuration data
 const pink = "rgb(243, 38, 114)",
@@ -99,22 +99,35 @@ module.exports = {
 	// Distribution of response times per author
 	responseTimesHist: function () {
 		var Convo = this.Convo;
-		responseTimesHist.render({
+		let ResponseTimesHistViewA = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts
-		}, "#resp-times-A");
-		responseTimesHist.render({
+			options: opts,
+			chatMode: false,
+			author: "A"
+		}, "#resp-times-A")
+		let ResponseTimesHistViewB = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts
+			options: opts,
+			chatMode: false,
+			author: "B"
 		}, "#resp-times-B");
-		responseTimesHist.render({
+		let ResponseTimesHistViewAchat = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts
+			options: opts,
+			chatMode: true,
+			author: "A"
 		}, "#resp-times-chat-A");
-		responseTimesHist.render({
+		let ResponseTimesHistViewBchat = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts
+			options: opts,
+			chatMode: true,
+			author: "B"
 		}, "#resp-times-chat-B");
+
+		ResponseTimesHistViewA.render();
+		ResponseTimesHistViewB.render();
+		ResponseTimesHistViewAchat.render();
+		ResponseTimesHistViewBchat.render();
 	},
 
 	/*
