@@ -75,7 +75,6 @@ module.exports = {
 			options: opts
 		})
 		VolumeTimeView.render();
-		VolumeTimeView.addEvents(this.messages);
 	},
 
 	// Response times over time

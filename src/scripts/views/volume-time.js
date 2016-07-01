@@ -10,10 +10,13 @@ export default class VolumeTime {
     this.labelFormat = args.options.labelFormat;
     this.Convo = args.Convo;
     this.chars = this.Convo.getCharactersByAuthorAndDay();
+    this.messages = args.Convo.getMessages();
+
+    this.dayFormatParse = d3.timeParse(this.dayFormat);
   }
 
   render () {
-    // Please don't do this...
+    // TO DO: WTF
     d3.select('#graph-viewer svg').remove();
 
     // Append SVG do the div
@@ -22,39 +25,57 @@ export default class VolumeTime {
                 .attr('width', this.w)
                 .attr('height', this.h);
 
-    this.timeScale = d3.scaleTime()
-                      .domain([this.Convo.date0, this.Convo.dateF])
-                      .range([this.mg, this.w - this.mg]);
+    this.computeScaleFns();
+    this.addLines();
+    this.addTimeLabelAxis();
+    this.addSearchFunctionality();
+  }
 
-    let allChars = this.chars.authorA.concat(this.chars.authorB);
-    let maxChar = d3.max(allChars, (d) => d.chars );
+  computeScaleFns () {
+    let maxChar = this.getMaxNumChars();
 
-    this.charScale = d3.scaleLinear()
-                      .domain([0, maxChar])
-                      .range([this.h / 2, 0]);
+    // X axis -> time scale
+    this.timeScale =
+      d3.scaleTime()
+        .domain([this.Convo.date0, this.Convo.dateF])
+        .range([this.mg, this.w - this.mg]);
 
-    let parseFn = d3.timeParse(this.dayFormat);
+    // Y axis -> Number of characters
+    this.charScale =
+      d3.scaleLinear()
+        .domain([0, maxChar])
+        .range([this.h / 2, 0]);
+  }
 
-    let lineFunction = d3.area()
-      .x((d) => this.timeScale(parseFn(d.datetime)))
+  // Add areas
+  addLines () {
+    let lineFunctionA = d3.area()
+      .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .y0((d) => this.charScale(d.chars))
       .y1((d) => this.charScale(0))
       .curve(d3.curveBasis);
 
-    let lineFunction2 = d3.area()
-      .x((d) => this.timeScale(parseFn(d.datetime)))
+    let lineFunctionB = d3.area()
+      .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .y0((d) => this.charScale(-d.chars))
       .y1((d) => this.charScale(0))
       .curve(d3.curveBasis);
 
     let lineA = this.svg.append("path")
-      .attr("d", lineFunction(this.chars.authorA))
+      .attr("class", "lineA")
+      .attr("d", lineFunctionA(this.chars.authorA))
       .attr("fill", this.pink);
 
     let lineB = this.svg.append("path")
-      .attr("d", lineFunction2(this.chars.authorB))
+      .attr("class", "lineB")
+      .attr("d", lineFunctionB(this.chars.authorB))
       .attr("fill", this.purple);
+  }
 
+  // Add time labels and axis
+  // TODO: Review and rethink this
+  addTimeLabelAxis () {
+    // Timelabels
     this.svg.append("text")
       .attr("class", "time-label")
       .attr("x", this.mg)
@@ -69,6 +90,7 @@ export default class VolumeTime {
       .style("text-anchor", "end")
       .text(this.labelFormat(this.Convo.dateF));
 
+    // Ticks
     this.svg.append("line")
       .attr("class", "tick")
       .attr("x1", this.mg)
@@ -86,61 +108,99 @@ export default class VolumeTime {
 
   // Flag days where those messages are sent
 	displaySomeMessages (messages) {
-    let svg = this.svg,
-				timeScale = this.timeScale,
-				charScale = this.charScale,
-        dayFormat = this.dayFormat,
-        purple = this.purple,
-        h = this.h;
+    let selectedMsg =
+        this.svg.selectAll('.selected-msg')
+            .data(messages)
 
+    // Remove previously selected messages
+    selectedMsg
+            .exit().remove()
+
+    // Add new ones, if there are any
     if (messages.length > 0) {
-      let date0 = this.dayFormat.parse(messages[0].datetime),
-          date1 = d3.timeDay.offset(date0, 1),
-          width = timeScale(date1) - timeScale(date0);
-    }
+      let width = this.getDayWidth();
 
-		if (svg) {
-			svg.selectAll('.selected-msg').remove();
-			svg.selectAll('.selected-msg')
-				.data(messages)
-				.enter().append('rect')
-				.attr('class', 'selected-msg')
-				.attr('x', (d) => timeScale(dayFormat.parse(d.datetime)) - width / 2)
-				.attr('y', 0)
-				.attr('width', width)
-				.attr('height', h)
-				.style('fill', purple)
-				.style('opacity', .2);
-		}
+      // X position
+      let x = (d) => {
+        let parsedDate = this.dayFormatParse(d.datetime);
+        return this.timeScale(parsedDate) - width / 2;
+      }
+
+      // Add new messages
+  		selectedMsg
+  				.enter().append('rect')
+  				.attr('class', 'selected-msg');
+
+      selectedMsg
+  				.attr('x', x)
+  				.attr('y', 0)
+  				.attr('width', width)
+  				.attr('height', this.h);
+
+      selectedMsg
+          .style('fill', this.purple)
+  				.style('opacity', .2);
+    }
 	}
 
   /*
-	Events on the dashboard
+	Search utilities on the dashboard
 	*/
 
-	addEvents (messages) {
-		let searchForm = document.getElementById("search-form");
+	addSearchFunctionality () {
+		let searchForm = document.getElementById("search-form"),
+        searchBox = document.getElementById("search-box");
+
+    // Do not fire the form itself
 		searchForm.addEventListener('submit', (e) => e.preventDefault());
 
-		let searchBox = document.getElementById("search-box");
-		searchBox.addEventListener('keypress',
-      this.searchText.bind(this, searchBox, messages));
+    // Search it
+		searchBox.addEventListener('keypress', (e) => {
+      // Get the query value in the input field
+      let searchBoxQuery = searchBox.value;
+
+      // Search for it
+      this.searchText(e, searchBoxQuery);
+    })
+
 	}
 
-  searchText (searchBox, messages, e) {
-    if (e.keyCode === 13 && searchBox.value.length > 0){
+  searchText (e, searchBoxQuery) {
+    // If there is a query, and enter is pressed
+    if (e.keyCode === 13 && searchBoxQuery.length > 0){
       let toDisplay = [],
-          valueRE = new RegExp("(" + searchBox.value + ")");
+          queryRE = new RegExp("(" + searchBoxQuery + ")");
 
-      for (var i = 0; i < messages.length; i++) {
-      	if (messages[i].text.search(valueRE) !== -1) {
-      		toDisplay.push(messages[i]);
+      for (let i = 0; i < this.messages.length; i++) {
+        let queryResult = this.messages[i].text.search(queryRE);
+      	if (queryResult !== -1) {
+      		toDisplay.push(this.messages[i]);
       	};
       }
 
+      // Display messages
       this.displaySomeMessages(toDisplay);
-      document.getElementById("search-box").blur()
+      this.blurSearchField();
     }
     return false;
+  }
+
+  blurSearchField () {
+    // Blur focus from input field
+    let searchBox = document.getElementById("search-box");
+    searchBox.blur()
+  }
+
+  getDayWidth () {
+    let date0 = d3.timeParse(this.dayFormat)(this.messages[0].datetime),
+        date1 = d3.timeDay.offset(date0, 1);
+
+    return this.timeScale(date1) - this.timeScale(date0);
+  }
+
+  getMaxNumChars () {
+    let allChars = this.chars.authorA.concat(this.chars.authorB);
+
+    return d3.max(allChars, (d) => d.chars );
   }
 }
