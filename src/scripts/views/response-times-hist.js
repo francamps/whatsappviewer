@@ -12,14 +12,19 @@ export default class ResponseTimesHist {
     this.author = args.author;
     this.svgID = svgID;
 
-    if (document.querySelector(".page-wrap").offsetWidth < 800) {
-      this.w = 100;
-      this.mg = 5;
-    }
-
     this.resps = args.Convo.getResponseTimes();
     this.getBuckets();
     this.viewTypeAdjustments();
+    this.viewSizeAdjustments();
+  }
+
+  viewSizeAdjustments () {
+    // Make sure the dimensions are correct for the viewport
+    let smallVersion = (document.querySelector(".page-wrap").offsetWidth < 800);
+    if (smallVersion) {
+      this.w = 100;
+      this.mg = 5;
+    }
   }
 
   getBuckets () {
@@ -109,6 +114,7 @@ export default class ResponseTimesHist {
       .style("fill", this.color);
   }
 
+  // Add time buckets labels
   addLabels () {
     // First row of labels
     let labelsHigh = this.svg.selectAll(".labelHigh")
@@ -133,6 +139,9 @@ export default class ResponseTimesHist {
       .text((d, i) => this.labelsLow[i]);
   }
 
+  // Get histogram data formatting,
+  // excluding those response times under 15 minutes,
+  // which will fall under the chat mode buckets
   bucketify (times) {
     let buckets = [
       0, // 15min - 1 h
@@ -161,6 +170,8 @@ export default class ResponseTimesHist {
     return buckets;
   }
 
+  // Put data as frequencies in buckets for histogram
+  // Only response times under 15 minutes will be included
   bucketify15m (times) {
     let buckets = [
       0, // < 2min
