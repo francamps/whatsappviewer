@@ -36,11 +36,11 @@ export default class TimeOfDay {
     this.maxB = d3.max(this.messageTimesB);
 
     // Define scale functions
-    let rScale = d3.scalePow().exponent(.5)
+    this.rScale = d3.scalePow().exponent(.5)
                   .domain([0, this.maxA])
                   .range([1, 15]);
 
-    let cScale = d3.scalePow().exponent(.5)
+    this.cScale = d3.scalePow().exponent(.5)
                   .domain([0, this.maxB])
                   .range([.2, .6]);
   }
@@ -108,9 +108,11 @@ export default class TimeOfDay {
 
     timeLabel
       .text((d, i) => {
+        // If there is room, display labels every 1 h
         if (this.w > 600 || (i % 2 === 0)) {
           return i + "h";
         }
+        // Otherwise, display every 2 hours
         return "";
       });
 

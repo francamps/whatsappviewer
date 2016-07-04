@@ -1,7 +1,6 @@
 // MAIN script
 'use strict';
-
-var Viewer = require('./viewer.js');
+import Viewer from './viewer';
 
 (function () {
 
@@ -17,11 +16,11 @@ var Viewer = require('./viewer.js');
   }
 
   document.querySelector("#render-button").addEventListener('click', function () {
-      var text = document.querySelector('#text').value || '';
+      let text = document.querySelector('#text').value || '';
+      let CanvasViewer = new Viewer(text);
 
-      var isParsed = Viewer.init(text);
-      if (isParsed) {
-        Viewer.render();
+      if (CanvasViewer.isParsed) {
+        CanvasViewer.render();
         switchState();
       }
   });

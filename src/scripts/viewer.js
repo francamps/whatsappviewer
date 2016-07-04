@@ -17,14 +17,14 @@ const pink = "rgb(243, 38, 114)",
 //var pink = "rgb(253, 199, 20)", // gold
 //		purple = "rgb(71, 3, 166)";
 
-var w = document.querySelector(".widget").offsetWidth - 44,
+let w = document.querySelector(".widget").offsetWidth - 44,
 		h = 400,
 		marginH = 20;
 
-var dayFormat = d3.timeFormat("%Y-%m-%d"),
+let dayFormat = d3.timeFormat("%Y-%m-%d"),
 		labelFormat = d3.timeFormat("%b %d '%y");
 
-var opts = {
+let opts = {
 	pink: pink,
 	purple: purple,
 	gold: gold,
@@ -35,21 +35,23 @@ var opts = {
 	labelFormat: labelFormat
 }
 
-module.exports = {
+export default class Viewer {
 	/*
 	* Initialize conversation
 	* Parse text and create model
 	*
 	*/
-	init: function (text) {
+	constructor (text) {
 		this.Convo = new Conversation(text);
+		this.isParsed = false;
+
 		if (this.Convo.isParsed) {
 			this.messages = this.Convo.getMessages();
-			return true;
+			this.isParsed = true;
 		} else if (this.Convo.parsingError) {
 			this.notifyParsingError(this.Convo.parsingError);
 		}
-	},
+	}
 
 	/*
 	*
@@ -58,54 +60,54 @@ module.exports = {
 	*/
 
 	// Get authors names from Conversation and display a legend
-	authorsLegend: function (svg) {
+	authorsLegend (svg) {
 		document.querySelector("#author-A-col").style.background = pink;
 		document.querySelector("#author-B-col").style.background = purple;
 		document.querySelector("#author-A-leg-label").innerHTML =
 				this.Convo.authorAName;
 		document.querySelector("#author-B-leg-label").innerHTML =
 				this.Convo.authorBName;
-	},
+	}
 
 	// Volume of messages over time
-	volumeTime: function () {
+	volumeTime () {
 		let Convo = this.Convo;
 		let VolumeTimeView = new VolumeTime({
 			Convo: Convo,
 			options: opts
 		})
 		VolumeTimeView.render();
-	},
+	}
 
 	// Response times over time
-	responseTimes: function () {
-		var Convo = this.Convo;
+	responseTimes () {
+		let Convo = this.Convo;
 		let ResponseTimesTimeView = new ResponseTimesTime({
 			Convo: Convo,
 			options: opts
 		});
 		ResponseTimesTimeView.render();
-	},
+	}
 
 	// Volume of messages per time of day
-	timeofDay: function () {
+	timeofDay () {
 		let Convo = this.Convo;
 		let TimeOfDayView = new TimeOfDay({
 			Convo: Convo,
 			options: opts
 		});
 		TimeOfDayView.render();
-	},
+	}
 
 	// Distribution of response times per author
-	responseTimesHist: function () {
-		var Convo = this.Convo;
+	responseTimesHist () {
+		let Convo = this.Convo;
 		let ResponseTimesHistViewA = new ResponseTimesHist({
 			Convo: Convo,
 			options: opts,
 			chatMode: false,
 			author: "A"
-		}, "#resp-times-A")
+		}, "#resp-times-A");
 		let ResponseTimesHistViewB = new ResponseTimesHist({
 			Convo: Convo,
 			options: opts,
@@ -129,7 +131,7 @@ module.exports = {
 		ResponseTimesHistViewB.render();
 		ResponseTimesHistViewAchat.render();
 		ResponseTimesHistViewBchat.render();
-	},
+	}
 
 	/*
 	*
@@ -137,43 +139,44 @@ module.exports = {
 	*
 	*/
 
-	fillDataTable: function () {
+	fillDataTable () {
 		// Word count
-		var countsAvg = this.wordCountAvg();
-		var countsMed = this.wordCountMedian();
+		let countsAvg = this.getWordCountAvg(),
+				countsMed = this.getWordCountMedian();
+
 		document.querySelector("#word-count-A").innerHTML =
 				countsAvg.authorA.toFixed(2) + " / " + countsMed.authorA.toFixed(2);
 		document.querySelector("#word-count-B").innerHTML =
 				countsAvg.authorB.toFixed(2) + " / " + countsMed.authorB.toFixed(2);
 
 		// Number of messages
-		var messages = this.numberOfMessages();
+		let messages = this.getNumberOfMessages();
 		document.querySelector("#message-num-A").innerHTML = messages.authorA;
 		document.querySelector("#message-num-B").innerHTML = messages.authorB;
 
 		// Authors
 		document.querySelector("#author-A").innerHTML = this.Convo.authorAName;
 		document.querySelector("#author-B").innerHTML = this.Convo.authorBName;
-	},
+	}
 
-	numberOfMessages: function () {
+	getNumberOfMessages () {
 		return this.Convo.getNumberOfMessagesByAuthor();
-	},
+	}
 
-	wordCountAvg: function () {
+	getWordCountAvg () {
 		return this.Convo.getMessageWordCountAverage();
-	},
+	}
 
-	wordCountMedian: function () {
+	getWordCountMedian () {
 		return this.Convo.getMessageWordCountMedian();
-	},
+	}
 
-	notifyParsingError: function (message) {
+	notifyParsingError (message) {
 		document.querySelector("#notification").innerHTML = message;
 		document.querySelector("#notification").classList.remove('hidden');
-	},
+	}
 
-	render: function () {
+	render () {
 		this.authorsLegend();
 		this.volumeTime();
 		this.fillDataTable();
