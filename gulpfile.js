@@ -3,15 +3,25 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var sass = require('gulp-sass');
 var babelify = require('babelify');
+var factor = require('factor-bundle');
 
 gulp.task('browserify', function() {
-    return browserify('./src/scripts/app.js')
+    return browserify({
+            entries: ['./src/scripts/app.jsx'],
+            extensions: ['.jsx'],
+            debug: false
+        })
         .transform(babelify, {
-          presets: ['es2015']
+          presets: ['es2015', 'react']
+        })
+        .plugin(factor, {
+          o: [
+            'public/app.js'
+          ]
         })
         .bundle()
         //Pass desired output filename to vinyl-source-stream
-        .pipe(source('bundle.js'))
+        .pipe(source('app.js'))
         // Start piping stream to tasks!
         .pipe(gulp.dest('./public/scripts/'));
 });

@@ -11,29 +11,8 @@ import ResponseTimesTime from './views/response-times-day';
 
 // View configuration data
 const pink = "rgb(243, 38, 114)",
-		purple = "rgb(71, 3, 166)",
-		gold = "rgb(253, 199, 20)"
-
-//var pink = "rgb(253, 199, 20)", // gold
-//		purple = "rgb(71, 3, 166)";
-
-let w = document.querySelector(".widget").offsetWidth - 44,
-		h = 400,
-		marginH = 20;
-
-let dayFormat = d3.timeFormat("%Y-%m-%d"),
-		labelFormat = d3.timeFormat("%b %d '%y");
-
-let opts = {
-	pink: pink,
-	purple: purple,
-	gold: gold,
-	w: w,
-	h: h,
-	marginH: marginH,
-	dayFormat: dayFormat,
-	labelFormat: labelFormat
-}
+			purple = "rgb(71, 3, 166)",
+			gold = "rgb(253, 199, 20)";
 
 export default class Viewer {
 	/*
@@ -44,12 +23,33 @@ export default class Viewer {
 	constructor (text) {
 		this.Convo = new Conversation(text);
 		this.isParsed = false;
+		this.setConfigurations();
 
 		if (this.Convo.isParsed) {
 			this.messages = this.Convo.getMessages();
 			this.isParsed = true;
 		} else if (this.Convo.parsingError) {
 			this.notifyParsingError(this.Convo.parsingError);
+		}
+	}
+
+	setConfigurations () {
+		let w = document.querySelector(".widget").offsetWidth - 44,
+				h = 400,
+				mg = 20;
+
+		let dayFormat = d3.timeFormat("%Y-%m-%d"),
+				labelFormat = d3.timeFormat("%b %d '%y");
+
+		this.opts = {
+			pink: pink,
+			purple: purple,
+			gold: gold,
+			w: w,
+			h: h,
+			mg: mg,
+			dayFormat: dayFormat,
+			labelFormat: labelFormat
 		}
 	}
 
@@ -74,7 +74,7 @@ export default class Viewer {
 		let Convo = this.Convo;
 		let VolumeTimeView = new VolumeTime({
 			Convo: Convo,
-			options: opts
+			options: this.opts
 		})
 		VolumeTimeView.render();
 	}
@@ -84,7 +84,7 @@ export default class Viewer {
 		let Convo = this.Convo;
 		let ResponseTimesTimeView = new ResponseTimesTime({
 			Convo: Convo,
-			options: opts
+			options: this.opts
 		});
 		ResponseTimesTimeView.render();
 	}
@@ -94,7 +94,7 @@ export default class Viewer {
 		let Convo = this.Convo;
 		let TimeOfDayView = new TimeOfDay({
 			Convo: Convo,
-			options: opts
+			options: this.opts
 		});
 		TimeOfDayView.render();
 	}
@@ -104,25 +104,25 @@ export default class Viewer {
 		let Convo = this.Convo;
 		let ResponseTimesHistViewA = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts,
+			options: this.opts,
 			chatMode: false,
 			author: "A"
 		}, "#resp-times-A");
 		let ResponseTimesHistViewB = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts,
+			options: this.opts,
 			chatMode: false,
 			author: "B"
 		}, "#resp-times-B");
 		let ResponseTimesHistViewAchat = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts,
+			options: this.opts,
 			chatMode: true,
 			author: "A"
 		}, "#resp-times-chat-A");
 		let ResponseTimesHistViewBchat = new ResponseTimesHist({
 			Convo: Convo,
-			options: opts,
+			options: this.opts,
 			chatMode: true,
 			author: "B"
 		}, "#resp-times-chat-B");

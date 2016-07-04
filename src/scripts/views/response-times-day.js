@@ -1,7 +1,7 @@
 export default class ResponseTimesTime {
   constructor (args) {
     this.w = args.options.w;
-    this.mg = args.options.marginH;
+    this.mg = args.options.mg;
     this.h = args.options.h;
     this.pink = args.options.pink;
     this.purple = args.options.purple;

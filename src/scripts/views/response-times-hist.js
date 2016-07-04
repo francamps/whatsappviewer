@@ -1,7 +1,7 @@
 export default class ResponseTimesHist {
   constructor (args, svgID) {
     this.w = 200;
-    this.mg = args.options.marginH;
+    this.mg = args.options.mg;
     this.h = 120;
     this.pink = args.options.pink;
     this.purple = args.options.purple;
