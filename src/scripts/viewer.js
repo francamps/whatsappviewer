@@ -1,7 +1,7 @@
 'use strict';
 
 // Model
-var Conversation = require('./conversation.js');
+import Conversation from './conversation';
 
 // Views
 import VolumeTime from './views/volume-time';

@@ -1,78 +1,30 @@
 'use strict';
 
-function Conversation (data) {
-	// Some initializing functions
-	this.datetimeFormat = "%-m/%-d/%-y, %-H:%M %p";
-	this.dayFormat = "%Y-%m-%d";
-	this.data = data || '';
-	this.authors = {};
+import getDateFormats from './utilities/date-formats';
 
-	// Initial, neurtal parsing
-	this.parseTextData();
-}
+export default class Conversation {
+	constructor (data) {
+		// Some initializing functions
+		this.datetimeFormat = "%-m/%-d/%-y, %-H:%M %p";
+		this.dayFormat = "%Y-%m-%d";
+		this.data = data || '';
+		this.authors = {};
+		this.dateFormats = getDateFormats();
+		this.messages = [];
 
-Conversation.prototype = {
-	getMessages: function () {
+		// Initial, neurtal parsing
+		this.parseTextData();
+	}
+
+	getMessages () {
 		return this.messages;
-	},
-	dateFormats: [
-		/* 6/15/2009 */
-		"%d/%m/%Y",
-		"%-d/%-m/%Y",
-		/* 15/06/2009 */
-		"%m/%d/%Y",
-		"%-m/%-d/%Y",
-		/* 2009/06/15 */
-		"%Y/%m/%d",
-		"%Y/%-m/%-d",
-		/* Monday, June 15, 2009 */
-		"%b %d, %Y",
-		"%b, %d, %Y",
-		/* Monday, June 15, 2009 1:45 PM */
-		"%b %d, %Y, %H:%M %p",
-		"%b, %d, %Y, %H:%M %p",
-		/* Monday, June 15, 2009 1:45:30 PM */
-		"%b %d, %Y, %H:%M:%S %p",
-		"%b, %d, %Y, %H:%M:%S %p",
-		/* 6/15/2009 1:45 PM */
-		"%-m/%-d/%-y, %-I:%M %p",
-		/* 15/06/2009 13:45 */
-		"%-m/%-d/%-y, %H:%M",
-		/* 06/15/2009 13:45 */
-		"%-d/%-m/%-y, %H:%M %p",
-		/* 2009/6/15 13:45 */
-		"%Y/%-m/%-d, %H:%M",
-		/* 15/06/2009 13:45:30 */
-		"%-d/%-m/%Y, %H:%M:%S",
-		/* 6/15/2009 1:45:30 PM */
-		"%m/%-d/%Y, %I:%M:%S %p",
-		/* 2009/6/15 13:45:30 */
-		"%Y/%m/%-d, %H:%M:%S",
-		/* 2009-06-15T13:45:30 */
-		"%Y-%-m-%-dT%H:%M:%S",
-		/* 2009-06-15 13:45:30Z */
-		"%Y-%-m-%-d %H:%M:%SZ",
-		/* Monday, June 15, 2009 8:45:30 PM */
-		"%b, %m %d, %H:%M:%S %p",
-		/* */
-		"%-m/%-d/%-y, %-H:%M %p",
-		"%-m/%-d/%-Y, %-H:%M %p",
-		"%Y-%m-%d, %H:%M:%S",
-		"%b %d, %Y, %H:%M %p"
-	],
+	}
 
-	calculateDateLimits: function () {
-    var datetime0 = this.messages[0].datetime,
-				datetimeF = this.messages[this.messages.length - 1].datetime;
-
-		this.date0 = d3.timeParse(this.dayFormat)(datetime0);
-		this.dateF = d3.timeParse(this.dayFormat)(datetimeF);
-		this.daysNum = (this.dateF.getTime() - this.date0.getTime()) / 86400000;
-	},
-
-	parseDateFormat: function (date) {
-		var error = true;
-		var formats = this.dateFormats,
+	// Go through possible date formats to find the one
+	// the format that will let us parse through the messages
+	parseDateFormat (date) {
+		let error = true,
+				formats = this.dateFormats,
 				i = 0;
 
 		while (i < formats.length && error === true) {
@@ -88,62 +40,93 @@ Conversation.prototype = {
 				if (e instanceof TypeError) {
 					i++;
 				}
-				console.log('Unknown error.');
+				console.log('Unknown parsing error.');
 			}
 		}
 		return error;
-	},
+	}
 
-	parseAuthors: function () {
-		this.authorAName = Object.keys(this.authors)[0];
-		this.authorBName = Object.keys(this.authors)[1];
-	},
+	parseAuthors () {
+		this.authorAName = d3.keys(this.authors)[0];
+		this.authorBName = d3.keys(this.authors)[1];
+	}
 
-	getDateRange: function () {
+	calculateDateLimits () {
+    let datetime0 = this.messages[0].datetime,
+				datetimeF = this.messages[this.messages.length - 1].datetime;
+
+		this.date0 = d3.timeParse(this.dayFormat)(datetime0).getTime();
+		this.dateF = d3.timeParse(this.dayFormat)(datetimeF).getTime();
+		this.daysNum = (this.dateF - this.date0) / 86400000;
+	}
+
+	getDateRange () {
 		return d3.timeDays(this.date0, d3.timeDay.offset(this.dateF, 1));
-	},
+	}
 
-	parseErrorHandler: function () {
-		this.parsingError = "There was an error parsing the text. Sorry :/";
-	},
+	parseErrorHandler () {
+		this.parsingError = "There was an error parsing your chat. Sorry :/";
+	}
 
-	parseTextData: function () {
-		this.messages = [];
-
-		// It is a new line if it contains time and author
+	parseTextData () {
+		// It is a new line if it contains date time and author
+		// Every line as chopped by ' - ' contains author, message
+		// plus the author of the NEXT message.
+		// If we chopped using '\n' we would risk chopping also messages that have
+		// line breaks in the text, so we use ' - '
 		this.linesAuthored = this.data.split(' - ');
-		var previousDate = this.linesAuthored[0];
-		var isError = this.parseDateFormat(previousDate);
 
-		if (isError) {
+		// First item is the date of first message
+		// Use this to decide on date formatting
+		let previousDate = this.linesAuthored[0];
+		let parseErrorFound = this.parseDateFormat(previousDate);
+
+		if (parseErrorFound) {
+			// Unable to parse datetime formatting
 			this.parseErrorHandler();
 		} else {
-			for (var i = 1; i < this.linesAuthored.length; i++) {
-				var allThisLine = this.linesAuthored[i],
-						thisline = allThisLine.split('\n'),
-						datetime = previousDate;
+			for (let i = 1; i < this.linesAuthored.length; i++) {
+				// Author, message text for THIS message,
+				// together with datetime for the FOLLOWING message
+				let line = this.linesAuthored[i];
 
+				// Datetime for this message is contained in the previous line item
+				let datetime = previousDate;
+
+				// The message text will be finished by a \n,
+				// so even if there are more line breaks within the text,
+				// we'll catch the whole thing
+				let	thisline = line.split('\n');
+
+				// Set this line's datetime as the FOLLOWING's message datetime
 				previousDate = thisline[thisline.length - 1];
-				var previousDateLen = previousDate.length;
-				var messageLen = allThisLine.length - previousDateLen;
-				var messageMinusAuthor = allThisLine.substr(0, messageLen);
 
-				var author = allThisLine.split(': ')[0],
-						message = messageMinusAuthor.split(': ')[1];
+				// Message is the whole thing minus de number of characters
+				// taken by the datetime at the end of the line
+				let authorPlusMessageLength = line.length - previousDate.length,
+						authorPlusMessage = line.substr(0, authorPlusMessageLength);
 
+				// Author is the first part of splitting by a colon
+				let author = authorPlusMessage.split(': ')[0],
+						message = authorPlusMessage.substr(author.length, authorPlusMessageLength);
+
+				// If message seems properly pased, store it
 				if (author && message) {
+					// Store authors
 					if (!(author in this.authors)) {
 						this.authors[author] = true;
 					}
 
+					// Store author names in variables
 					this.parseAuthors();
 
 					// TODO: Catch all weird cases
 					// TODO: More resilient parsing, please!
 					if (datetime && author && message) {
+						let datetimeObj = d3.timeParse(this.datetimeFormat)(datetime);
 						this.messages.push({
-							'datetime': d3.timeFormat(this.dayFormat)(d3.timeParse(this.datetimeFormat)(datetime)),
-							'datetimeObj': d3.timeParse(this.datetimeFormat)(datetime),
+							'datetime': d3.timeFormat(this.dayFormat)(datetimeObj),
+							'datetimeObj': datetimeObj,
 							'author': author,
 							'text': message
 						});
@@ -156,85 +139,104 @@ Conversation.prototype = {
 			// Flag success
 			this.isParsed = true;
 		}
-	},
+	}
 
-	getConvFormat: function () {
-		return this.datetimeFormat;
-	},
-
-	getMessagesByDay: function (day) {
+	getMessagesByDay (day) {
 		// If already computed, return it
 		if (this.messagesByDay) return this.messagesByDay;
 
+		let messages = [];
+
 		// Variable day needs to be of type date
-		var messages = [];
-		if (Object.prototype.toString.call(day) === "[object Date]") {
-			var dayStr = d3.timeFormat(this.dayFormat)(day);
-			for (var i = 0; i < this.messages.length; i++) {
-				if (this.messages[i].datetime === dayStr) {
-					messages.push(this.messages[i]);
+		let isDate = (Object.prototype.toString.call(day) === "[object Date]");
+
+		if (isDate) {
+			let dayString = d3.timeFormat(this.dayFormat)(day);
+
+			this.messages.forEach((message, i) => {
+				if (message.datetime === dayString) {
+					messages.push(message);
 				}
-			}
+			});
 		}
+
 		this.messagesByDay = messages;
 		return this.messagesByDay;
-	},
+	}
 
-	getMessagesByAuthorAndDay: function () {
-		// If already computed, return it
-		if (this.messagesByAuthorAndDay) return this.messagesByAuthorAndDay;
+	createObjectWithDateKeys () {
+		let dates = this.getDateRange();
+		let obj = {}
 
-		var messages = this.getMessages();
+		dates.forEach((d) => obj[d3.timeFormat(this.dayFormat)(d)] = []);
+		return obj;
+	}
 
-		var authorA = [],
-				authorAbyDay = {};
+	bundleByAuthorAndDay () {
+		let authorAbyDay = this.createObjectWithDateKeys(),
+				authorBbyDay = this.createObjectWithDateKeys();
 
-		var authorB = [],
-				authorBbyDay = {};
+		let messages = this.getMessages();
 
-		// Separate data objects for authors
+		// Separate data objects by authors
 		// and bundle them by day
-		var self = this;
+		messages.forEach((message) => {
+			let day = message.datetime;
+			// Author A
+			if (message.author === this.authorAName) {
+				authorAbyDay[day].push(message);
 
-		messages.forEach(function (msg) {
-			var day = msg.datetime;
-			if (msg.author === self.authorAName) {
-				if (!(msg.datetime in authorAbyDay)) {
-					authorAbyDay[msg.datetime] = [];
-				}
-				authorAbyDay[msg.datetime].push(msg);
-			} else {
-				if (!(msg.datetime in authorBbyDay)) {
-					authorBbyDay[msg.datetime] = [];
-				}
-				authorBbyDay[msg.datetime].push(msg);
+			// Author B
+			} else if (message.author === this.authorBName) {
+				authorBbyDay[day].push(message);
 			}
 		});
 
+		return {
+			authorAbyDay: authorAbyDay,
+			authorBbyDay: authorBbyDay
+		}
+	}
+
+	getMessagesByAuthorAndDay () {
+		// If already computed, return it
+		if (this.messagesByAuthorAndDay) return this.messagesByAuthorAndDay;
+
+		let messages = this.getMessages();
+
+		let authorA = [],
+				authorB = [];
+
+		let {authorAbyDay, authorBbyDay} = this.bundleByAuthorAndDay();
+
 		// Array of days
-		var dateRange = this.getDateRange();
+		let dateRange = this.getDateRange();
 
-		for (var day in dateRange) {
-			var date = dateRange[day];
-			var dayString = d3.timeFormat(this.dayFormat)(date)
+		// Put messages in array of days,
+		// fill in those days with no text with silence
+		// REVIEW THIS
+		for (let day in dateRange) {
+			let date = dateRange[day],
+					dayString = d3.timeFormat(this.dayFormat)(date);
 
-			if (dayString in authorAbyDay) {
+			if (authorAbyDay[dayString].length > 1) {
 				authorA.push(authorAbyDay[dayString]);
 			} else {
-				// Fill day item with empty text
 				authorA.push([{
 					author: this.authorAName,
 					datetime: dayString,
+					datetimeObj: date,
 					text: ''
 				}]);
 			}
 
-			if (dayString in authorBbyDay) {
+			if (authorBbyDay[dayString].length > 1) {
 				authorB.push(authorBbyDay[dayString]);
 			} else {
 				authorB.push([{
 					author: this.authorBName,
 					datetime: dayString,
+					datetimeObj: date,
 					text: ''
 				}]);
 			}
@@ -248,34 +250,35 @@ Conversation.prototype = {
 		};
 
 		return this.messagesByAuthorAndDay;
-	},
+	}
 
-	getCharactersByAuthorAndDay: function () {
+	getCharacters (day) {
+		// day is an array of messages for a given day
+		let numberOfChars = 0,
+				datetime = '';
+
+		if (day.length > 0) {
+			datetime = day[0].datetime;
+			day.forEach((message) => numberOfChars += message.text.length);
+		}
+
+		return {
+			chars: numberOfChars,
+			datetime: datetime
+		}
+	}
+
+	getCharactersByAuthorAndDay () {
 		// If already computed, return it
 		if (this.charactersByAuthorAndDay) return this.charactersByAuthorAndDay;
 
-		var messages = this.getMessagesByAuthorAndDay();
+		let messages = this.getMessagesByAuthorAndDay();
 
-		var charsDayA = [],
+		let charsDayA = [],
 				charsDayB = [];
 
-		function getCharacters(day) {
-			var numChar = 0;
-			day.forEach(function (message) {
-				numChar += message.text.length;
-			});
-			return {
-				chars: numChar,
-				datetime: day[0].datetime
-			}
-		}
-
-		messages.authorA.forEach(function (day) {
-			charsDayA.push(getCharacters(day));
-		});
-		messages.authorB.forEach(function (day) {
-			charsDayB.push(getCharacters(day));
-		});
+		messages.authorA.forEach((day) => charsDayA.push(this.getCharacters(day)));
+		messages.authorB.forEach((day) => charsDayB.push(this.getCharacters(day)));
 
 		this.charactersByAuthorAndDay = {
 			authorA: charsDayA,
@@ -283,45 +286,48 @@ Conversation.prototype = {
 		}
 
 		return this.charactersByAuthorAndDay;
-	},
+	}
 
-	getMessageLengths: function () {
+	getMessageLengths () {
 		// If already computed, return it
 		if (this.messageLengths) return this.messageLengths;
 
-		var lengths = [];
-		for (var i = 0; i < this.messages.length; i++) {
-			if (this.messages[i].text.substr(0, 15) !== "<Media omitted>") {
-				lengths.push(this.messages[i].text.length);
+		let lengths = [];
+		this.messages.forEach((message) => {
+			if (message.text.substr(0, 15) !== "<Media omitted>") {
+				lengths.push(message.text.length);
 			}
-		}
+		})
+
 		this.messageLengths = lengths;
 		return this.messageLengths;
-	},
+	}
 
-	getMessageWordCount: function () {
+	getMessageWordCount () {
 		// If already computed, return it
 		if (this.messageWordCount) return this.messageWordCount;
 
-		var countsA = [],
+		let countsA = [],
 				countsB = [];
-		for (var i = 0; i < this.messages.length; i++) {
-			var msg = this.messages[i]
-			if (msg.text.substr(0, 15) !== "<Media omitted>") {
-				if (msg.author === this.authorAName) {
-					countsA.push(msg.text.split(' ').length);
+
+		this.mediaMessages = []
+
+		this.messages.forEach((message) => {
+			// Omit audios
+			if (message.text.substr(0, 15) !== "<Media omitted>") {
+				if (message.author === this.authorAName) {
+					countsA.push(message.text.split(' ').length);
 				} else {
-					countsB.push(msg.text.split(' ').length);
+					countsB.push(message.text.split(' ').length);
 				}
+			} else {
+				this.mediaMessages.push(msg);
 			}
-		}
+		});
+
 		// Sort response times
-		countsA.sort(function(a, b) {
-		  return a - b;
-		});
-		countsB.sort(function(a, b) {
-		  return a - b;
-		});
+		countsA.sort((a, b) => a - b);
+		countsB.sort((a, b) => a - b);
 
 		this.messageWordCount = {
 			authorA: countsA,
@@ -329,21 +335,19 @@ Conversation.prototype = {
 		};
 
 		return this.messageWordCount;
-	},
+	}
 
-	getMessageWordCountAverage: function () {
+	getMessageWordCountAverage () {
 		// If already computed, return it
 		if (this.messageWordCountAverage) return this.messageWordCountAverage;
 
-		var counts = this.getMessageWordCount();
-		var avgA = 0,
+		let counts = this.getMessageWordCount();
+
+		let avgA = 0,
 				avgB = 0;
-		counts.authorA.forEach(function (d) {
-			avgA += d;
-		});
-		counts.authorB.forEach(function (d) {
-			avgB += d;
-		});
+
+		counts.authorA.forEach((d) => avgA += d);
+		counts.authorB.forEach((d) => avgB += d);
 
 		this.messageWordCountAverage = {
 			authorA: avgA / counts.authorA.length,
@@ -351,39 +355,46 @@ Conversation.prototype = {
 		};
 
 		return this.messageWordCountAverage;
-	},
+	}
 
-	getMessageWordCountMedian: function () {
+	getMedian (counts) {
+		// Assumes counts is sorted
+		let halfLength = counts.length / 2;
+		if (counts.length % 2 === 0) {
+			return (counts[halfLength - 1] + counts[halfLength]) / 2;
+		}
+		return counts[Math.floor(halfLength)];
+	}
+
+	getMessageWordCountMedian () {
 		// If already computed, return it
 		if (this.messageWordCountMedian) return this.messageWordCountMedian;
 
-		var counts = this.getMessageWordCount();
+		let counts = this.getMessageWordCount();
+
 		this.messageWordCountMedian = {
-			authorA: counts.authorA[Math.floor(counts.authorA.length/2)],
-			authorB: counts.authorB[Math.floor(counts.authorB.length/2)]
+			authorA: this.getMedian(counts.authorA),
+			authorB: this.getMedian(counts.authorB)
 		};
 
 		return this.messageWordCountMedian;
-	},
+	}
 
-	getMedianMessageLen: function () {
+	getMedianMessageLen () {
 		// If already computed, return it
 		if (this.medianMessageLen) return this.medianMessageLen;
 
-		var lens = this.getMessageLengths();
-		if (lens.length % 2 === 0) {
-			var halfLen = Math.floor(lens/2);
-			return (lens[halfLen - 1] + lens[halfLen + 1]) / 2;
-		}
-		this.medianMessageLen = lens[Math.floor(lens.length / 2) + 1];
-		return this.medianMessageLen;
-	},
+		let lens = this.getMessageLengths();
 
-	getNumberOfMessagesByAuthor: function () {
+		this.medianMessageLen = this.getMedian(lens);
+		return this.medianMessageLen;
+	}
+
+	getNumberOfMessagesByAuthor () {
 		// If already computed, return it
 		if (this.numberOfMessagesByAuthor) return this.numberOfMessagesByAuthor;
 
-		var authorA = _.filter(this.messages, { author: this.authorAName }),
+		let authorA = _.filter(this.messages, { author: this.authorAName }),
 				authorB = _.filter(this.messages, { author: this.authorBName });
 
 		this.numberOfMessagesByAuthor = {
@@ -392,25 +403,26 @@ Conversation.prototype = {
 		};
 
 		return this.numberOfMessagesByAuthor;
-	},
+	}
 
-	getMessageTimes: function () {
+	getMessageTimes () {
 		// If already computed, return it
 		if (this.messageTimes) return this.messageTimes;
 
-		var timeformat = d3.timeFormat('%H');
-		var authorA = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
-		var authorB = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
-		var messages = this.messages;
+		let hourTimeFormat = d3.timeFormat('%H');
 
-		for (var i = 0; i < messages.length; i++ ) {
-			var hour = parseInt(timeformat(messages[i].datetimeObj));
-			if (messages[i].author === this.authorAName) {
+		// Empty arrays with 24 items, one for each position
+		let authorA = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0),
+				authorB = Array.apply(null, Array(24)).map(Number.prototype.valueOf,0);
+
+		this.messages.forEach((message) => {
+			let hour = parseInt(hourTimeFormat(message.datetimeObj));
+			if (message.author === this.authorAName) {
 				authorA[hour] += 1;
 			} else {
 				authorB[hour] += 1;
 			}
-		}
+		});
 
 		this.messageTimes = {
 			authorATimes: authorA,
@@ -418,40 +430,40 @@ Conversation.prototype = {
 		};
 
 		return this.messageTimes;
-	},
+	}
 
-	getResponseTimes: function () {
+	getTimeDifference (responder, prompter) {
+		let dateResponse = responder.datetimeObj.getTime(),
+				datePrompt = prompter.datetimeObj.getTime();
+
+		return Math.abs(dateResponse - datePrompt);
+	}
+
+	getResponseTimes () {
 		// If already computed, return it
 		if (this.responseTimes) return this.responseTimes;
 
-		var authorAresps = [],
+		let authorAresps = [],
 				authorBresps = [];
 
-		for (var i = 2; i < this.messages.length; i++) {
-			var responder = this.messages[i].author,
-					prompter = this.messages[i - 1].author;
+		for (let i = 2; i < this.messages.length; i++) {
+			let responder = this.messages[i],
+					prompter = this.messages[i - 1];
 
-			if (responder !== prompter) {
-				var dateResp = this.messages[i].datetimeObj;
-				var dateOrig = this.messages[i - 1].datetimeObj;
+			if (responder.author !== prompter.author) {
+				let diff = this.getTimeDifference(responder, prompter);
 
-				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
-
-				if (responder === this.authorAName) {
+				if (responder.author === this.authorAName) {
 					authorAresps.push(diff);
-				} else if (responder === this.authorBName){
+				} else if (responder.author === this.authorBName){
 					authorBresps.push(diff);
 				}
 			}
 		}
 
 		// Sort response times
-		authorAresps.sort(function(a, b) {
-		  return a - b;
-		});
-		authorBresps.sort(function(a, b) {
-		  return a - b;
-		});
+		authorAresps.sort((a, b) => a - b);
+		authorBresps.sort((a, b) => a - b);
 
 		this.responseTimes = {
 			authorA: authorAresps,
@@ -459,73 +471,45 @@ Conversation.prototype = {
 		};
 
 		return this.responseTimes;
-	},
+	}
 
-	getSilences: function () {
-		// If already calculated, return it
-		if (this.silences) return this.silences;
-
-		var messages = this.getMessagesByAuthorAndDay();
-		var dateRange = this.getDateRange();
-
-		var self = this;
-		var authorA = messages.authorAbyDay;
-		var authorB = messages.authorBbyDay;
-		var silenceHeldBy;
-		var lastChattyDate = d3.timeFormat(this.dayFormat)(dateRange[0]);
-		var silences = {}
-		dateRange.forEach(function (date) {
-			var day = d3.timeFormat(self.dayFormat)(date);
-			silences[day] = false;
-			if (day in authorA || day in authorB) {
-				lastChattyDate = day;
-			} else {
-				// Find last one to talk
-				if (lastChattyDate in authorA && !(lastChattyDate in authorB)) {
-					silences[day] = self.authorAName;
-				} else if (lastChattyDate in authorB && !(lastChattyDate in authorA)) {
-					silences[day] = self.authorBName;
-				} else if (lastChattyDate in authorA && lastChattyDate in authorB) {
-					var msgTimeA = _.last(authorA[lastChattyDate]).datetimeObj.getTime();
-					var msgTimeB = _.last(authorB[lastChattyDate]).datetimeObj.getTime();
-					if (msgTimeA > msgTimeB) {
-						silences[day] = self.authorAName;
-					} else {
-						silences[day] = self.authorBName;
-					}
-				}
+	reduceResponseTimesPerDay (d, dayString) {
+		if (d.length > 0) {
+			return {
+				responseTime: d.reduce((m, n) => m + n) / d.length,
+				datetime: dayString
 			}
-		});
-		this.silences = _.map(silences, function (d, dayString) {
-			return d;
-		});
-		return this.silences;
-	},
+		}
+	}
 
-	getResponseTimesByAuthorDay: function () {
+	getResponseTimesByAuthorDay () {
 		// If already calculated, return it
 		if (this.responseTimesByAuthorDay) return this.responseTimesByAuthorDay;
 
-		var authorAresps = {},
+		let authorAresps = {},
 				authorBresps = {};
 
-		for (var i = 0; i < this.daysNum + 2; i++) {
-			var thisDate = d3.timeFormat(this.dayFormat)(d3.timeDay.offset(this.date0, i));
+		let formatFn = d3.timeFormat(this.dayFormat);
+
+		for (let i = 0; i < this.daysNum + 2; i++) {
+			let date = d3.timeDay.offset(this.date0, i),
+					thisDate = formatFn(date);
 			authorAresps[thisDate] = [];
 			authorBresps[thisDate] = [];
 		}
 
-		for (var i = 2; i < this.messages.length; i++) {
-			var responder = this.messages[i].author,
+		// Get response time difference per day
+		for (let i = 2; i < this.messages.length; i++) {
+			let responder = this.messages[i].author,
 					prompter = this.messages[i - 1].author;
 
-			var dayString = d3.timeFormat(this.dayFormat)(this.messages[i].datetimeObj);
+			let dayString = formatFn(this.messages[i].datetimeObj);
 
 			if (responder !== prompter) {
-				var dateResp = this.messages[i].datetimeObj;
-				var dateOrig = this.messages[i - 1].datetimeObj;
+				let dateResponse = this.messages[i].datetimeObj.getTime(),
+				 		datePrompt = this.messages[i - 1].datetimeObj.getTime();
 
-				var diff = Math.abs(dateResp.getTime() - dateOrig.getTime());
+				let diff = Math.abs(dateResponse - datePrompt);
 
 				if (diff < 86400000) {
 					if (responder === this.authorAName) {
@@ -537,31 +521,24 @@ Conversation.prototype = {
 			}
 		}
 
-		function reduceResponseTimesPerDay(d, dayString) {
-			if (d.length > 0) {
-				return {
-					responseTime: d.reduce(function(m, n) { return m + n; }) / d.length,
-					datetime: dayString
-				}
-			}
-		}
+		let respsAvgDiff = [];
 
-		var respsAvgDiff = [];
-		var authorArespsAvg = _.map(authorAresps, reduceResponseTimesPerDay);
-		var authorBrespsAvg = _.map(authorBresps, reduceResponseTimesPerDay);
+		let authorArespsAvg = _.map(authorAresps, this.reduceResponseTimesPerDay),
+				authorBrespsAvg = _.map(authorBresps, this.reduceResponseTimesPerDay);
 
-		for (var i = 0; i < this.daysNum; i++) {
-			var diff = undefined;
+		for (let i = 0; i < this.daysNum; i++) {
+			let diff = undefined;
 			if (authorArespsAvg[i] && authorBrespsAvg[i]) {
 				diff = authorArespsAvg[i].responseTime - authorBrespsAvg[i].responseTime;
 			}
-			var dayString = d3.timeFormat(this.dayFormat)(d3.timeDay.offset(this.date0, i));
+
+			let dayString = formatFn(d3.timeDay.offset(this.date0, i));
 
 			respsAvgDiff.push({
 				responseTimeDifference: diff,
 				datetime: dayString
 			});
-		}
+		};
 
 		this.responseTimesByAuthorDay = {
 			authorA: authorArespsAvg,
@@ -573,6 +550,50 @@ Conversation.prototype = {
 
 		return this.responseTimesByAuthorDay;
 	}
-}
 
-module.exports = Conversation;
+	getSilences () {
+		// If already calculated, return it
+		if (this.silences) return this.silences;
+
+		let messages = this.getMessagesByAuthorAndDay(),
+				dateRange = this.getDateRange();
+
+		let authorA = messages.authorAbyDay,
+				authorB = messages.authorBbyDay;
+
+		let silenceHeldBy,
+				lastChattyDate = d3.timeFormat(this.dayFormat)(dateRange[0]);
+
+		let silences = {}
+
+		// For each date, if nobody talks, fill in with who spoke the last
+		dateRange.forEach((date) => {
+			let day = d3.timeFormat(self.dayFormat)(date);
+			silences[day] = false;
+
+			let isALastOneToTalk = (lastChattyDate in authorA),
+					isBLastOneToTalk = (lastChattyDate in authorB);
+
+			if (day in authorA || day in authorB) {
+				lastChattyDate = day;
+			} else {
+				// Find last one to talk
+				if (isALastOneToTalk && !(isBLastOneToTalk)) {
+					silences[day] = self.authorAName;
+
+				} else if (isBLastOneToTalk && !(isALastOneToTalk)) {
+					silences[day] = self.authorBName;
+
+				} else if (isALastOneToTalk && isBLastOneToTalk) {
+					let msgTimeA = _.last(authorA[lastChattyDate]).datetimeObj.getTime(),
+					 		msgTimeB = _.last(authorB[lastChattyDate]).datetimeObj.getTime();
+
+					silences[day] = (msgTimeA > msgTimeB) ? this.authorAName : this.authorBName;
+				}
+			}
+		});
+		this.silences = _.map(silences, (d, dayString) => d);
+
+		return this.silences;
+	}
+}

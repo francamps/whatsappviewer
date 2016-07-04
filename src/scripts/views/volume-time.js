@@ -11,7 +11,6 @@ export default class VolumeTime {
     this.Convo = args.Convo;
     this.chars = this.Convo.getCharactersByAuthorAndDay();
     this.messages = args.Convo.getMessages();
-
     this.dayFormatParse = d3.timeParse(this.dayFormat);
   }
 
