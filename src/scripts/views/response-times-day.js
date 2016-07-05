@@ -31,7 +31,7 @@ export default class ResponseTimesTime {
 
   initializeSVG () {
     // Please find a better way to do this
-  	d3.select('#widget-3 svg')
+  	d3.select('#widget-3 .svg svg')
       .remove();
 
     // Append SVG to the DOM

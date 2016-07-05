@@ -19,7 +19,7 @@ export default class VolumeTime {
     d3.select('#graph-viewer svg').remove();
 
     // Append SVG do the div
-    this.svg = d3.select('#graph-viewer')
+    this.svg = d3.select('#graph-viewer .svg')
                 .append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);

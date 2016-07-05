@@ -114,7 +114,7 @@ h3 {
       float: right;
     }
 
-    .graph-widget + form {
+    .svg + form {
       margin: 10px 0 0 0;
     }
   }
@@ -138,15 +138,14 @@ h3 {
     transition: width 2s, padding 2s;
     top: 80px;
     opacity: 1;
-    transition: opacity .3s ease-in-out;
+    transition: opacity, height .3s ease-in-out;
 
     &.hidden {
       opacity: 0;
+      height: 0;
       transition: opacity .3s ease-in-out;
-    }
-
-    &.removed {
-      display: none;
+      transition-delay: height .3s;
+      transition-duration: height 0;
     }
   }
 }

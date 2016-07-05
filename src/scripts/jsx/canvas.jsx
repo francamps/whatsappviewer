@@ -1,31 +1,50 @@
 'use strict';
 
 import Legend from './legend';
-import DataTable from './data-table';
+import Widget from './widget';
+import DataTable from './data-table/table';
 
 export default class Canvas extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      classes: "canvas hidden"
+    }
+  }
+
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.isShowing) {
+      this.setState({
+        classes: "canvas showing"
+      });
+      document.body.scrollTop = 0;
+    }
+  }
+
+  renderTitle () {
+    return (
+      <div id="dashboard-title" className="widget-title">
+        <p>Your conversation</p>
+      </div>
+    );
+  }
+
   render () {
     return (
-      <div id="canvas" className="canvas hidden">
-        <div id="dashboard-title" className="widget-title">
-          <p>Your conversation</p>
-        </div>
+      <div id="canvas" className={this.state.classes}>
+        {this.renderTitle()}
         <Legend />
-        <div className="widget">
-          <h3>Volume of messages over time</h3>
-          <div id="graph-viewer" className="graph-widget"></div>
-          <form id="search-form" className="form">
-            <input id="search-box" type="text" placeholder="Search a word or phrase"></input>
-          </form>
-        </div>
-        <div id="widget-2" className="widget">
-          <h3>Volume of messages per hour of day</h3>
-          <div></div>
-        </div>
-        <div id="widget-3" className="widget">
-          <h3>Response times per day (average)</h3>
-          <div className="svg"></div>
-        </div>
+        <Widget
+          title={'Volume of messages over time'}
+          svgID={'graph-viewer'}
+          renderSearchBox={true} />
+        <Widget
+          title={'Volume of messages per time of day'}
+          svgID={'widget-2'} />
+        <Widget
+          title={'Response times per day (average)'}
+          svgID={'widget-3'} />
         <DataTable />
       </div>
     );

@@ -8,7 +8,9 @@ export default class ChatForm extends React.Component{
             <span>Paste your conversation text here:</span>
             <textarea id="text" type="text" rows="6" placeholder="Insert text"></textarea>
         </form>
-        <button id="render-button">Render</button>
+        <button
+          onClick={this.props.onClickRender}
+          id="render-button">Render</button>
       </div>
     )
   }

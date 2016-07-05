@@ -38,7 +38,7 @@ gulp.task('copy', function () {
 });
 
 gulp.task('watch', function () {
-  gulp.watch('./src/scripts/**/*.js', ['browserify']);
+  gulp.watch(['./src/scripts/**/*.js', './src/scripts/**/*.jsx'], ['browserify']);
   gulp.watch('./src/scss/*.scss', ['sass']);
   gulp.watch('./src/*.html', ['copy']);
 });

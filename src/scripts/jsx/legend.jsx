@@ -1,5 +1,7 @@
 'use strict'
 
+import Summary from './summary';
+
 export default class Legend extends React.Component {
   render () {
     return (
@@ -8,6 +10,7 @@ export default class Legend extends React.Component {
         <div id="author-A-leg-label" className="legend-label">unknown</div>
         <div id="author-B-col" className="legend-col"></div>
         <div id="author-B-leg-label" className="legend-label">unknown</div>
+        <Summary />
       </div>
     );
   }

@@ -5,7 +5,19 @@
   padding: 20px 20px 0 20px;
 
   &.hidden {
-    display: none;
+    opacity: 0;
+    height: 0;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;    
+  }
+
+  &.showing {
+    opacity: 1;
+    height: auto;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;
   }
 }
 

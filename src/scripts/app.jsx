@@ -12,27 +12,27 @@ import Footer from './jsx/footer';
 import Viewer from './viewer';
 
 class App extends React.Component {
-  componentDidMount () {
-    function switchState() {
-      // This will trigger a rerender
-      document.querySelector(".form-container").classList.add('hidden');
-
-      window.setTimeout(function () {
-        document.querySelector(".form-container").classList.add('removed');
-        document.querySelector(".canvas").classList.remove('hidden');
-        document.body.scrollTop = 0;
-      }, 1000);
+  constructor(props) {
+    super(props);
+    this.state = {
+      isAnalyzed: false,
     }
+  }
 
-    document.querySelector("#render-button").addEventListener('click', function () {
-        let text = document.querySelector('#text').value || '';
-        let CanvasViewer = new Viewer(text);
-
-        if (CanvasViewer.isParsed) {
-          CanvasViewer.render();
-          switchState();
-        }
+  switchState () {
+    this.setState({
+      isAnalyzed: true
     });
+  }
+
+  toggleForm () {
+    let text = document.querySelector('#text').value || '';
+    let CanvasViewer = new Viewer(text);
+
+    if (CanvasViewer.isParsed) {
+      CanvasViewer.render();
+      this.switchState();
+    }
   }
 
   render () {
@@ -40,8 +40,11 @@ class App extends React.Component {
       <div>
         <Header />
         <div className="page-wrap">
-          <Form />
-          <Canvas />
+          <Form
+            isAnalyzed={this.state.isAnalyzed}
+            onClickRender={this.toggleForm.bind(this)}/>
+          <Canvas
+            isShowing={this.state.isAnalyzed}/>
         </div>
         <Footer />
       </div>

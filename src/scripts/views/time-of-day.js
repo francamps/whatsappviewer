@@ -18,10 +18,10 @@ export default class TimeOfDay {
   render () {
     // Make sure there is not one already
     // TODO: This is dirty, fix it
-    d3.select('#widget-2 svg').remove();
+    d3.select('#widget-2 .svg svg').remove();
 
     // Append SVG to div
-    this.svg = d3.select('#widget-2')
+    this.svg = d3.select('#widget-2 .svg')
                 .append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
