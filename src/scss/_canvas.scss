@@ -9,7 +9,7 @@
     height: 0;
     transition: opacity, height;
     transition-delay: .3s;
-    transition-duration: .3s;    
+    transition-duration: .3s;
   }
 
   &.showing {
@@ -47,6 +47,14 @@
 
     &:first-child {
       margin-left: 0;
+    }
+
+    .authorA {
+      background: $pink;
+    }
+
+    .authorB {
+      background: $purple;
     }
   }
 

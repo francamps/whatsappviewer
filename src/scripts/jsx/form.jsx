@@ -3,6 +3,7 @@
 import Instructions from './instructions';
 import ChatForm from './chat-form';
 import Notification from './notification';
+import WidgetTitle from './widget-title';
 
 export default class Form extends React.Component {
   constructor (props) {
@@ -30,21 +31,22 @@ export default class Form extends React.Component {
     }
   }
 
-  renderTitle () {
-    return (
-      <div className="widget-title">
-        <p>Explore and analyze your conversations</p>
-      </div>
-    );
+  renderNotification () {
+    if (this.props.parsingError) {
+      return (
+        <Notification
+          message={this.props.parsingError} />
+      );
+    }
   }
 
   render () {
     return (
       <div id="form-container" className={this.state.classes}>
-        {this.renderTitle()}
+        <WidgetTitle title={'Explore and analyze your conversations'} />
         <Instructions />
         <ChatForm onClickRender={this.props.onClickRender}/>
-        <Notification />
+        {this.renderNotification()}
       </div>
     );
   }

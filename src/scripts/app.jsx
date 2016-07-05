@@ -9,29 +9,32 @@ import Form from './jsx/form';
 import Canvas from './jsx/canvas';
 import Footer from './jsx/footer';
 
-import Viewer from './viewer';
+import { getConfig } from './utilities/view-configuration';
+import Conversation from './models/conversation';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isAnalyzed: false,
+      parsingError: false
     }
   }
 
-  switchState () {
-    this.setState({
-      isAnalyzed: true
-    });
-  }
+  analyzeAndRender (text) {
+    let viewConfig = getConfig();
+    let Chat = new Conversation(text);
 
-  toggleForm () {
-    let text = document.querySelector('#text').value || '';
-    let CanvasViewer = new Viewer(text);
-
-    if (CanvasViewer.isParsed) {
-      CanvasViewer.render();
-      this.switchState();
+    if (Chat.isParsed) {
+      this.setState({
+        conversation: Chat,
+        viewOpts: viewConfig,
+        isAnalyzed: true
+      });
+    } else if (Chat.parsingError) {
+      this.setState({
+        parsingError: Chat.parsingError
+      })
     }
   }
 
@@ -41,9 +44,12 @@ class App extends React.Component {
         <Header />
         <div className="page-wrap">
           <Form
+            parsingError={this.state.parsingError}
             isAnalyzed={this.state.isAnalyzed}
-            onClickRender={this.toggleForm.bind(this)}/>
+            onClickRender={this.analyzeAndRender.bind(this)}/>
           <Canvas
+            viewOpts={this.state.viewOpts}
+            conversation={this.state.conversation}
             isShowing={this.state.isAnalyzed}/>
         </div>
         <Footer />

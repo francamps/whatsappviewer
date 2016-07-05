@@ -22,8 +22,26 @@ export default class Widget extends React.Component {
         <form id="search-form" className="form">
           <input id="search-box" type="text" placeholder="Search a word or phrase"></input>
         </form>
-      );      
+      );
     }
+  }
+  // Volume of messages per time of day
+  componentDidMount () {
+    if (this.props.view) {
+      this.renderSVGs();
+    }
+  }
+
+  renderSVGs () {
+    let Convo = this.props.conversation;
+    let viewOptions = this.props.viewOpts;
+    let View = this.props.view;
+
+    let thisView = new View({
+      Convo: Convo,
+      options: viewOptions
+    });
+    thisView.render();
   }
 
   render () {

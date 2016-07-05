@@ -26,7 +26,7 @@ export default class VolumeTime {
 
     this.computeScaleFns();
     this.addLines();
-    this.addTimeLabelAxis();
+    //this.addTimeLabelAxis();
     this.addSearchFunctionality();
   }
 
