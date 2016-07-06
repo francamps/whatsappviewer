@@ -34,12 +34,12 @@ export default class Widget extends React.Component {
 
   renderSVGs () {
     let Convo = this.props.conversation;
-    let viewOptions = this.props.viewOpts;
+    let viewParams = this.props.viewParams;
     let View = this.props.view;
 
     let thisView = new View({
       Convo: Convo,
-      options: viewOptions
+      options: viewParams
     });
     thisView.render();
   }

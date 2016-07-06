@@ -61,13 +61,13 @@ export default class DataTable extends React.Component {
           <Row metricID={'resp-times'}
             conversation={this.props.conversation}
             view={ResponseTimesHist}
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             chatMode={false}
             metricLabel={'Response times frequency'} />
           <Row metricID={'resp-times-chat'}
             conversation={this.props.conversation}
             view={ResponseTimesHist}
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             chatMode={true}
             metricLabel={'Response times frequency in chat mode (RT < 15min)'} />
         </div>

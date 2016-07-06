@@ -7,12 +7,12 @@ export default class Row extends React.Component {
 
   renderViews () {
     let Convo = this.props.conversation;
-    let viewOptions = this.props.viewOpts;
+    let viewParams = this.props.viewParams;
     let View = this.props.view;
 
     let viewA = new View({
       Convo: Convo,
-      options: viewOptions,
+      options: viewParams,
       chatMode: this.props.chatMode,
 			author: "A"
     }, "#" + this.props.metricID + "-A");
@@ -20,7 +20,7 @@ export default class Row extends React.Component {
 
     let viewB = new View({
       Convo: Convo,
-      options: viewOptions,
+      options: viewParams,
       chatMode: this.props.chatMode,
 			author: "B"
     }, "#" + this.props.metricID + "-B");

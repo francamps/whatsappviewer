@@ -10,11 +10,11 @@ export default class Legend extends React.Component {
         <div id="author-A-leg-label" className="legend-label">
           {this.props.conversation.authorAName}
         </div>
-        <div id="author-B-col" className="legend-col authorA"></div>
+        <div id="author-B-col" className="legend-col authorB"></div>
         <div id="author-B-leg-label" className="legend-label">
           {this.props.conversation.authorBName}
         </div>
-        <Summary />
+        <Summary conversation={this.props.conversation} />
       </div>
     );
   }

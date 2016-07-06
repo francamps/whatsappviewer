@@ -25,8 +25,8 @@ export default class Form extends React.Component {
     });
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.isAnalyzed) {
+  componentWillUnmount () {
+    if (this.props.isAnalyzed) {
       this.hideForm();
     }
   }

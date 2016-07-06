@@ -12,7 +12,6 @@ export default class ResponseTimesTime {
 
     this.resps = args.Convo.getResponseTimes();
   	this.respsDay = args.Convo.getResponseTimesByAuthorDay();
-    this.silences = args.Convo.getSilences();
 
     this.dayFormatParse = d3.timeParse(this.dayFormat);
   }
@@ -26,7 +25,6 @@ export default class ResponseTimesTime {
     this.addDiffLine();
     this.addMessageDots();
     this.addAxis();
-    //this.addSilences();
   }
 
   initializeSVG () {
@@ -168,12 +166,14 @@ export default class ResponseTimesTime {
     let allMessagesA = d3.map(this.respsDay.authorAAll).entries(),
         allMessagesB = d3.map(this.respsDay.authorBAll).entries();
 
+    let r = 2,
+        x = (i) => this.mg + (i + 1/2) * this.colW - 1;
+
     // Add messages for author A
     // grouping them per day
     let daysA = msgs.selectAll(".day-message-circles")
       .data(allMessagesA)
       .enter().append("g");
-
 
     daysA.each((d, i, nodes) => {
       let circle = d3.select(nodes[i]).selectAll(".message-circle")
@@ -183,9 +183,9 @@ export default class ResponseTimesTime {
 
       // Position and dimension
       circle
-        .attr("cx", this.mg + (i + 1/2) * this.colW)
+        .attr("cx", x(i))
         .attr("cy", (b) => this.h / 2 - this.yScale(b))
-        .attr("r", 2)
+        .attr("r", r)
 
       // Styling, please move to stylesheet
       circle
@@ -207,9 +207,9 @@ export default class ResponseTimesTime {
 
       // Position and dimension
       circle
-        .attr("cx", this.mg + (i + 1/2) * this.colW)
+        .attr("cx", x(i))
         .attr("cy", (b) => this.h / 2 + this.yScale(b))
-        .attr("r", 2)
+        .attr("r", r)
 
       // Styling, please move to stylesheet
       circle
@@ -231,9 +231,5 @@ export default class ResponseTimesTime {
       .attr("class", "axis-g")
       .attr("transform", `translate(0, ${midH})`)
       .call(axis);
-  }
-
-  addSilences () {
-    // TODO: Do something with the silences at somepoint
   }
 }

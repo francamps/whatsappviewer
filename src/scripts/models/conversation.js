@@ -17,6 +17,9 @@ Public methods
 * getMessages
 * getMessagesByAuthorAndDay
 * getMessagesByDay
+* getNumberOfMessages
+* getMediaMessages
+* getNumberOfMediaMessages
 * getDateRange
 * getCharacters
 * getCharactersByAuthorAndDay
@@ -31,7 +34,6 @@ Public methods
 * getTimeDifference
 * getResponseTimes
 * getResponseTimesByAuthorDay
-* getSilences
 
 */
 
@@ -44,6 +46,7 @@ export default class Conversation {
 		this.authors = {};
 		this.dateFormats = getDateFormats();
 		this.messages = [];
+		this.mediaMessages = [];
 
 		// Initial, neurtal parsing
 		this._parseTextData();
@@ -51,6 +54,10 @@ export default class Conversation {
 
 	getMessages () {
 		return this.messages;
+	}
+
+	getNumberOfMessages () {
+		return this.messages.length;
 	}
 
 	// Go through possible date formats to find the one
@@ -320,13 +327,33 @@ export default class Conversation {
 		return this.charactersByAuthorAndDay;
 	}
 
+	getMediaMessages () {
+		if (this.mediaMessages.length > 0) return this.mediaMessages;
+
+		this.mediaMessages = [];
+
+		let messages = this.getMessages();
+		messages.forEach((message) => {
+			if (message.text.substr(2, 15) === "<Media omitted>") {
+				this.mediaMessages.push(message);
+			}
+		});
+
+		return this.mediaMessages;
+	}
+
+	getNumberOfMediaMessages () {
+		let mediaMessages = this.getMediaMessages();
+		return this.mediaMessages.length;
+	}
+
 	getMessageLengths () {
 		// If already computed, return it
 		if (this.messageLengths) return this.messageLengths;
 
 		let lengths = [];
 		this.messages.forEach((message) => {
-			if (message.text.substr(0, 15) !== "<Media omitted>") {
+			if (message.text.substr(2, 15) !== "<Media omitted>") {
 				lengths.push(message.text.length);
 			}
 		})
@@ -342,18 +369,14 @@ export default class Conversation {
 		let countsA = [],
 				countsB = [];
 
-		this.mediaMessages = []
-
 		this.messages.forEach((message) => {
 			// Omit audios
-			if (message.text.substr(0, 15) !== "<Media omitted>") {
+			if (message.text.substr(2, 15) !== "<Media omitted>") {
 				if (message.author === this.authorAName) {
 					countsA.push(message.text.split(' ').length);
 				} else {
 					countsB.push(message.text.split(' ').length);
 				}
-			} else {
-				this.mediaMessages.push(msg);
 			}
 		});
 
@@ -583,49 +606,31 @@ export default class Conversation {
 		return this.responseTimesByAuthorDay;
 	}
 
-	getSilences () {
-		// If already calculated, return it
-		if (this.silences) return this.silences;
+	getLongestSilence () {
+		if (this.longestSilence) return this.longestSilence;
 
-		let messages = this.getMessagesByAuthorAndDay(),
-				dateRange = this.getDateRange();
+		let messages = this.getMessages(),
+				longestSilence = 0,
+				prompter, responder;
 
-		let authorA = messages.authorAbyDay,
-				authorB = messages.authorBbyDay;
+		for (let i = 1; i < messages.length; i++) {
+			let to = messages[i].datetimeObj,
+					from = messages[i - 1].datetimeObj,
+					thisSilence = to.getTime() - from.getTime()
 
-		let silenceHeldBy,
-				lastChattyDate = d3.timeFormat(this.dayFormat)(dateRange[0]);
-
-		let silences = {}
-
-		// For each date, if nobody talks, fill in with who spoke the last
-		dateRange.forEach((date) => {
-			let day = d3.timeFormat(self.dayFormat)(date);
-			silences[day] = false;
-
-			let isALastOneToTalk = (lastChattyDate in authorA),
-					isBLastOneToTalk = (lastChattyDate in authorB);
-
-			if (day in authorA || day in authorB) {
-				lastChattyDate = day;
-			} else {
-				// Find last one to talk
-				if (isALastOneToTalk && !(isBLastOneToTalk)) {
-					silences[day] = self.authorAName;
-
-				} else if (isBLastOneToTalk && !(isALastOneToTalk)) {
-					silences[day] = self.authorBName;
-
-				} else if (isALastOneToTalk && isBLastOneToTalk) {
-					let msgTimeA = _.last(authorA[lastChattyDate]).datetimeObj.getTime(),
-					 		msgTimeB = _.last(authorB[lastChattyDate]).datetimeObj.getTime();
-
-					silences[day] = (msgTimeA > msgTimeB) ? this.authorAName : this.authorBName;
-				}
+			if (thisSilence > longestSilence) {
+				longestSilence = thisSilence;
+				prompter = messages[i - 1];
+				responder = messages[i];
 			}
-		});
-		this.silences = _.map(silences, (d, dayString) => d);
+		}
 
-		return this.silences;
+		this.longestSilence = {
+			prompter: prompter,
+			responder: responder,
+			duration: longestSilence
+		}
+
+		return this.longestSilence;
 	}
 }

@@ -9,7 +9,7 @@ import Form from './jsx/form';
 import Canvas from './jsx/canvas';
 import Footer from './jsx/footer';
 
-import { getConfig } from './utilities/view-configuration';
+import { getViewParams } from './utilities/view-params';
 import Conversation from './models/conversation';
 
 class App extends React.Component {
@@ -22,13 +22,13 @@ class App extends React.Component {
   }
 
   analyzeAndRender (text) {
-    let viewConfig = getConfig();
+    let viewParams = getViewParams();
     let Chat = new Conversation(text);
 
     if (Chat.isParsed) {
       this.setState({
         conversation: Chat,
-        viewOpts: viewConfig,
+        viewParams: viewParams,
         isAnalyzed: true
       });
     } else if (Chat.parsingError) {
@@ -38,19 +38,35 @@ class App extends React.Component {
     }
   }
 
+  renderForm () {
+    if (!this.state.isAnalyzed) {
+      return (
+        <Form
+          parsingError={this.state.parsingError}
+          isAnalyzed={this.state.isAnalyzed}
+          onClickRender={this.analyzeAndRender.bind(this)}/>
+      );
+    }
+  }
+
+  renderCanvas () {
+    if (this.state.isAnalyzed) {
+      return (
+        <Canvas
+          viewParams={this.state.viewParams}
+          conversation={this.state.conversation}
+          isShowing={this.state.isAnalyzed}/>
+      );
+    }
+  }
+
   render () {
     return (
       <div>
         <Header />
         <div className="page-wrap">
-          <Form
-            parsingError={this.state.parsingError}
-            isAnalyzed={this.state.isAnalyzed}
-            onClickRender={this.analyzeAndRender.bind(this)}/>
-          <Canvas
-            viewOpts={this.state.viewOpts}
-            conversation={this.state.conversation}
-            isShowing={this.state.isAnalyzed}/>
+          {this.renderForm()}
+          {this.renderCanvas()}
         </div>
         <Footer />
       </div>

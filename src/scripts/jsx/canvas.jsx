@@ -18,9 +18,8 @@ export default class Canvas extends React.Component {
     }
   }
 
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.isShowing) {
+  componentDidMount () {
+    if (this.props.isShowing) {
       this.setState({
         classes: "canvas showing"
       });
@@ -43,24 +42,24 @@ export default class Canvas extends React.Component {
           <Widget
             title={'Volume of messages over time'}
             view={VolumeTime}
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             conversation={this.props.conversation}
             svgID={'graph-viewer'}
             renderSearchBox={true} />
           <Widget
             title={'Volume of messages per time of day'}
             view={TimeOfDay}
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             conversation={this.props.conversation}
             svgID={'widget-2'} />
           <Widget
             title={'Response times per day (average)'}
             view={ResponseTimesTime}
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             conversation={this.props.conversation}
             svgID={'widget-3'} />
           <DataTable
-            viewOpts={this.props.viewOpts}
+            viewParams={this.props.viewParams}
             conversation={this.props.conversation} />
         </div>
       );
