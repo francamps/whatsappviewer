@@ -26,7 +26,7 @@ export default class ChatForm extends React.Component{
         <span>Paste your conversation text here:</span>
         <form id="form" className="form" onSubmit={this.onClickRender.bind(this)}>
           <textarea type="text"
-            rows="6"
+            rows="10"
             placeholder="Insert text"
             value={this.state.chatValue}
             onChange={this.handleChange.bind(this)}></textarea>

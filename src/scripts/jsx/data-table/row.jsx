@@ -36,10 +36,10 @@ export default class Row extends React.Component {
   render () {
     return (
       <div className="row">
+        <div className="cell metric-label">{this.props.metricLabel}</div>
         <div id={this.props.metricID + "-A"} className="cell metric">
           {this.props.cellA}
         </div>
-        <div className="cell metric-label">{this.props.metricLabel}</div>
         <div id={this.props.metricID + "-B"} className="cell metric">
           {this.props.cellB}
         </div>

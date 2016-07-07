@@ -2,8 +2,8 @@ export default class TimeOfDay {
   constructor (args) {
     this.w = args.options.w;
     this.h = 140;
-    this.pink = args.options.pink;
-    this.purple = args.options.purple;
+    this.colorA = args.options.colorA;
+    this.colorB = args.options.colorB;
     this.r = 20;
     this.mg = 30;
     this.hourStep = (this.w - this.mg) / 24;
@@ -37,12 +37,8 @@ export default class TimeOfDay {
 
     // Define scale functions
     this.rScale = d3.scalePow().exponent(.5)
-                  .domain([0, this.maxA])
+                  .domain([0, d3.max([this.maxA, this.maxB])])
                   .range([1, 15]);
-
-    this.cScale = d3.scalePow().exponent(.5)
-                  .domain([0, this.maxB])
-                  .range([.2, .6]);
   }
 
   addBubbles () {
@@ -89,10 +85,10 @@ export default class TimeOfDay {
 
     // Paint bubbles
     bubblesA.selectAll(".bubbleA")
-      .style("fill", (d) => d3.hsl(265, .97, this.cScale(d)).toString());
+      .style("fill", this.colorA);
 
     bubblesB.selectAll(".bubbleB")
-      .style("fill", (d) => d3.hsl(338, .95, this.cScale(d)).toString());
+      .style("fill", this.colorB);
   }
 
   renderTimeLabels () {

@@ -3,8 +3,8 @@ export default class ResponseTimesTime {
     this.w = args.options.w;
     this.mg = args.options.mg;
     this.h = args.options.h;
-    this.pink = args.options.pink;
-    this.purple = args.options.purple;
+    this.colorA = args.options.colorA;
+    this.colorB = args.options.colorB;
     this.gold = args.options.gold;
     this.dayFormat = args.options.dayFormat;
     this.labelFormat = args.options.labelFormat;
@@ -22,8 +22,8 @@ export default class ResponseTimesTime {
     this.computeScaleFns();
     this.adjustSizeIfNeeded();
     this.addEachResponseTime()
-    this.addDiffLine();
-    this.addMessageDots();
+    //this.addDiffLine();
+    //this.addMessageDots();
     this.addAxis();
   }
 
@@ -56,7 +56,7 @@ export default class ResponseTimesTime {
 
   adjustSizeIfNeeded () {
     // Minimum width of columns to be perceived well
-    let minColW = 10,
+    let minColW = 20,
         minimumW = minColW * this.Convo.daysNum;
 
     this.colW = minColW;
@@ -89,6 +89,57 @@ export default class ResponseTimesTime {
     // Append columns per each day with response time daya
     let lineA = respsA.selectAll(".lineA")
       .data(this.respsDay.authorA.filter(Boolean))
+      .enter().append("line")
+      .attr("class", "lineA respLine")
+
+    // Positioning and sizing
+    lineA
+      .attr("x1", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("x2",  (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW)
+      .attr("y1", (d) => this.h / 2 - this.yScale(d.responseTime))
+      .attr("y2", (d) => this.h / 2 - this.yScale(d.responseTime));
+
+    // Styling for RT columns
+    lineA
+			.style("stroke", this.colorA)
+      .style("stroke-width", "2px");
+
+    /* Author B */
+    // Add RT for author B, grouped
+    let respsB =
+        this.svg.append("g")
+            .attr("class", "respsB");
+
+    // Append columns per each day with response time daya
+    let lineB = respsB.selectAll(".lineB")
+      .data(this.respsDay.authorB.filter(Boolean))
+      .enter().append("line")
+      .attr("class", "lineB respLine")
+
+    // Positioning and sizing
+    lineB
+      .attr("x1", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("x2",  (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW)
+      .attr("y1", (d) => this.h / 2 - this.yScale(d.responseTime))
+      .attr("y2", (d) => this.h / 2 - this.yScale(d.responseTime));
+
+      // Styling for RT columns
+      lineB
+        .style("stroke", this.colorB)
+        .style("stroke-width", "2px");
+  }
+
+  // Add response times column bar
+  addEachResponseTimeColumns () {
+    /* Author A */
+    // Add RT for author A, grouped
+    let respsA =
+        this.svg.append("g")
+            .attr("class", "respsA");
+
+    // Append columns per each day with response time daya
+    let lineA = respsA.selectAll(".lineA")
+      .data(this.respsDay.authorA.filter(Boolean))
       .enter().append("rect")
       .attr("class", "lineA respLine")
 
@@ -96,12 +147,12 @@ export default class ResponseTimesTime {
     lineA
       .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .attr("y", (d) => this.h / 2 - this.yScale(d.responseTime))
-      .attr("width", this.colW - 2)
+      .attr("width", this.colW/2 - 4)
       .attr("height", (d) => this.yScale(d.responseTime));
 
     // Styling for RT columns
     lineA
-			.style("fill", this.pink);
+			.style("fill", this.colorA);
 
     /* Author B */
     // Add RT for author B, grouped
@@ -117,14 +168,14 @@ export default class ResponseTimesTime {
 
     // Positioning and sizing
     lineB
-      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .attr("y", (d) => this.h / 2)
-      .attr("width", this.colW - 2)
+      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW/2 - 4)
+      .attr("y", (d) => this.h / 2 - this.yScale(d.responseTime))
+      .attr("width", this.colW/2 - 4)
       .attr("height", (d) => this.yScale(d.responseTime))
 
     // Styling, please move to stylesheet
     lineB
-  		.style("fill", this.purple);
+  		.style("fill", this.colorB);
   }
 
   // Add difference between each author's response time per day
@@ -189,7 +240,7 @@ export default class ResponseTimesTime {
 
       // Styling, please move to stylesheet
       circle
-        .style("fill", this.pink);
+        .style("fill", this.colorA);
     });
 
     // Add messages for author B
@@ -213,7 +264,7 @@ export default class ResponseTimesTime {
 
       // Styling, please move to stylesheet
       circle
-        .style("fill", this.purple);
+        .style("fill", this.colorB);
     });
 
     d3.selectAll(".message-circle")

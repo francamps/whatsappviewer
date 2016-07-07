@@ -21,8 +21,8 @@ Public methods
 * getMediaMessages
 * getNumberOfMediaMessages
 * getDateRange
-* getCharacters
-* getCharactersByAuthorAndDay
+* getWords
+* getWordsByAuthorAndDay
 * getMessageLengths
 * getMessageWordCount
 * getMessageWordCountAverage
@@ -291,40 +291,45 @@ export default class Conversation {
 		return this.messagesByAuthorAndDay;
 	}
 
-	getCharacters (day) {
+	getWords (day) {
 		// day is an array of messages for a given day
-		let numberOfChars = 0,
+		let numberOfWords = 0,
 				datetime = '';
 
 		if (day.length > 0) {
 			datetime = day[0].datetime;
-			day.forEach((message) => numberOfChars += message.text.length);
+			day.forEach((message) => {
+				let textWithOneSpace = message.text.replace(/[\s]+/gim, " ");
+				if (textWithOneSpace.length > 0) {
+					numberOfWords += textWithOneSpace.split(' ').length;					
+				}
+			});
 		}
 
 		return {
-			chars: numberOfChars,
+			words: numberOfWords,
 			datetime: datetime
 		}
 	}
 
-	getCharactersByAuthorAndDay () {
+	getWordsByAuthorAndDay () {
 		// If already computed, return it
-		if (this.charactersByAuthorAndDay) return this.charactersByAuthorAndDay;
+		if (this.wordsByAuthorAndDay) return this.wordsByAuthorAndDay;
 
 		let messages = this.getMessagesByAuthorAndDay();
 
-		let charsDayA = [],
-				charsDayB = [];
+		let wordsDayA = [],
+				wordsDayB = [];
 
-		messages.authorA.forEach((day) => charsDayA.push(this.getCharacters(day)));
-		messages.authorB.forEach((day) => charsDayB.push(this.getCharacters(day)));
+		messages.authorA.forEach((day) => wordsDayA.push(this.getWords(day)));
+		messages.authorB.forEach((day) => wordsDayB.push(this.getWords(day)));
 
-		this.charactersByAuthorAndDay = {
-			authorA: charsDayA,
-			authorB: charsDayB
+		this.wordsByAuthorAndDay = {
+			authorA: wordsDayA,
+			authorB: wordsDayB
 		}
 
-		return this.charactersByAuthorAndDay;
+		return this.wordsByAuthorAndDay;
 	}
 
 	getMediaMessages () {

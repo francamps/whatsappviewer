@@ -45,9 +45,18 @@ export default class Summary extends React.Component {
   render () {
     return (
       <div className="summary">
-        <p>Total messages: {this.state.messages}</p>
-        <p>Longest silence period: {this.state.longestSilence}</p>
-        <p>Media-based messages (ignored): {this.state.medias}</p>
+        <p>
+          Total messages:
+          <span className="summary-metric">{this.state.messages}</span>
+        </p>
+        <p>
+          Longest silence period:
+          <span className="summary-metric">{this.state.longestSilence}</span>
+        </p>
+        <p>
+          Media-based messages (ignored):
+          <span className="summary-metric">{this.state.medias}</span>
+        </p>
       </div>
     );
   }

@@ -3,8 +3,8 @@ export default class ResponseTimesHist {
     this.w = 200;
     this.mg = args.options.mg;
     this.h = 120;
-    this.pink = args.options.pink;
-    this.purple = args.options.purple;
+    this.colorA = args.options.colorA;
+    this.colorB = args.options.colorB;
     this.dayFormat = args.options.dayFormat;
     this.labelFormat = args.options.labelFormat;
     this.Convo = args.Convo;
@@ -61,16 +61,16 @@ export default class ResponseTimesHist {
 
     // Adjust color depending on author
     if (this.author === "A") {
-      this.color = this.pink;
+      this.color = this.colorA;
     } else {
-      this.color = this.purple;
+      this.color = this.colorB;
     }
   }
 
   computeScaleFns () {
     this.timeScale =
       (value) => {
-        return this.mg + value * (this.w - 2 * this.mg) / this.buckets.length;
+        return value * this.w / this.buckets.length;
       }
 
   	this.yScale =
@@ -79,7 +79,7 @@ export default class ResponseTimesHist {
 				.range([0, this.h - 30]);
 
     // Adjust column width based on type of buckets
-    this.colW = (this.w - 2 * this.mg) / this.buckets.length - 2;
+    this.colW = this.w / this.buckets.length - 2;
   }
 
   render () {

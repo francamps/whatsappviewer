@@ -43,7 +43,6 @@ export default class Form extends React.Component {
   render () {
     return (
       <div id="form-container" className={this.state.classes}>
-        <WidgetTitle title={'Explore and analyze your conversations'} />
         <Instructions />
         <ChatForm onClickRender={this.props.onClickRender}/>
         {this.renderNotification()}

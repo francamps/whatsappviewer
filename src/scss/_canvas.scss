@@ -22,7 +22,7 @@
 }
 
 
-/* Legend Widgte
+/* Legend Widget
 /* - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 .legend {
@@ -31,7 +31,6 @@
   box-sizing: border-box;
   padding: 10px;
   border: 1px solid $verylight-grey;
-  border-radius: 10px;
   box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
   min-height: 40px;
 
@@ -50,16 +49,22 @@
     }
 
     &.authorA {
-      background: $pink;
+      background: $colorA;
     }
 
     &.authorB {
-      background: $purple;
+      background: $colorB;
     }
   }
 
   .legend-label, .legend-col {
     display: inline-block;
+  }
+
+  .summary-metric {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 0 10px;
   }
 }
 
@@ -70,39 +75,47 @@
 
 .data-table {
   margin: 0 auto;
-  margin-bottom: 40px;
   padding: 0;
-
-  @media (min-width: 900px) {
-    padding: 0 30px;
-  }
 
   .row {
     box-sizing: border-box;
     display: flex;
     width: 100%;
-    padding: 26px;
-    font-family: 'Roboto', sans-serif;
-    border-bottom: 1px solid $dark-green;
+    padding: 26px 0;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    border-bottom: 1px solid $lightish-grey;
+
+    .cell {
+      width: 35%;
+      text-align: right;
+
+      &.metric {
+        font-size: 18px;
+        font-weight: 400;
+      }
+    }
 
     &:first-child {
       color: $dark-grey;
       font-size: 16px;
       font-weight: bolder;
+
+      .metric {
+        font-size: 16px;
+        font-weight: 400;
+      }
     }
 
-    .cell {
-      width: 35%;
-      text-align: center;
-
-      &.metric {
-        font-size: 16px;
-      }
+    &:last-child {
+      border-bottom: none;
     }
 
     .metric-label {
       width: 30%;
-      font-size: 12px;
+      font-size: 16px;
+      text-align: left;
+      font-weight: 700;
     }
   }
 }
@@ -111,8 +124,8 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 svg {
-  border: 1px solid rgba($dark-green, 0.15);
-  border-radius: 5px;
+  //border: 1px solid rgba($dark-green, 0.15);
+  //border-radius: 5px;
 
   .time-label {
     font-family: 'Roboto';
@@ -147,7 +160,7 @@ svg {
   &.histoRT-svg {
     .label {
       font-size: 10px;
-      font-weight: lighter;
+      font-weight: 300;
       text-anchor: middle;
     }
   }

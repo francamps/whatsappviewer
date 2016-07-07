@@ -13,19 +13,19 @@ body {
   top: 0;
   bottom: 0;
 
-  background: $verylight-grey;
-  background-image: url('background.png');
-  background-repeat: repeat;
-  background-size: 366.5px 666px;
+  background: $superlight-grey;
+  //background-image: url('background.png');
+  //background-repeat: repeat;
+  //background-size: 366.5px 666px;
 
   color: $dark-grey;
-  font-family: 'Roboto';
-  font-size: 14px;
+  font-family: 'Lato';
+  font-size: 1em;
   font-kerning: auto;
   line-height: 20px;
 
   @media (min-width: 900px) {
-    line-height: 22px;
+    line-height: 1.5em;
   }
 }
 
@@ -52,7 +52,9 @@ h2 {
 }
 
 h3 {
-  font-weight: lighter;
+  font-family: 'Oswald';
+  text-transform: uppercase;
+  font-weight: 300;
 }
 
 .page-wrap {
@@ -92,8 +94,12 @@ h3 {
     box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
     border: 1px solid;
     border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-    border-radius: 10px;
+    //border-radius: 10px;
     overflow: auto;
+
+    @media (min-width: 900px) {
+        padding: 30px;
+    }
 
     &::after {
       position: relative;
@@ -103,11 +109,11 @@ h3 {
     }
 
     &:nth-child(even){
-      background:$mess-green;
+      //background:$mess-green;
     }
 
     &:nth-child(odd){
-      background:$white;
+      //background:$white;
     }
 
     button {
@@ -154,11 +160,11 @@ form {
   input, textarea {
     width: 100%;
     outline: none;
-    border-radius: 5px;
-    border: 1px solid $verylight-grey;
+    //border-radius: 5px;
+    border: 1px solid $lightish-grey;
     padding: 10px;
     font-size: 14px;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Lato', sans-serif;
     color: $mid-grey;
   }
 
@@ -168,10 +174,11 @@ form {
 
   textarea {
     margin: 10px 0;
+    resize: none;
   }
 
   input:focus, textarea:focus {
     border-color: $wapp-green;
-    box-shadow: 0 0 10px $wapp-green;
+    box-shadow: 0 0 3px $wapp-green;
   }
 }

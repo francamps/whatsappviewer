@@ -3,10 +3,12 @@ header {
   font-family: 'Roboto', sans-serif;
   font-size: 18px;
   font-weight: lighter;
-  background: $dark-green;
+  //background: $dark-green;
   color: white;
-  box-shadow: 0px 3px 5px #dddddd;
+  //box-shadow: 0px 1px 5px #dddddd;
   text-transform: uppercase;
+  background: $white;
+  border-bottom: 1px solid $lightish-grey;
 
   a {
     margin: 20px;
@@ -15,17 +17,19 @@ header {
     float: left;
     background: none;
     text-decoration: none;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
     padding: 10px;
     cursor: pointer;
-    color: white;
+    color: $wapp-green;
 
     &.view {
       float: right;
     }
 
     &:hover {
-      color: $electric-green;
+      color: $wapp-green;
     }
   }
 }

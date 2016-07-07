@@ -4,12 +4,12 @@ export default class VolumeTime {
     this.w = args.options.w;
     this.mg = args.options.mg || 20;
     this.h = args.options.h;
-    this.pink = args.options.pink;
-    this.purple = args.options.purple;
+    this.colorA = args.options.colorA;
+    this.colorB = args.options.colorB;
     this.dayFormat = args.options.dayFormat;
     this.labelFormat = args.options.labelFormat;
     this.Convo = args.Convo;
-    this.chars = this.Convo.getCharactersByAuthorAndDay();
+    this.words = this.Convo.getWordsByAuthorAndDay();
     this.messages = args.Convo.getMessages();
     this.dayFormatParse = d3.timeParse(this.dayFormat);
   }
@@ -31,7 +31,7 @@ export default class VolumeTime {
   }
 
   computeScaleFns () {
-    let maxChar = this.getMaxNumChars();
+    let maxWords = this.getMaxNumWords();
 
     // X axis -> time scale
     this.timeScale =
@@ -39,10 +39,10 @@ export default class VolumeTime {
         .domain([this.Convo.date0, this.Convo.dateF])
         .range([this.mg, this.w - this.mg]);
 
-    // Y axis -> Number of characters
-    this.charScale =
+    // Y axis -> Number of words
+    this.wordScale =
       d3.scaleLinear()
-        .domain([0, maxChar])
+        .domain([0, maxWords])
         .range([this.h / 2, 0]);
   }
 
@@ -50,25 +50,25 @@ export default class VolumeTime {
   addLines () {
     let lineFunctionA = d3.area()
       .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .y0((d) => this.charScale(d.chars))
-      .y1((d) => this.charScale(0))
+      .y0((d) => this.wordScale(d.words))
+      .y1((d) => this.wordScale(0))
       .curve(d3.curveBasis);
 
     let lineFunctionB = d3.area()
       .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .y0((d) => this.charScale(-d.chars))
-      .y1((d) => this.charScale(0))
+      .y0((d) => this.wordScale(-d.words))
+      .y1((d) => this.wordScale(0))
       .curve(d3.curveBasis);
 
     let lineA = this.svg.append("path")
       .attr("class", "lineA")
-      .attr("d", lineFunctionA(this.chars.authorA))
-      .attr("fill", this.pink);
+      .attr("d", lineFunctionA(this.words.authorA))
+      .attr("fill", this.colorA);
 
     let lineB = this.svg.append("path")
       .attr("class", "lineB")
-      .attr("d", lineFunctionB(this.chars.authorB))
-      .attr("fill", this.purple);
+      .attr("d", lineFunctionB(this.words.authorB))
+      .attr("fill", this.colorB);
   }
 
   // Add time labels and axis
@@ -197,9 +197,9 @@ export default class VolumeTime {
     return this.timeScale(date1) - this.timeScale(date0);
   }
 
-  getMaxNumChars () {
-    let allChars = this.chars.authorA.concat(this.chars.authorB);
+  getMaxNumWords () {
+    let allWords = this.words.authorA.concat(this.words.authorB);
 
-    return d3.max(allChars, (d) => d.chars );
+    return d3.max(allWords, (d) => d.words );
   }
 }

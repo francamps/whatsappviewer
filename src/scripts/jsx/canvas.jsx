@@ -40,7 +40,7 @@ export default class Canvas extends React.Component {
           <Legend
             conversation={this.props.conversation}/>
           <Widget
-            title={'Volume of messages over time'}
+            title={'Volume of words over time'}
             view={VolumeTime}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
