@@ -1,19 +1,12 @@
 'use strict';
 
 import Row from './row';
-import ResponseTimesHist from '../../views/response-times-hist';
+import DoubleRTHist from '../../views/double-RT-hist';
+import ComparisonBar from '../../views/comparison-bar';
 
 export default class DataTable extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {
-      wordCountA: 0,
-      wordCountB: 0,
-      messageNumA: 0,
-      messageNumB: 0,
-      authorA: 'authorA',
-      authorB: 'authorB'
-    }
   }
 
   renderTitle () {
@@ -22,23 +15,10 @@ export default class DataTable extends React.Component {
     );
   }
 
-  componentDidMount () {
-    this.fillData();
-  }
-
-  fillData () {
-		let countsAvg = this.props.conversation.getMessageWordCountAverage(),
-				countsMed = this.props.conversation.getMessageWordCountMedian(),
-        messageNum = this.props.conversation.getNumberOfMessagesByAuthor();
-
-    this.setState({
-      wordCountA: countsAvg.authorA.toFixed(2) + " / " + countsMed.authorA.toFixed(2),
-      wordCountB: countsAvg.authorB.toFixed(2) + " / " + countsMed.authorB.toFixed(2),
-      messageNumA: messageNum.authorA,
-      messageNumB: messageNum.authorB,
-      authorA: this.props.conversation.authorAName,
-      authorB: this.props.conversation.authorBName
-    });
+  extendParams () {
+    let chatParams = _.cloneDeep(this.props.viewParams);
+    chatParams["chatMode"] = true;
+    return chatParams;
   }
 
   render () {
@@ -46,30 +26,28 @@ export default class DataTable extends React.Component {
       <div className="widget">
         {this.renderTitle()}
         <div className="data-table">
-          <Row metricID={'author'}
-            cellA={this.state.authorA}
-            cellB={this.state.authorB}
-            metricLabel={''} />
           <Row metricID={'word-count'}
-            cellA={this.state.wordCountA}
-            cellB={this.state.wordCountB}
-            metricLabel={'Words per message (avg / median)'} />
+            conversation={this.props.conversation}
+            data={this.props.conversation.getMessageWordCountAverage()}
+            view={ComparisonBar}
+            viewParams={this.props.viewParams}
+            metricLabel={'Words per message (avg)'} />
           <Row metricID={'message-num'}
-            cellA={this.state.messageNumA}
-            cellB={this.state.messageNumB}
+            conversation={this.props.conversation}
+            data={this.props.conversation.getNumberOfMessagesByAuthor()}
+            view={ComparisonBar}
+            viewParams={this.props.viewParams}
             metricLabel={'Number of messages'} />
           <Row metricID={'resp-times'}
             conversation={this.props.conversation}
-            view={ResponseTimesHist}
+            view={DoubleRTHist}
             viewParams={this.props.viewParams}
-            chatMode={false}
-            metricLabel={'Response times frequency'} />
+            metricLabel={'Response time frequency'} />
           <Row metricID={'resp-times-chat'}
             conversation={this.props.conversation}
-            view={ResponseTimesHist}
-            viewParams={this.props.viewParams}
-            chatMode={true}
-            metricLabel={'Response times frequency in chat mode (RT < 15min)'} />
+            view={DoubleRTHist}
+            viewParams={this.extendParams()}
+            metricLabel={'Response time frequency (chat mode, RT < 15min)'} />
         </div>
       </div>
     )

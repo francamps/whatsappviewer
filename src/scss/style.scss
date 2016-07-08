@@ -53,8 +53,8 @@ h2 {
 
 h3 {
   font-family: 'Oswald';
-  text-transform: uppercase;
-  font-weight: 300;
+  text-transform: capitalize;
+  font-weight: 400;
 }
 
 .page-wrap {
@@ -90,11 +90,10 @@ h3 {
     background: $white;
     box-sizing: border-box;
     padding: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
     border: 1px solid;
-    border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-    //border-radius: 10px;
+    border-color: $border-top $border-sides $border-bottom;
     overflow: auto;
 
     @media (min-width: 900px) {
@@ -122,6 +121,38 @@ h3 {
 
     .svg + form {
       margin: 10px 0 0 0;
+    }
+
+    .widget-extra-metric {
+      text-align: right;
+
+      p {
+        font-size: 15px;
+        margin: 0;
+
+        &:first-child {
+          margin: 10px 0 0 0;
+        }
+      }
+    }
+
+
+    &.summary {
+      padding: 15px 30px;
+
+      span {
+        float: right;
+
+        &:first-child {
+          float: left;
+        }
+      }
+
+      .summary-metric {
+        font-size: 15px;
+        font-weight: 700;
+        padding: 0 10px;
+      }
     }
   }
 
@@ -160,8 +191,7 @@ form {
   input, textarea {
     width: 100%;
     outline: none;
-    //border-radius: 5px;
-    border: 1px solid $lightish-grey;
+    border: 1px solid $border;
     padding: 10px;
     font-size: 14px;
     font-family: 'Lato', sans-serif;

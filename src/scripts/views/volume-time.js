@@ -26,7 +26,7 @@ export default class VolumeTime {
 
     this.computeScaleFns();
     this.addLines();
-    //this.addTimeLabelAxis();
+    this.addAxis();
     this.addSearchFunctionality();
   }
 
@@ -37,7 +37,7 @@ export default class VolumeTime {
     this.timeScale =
       d3.scaleTime()
         .domain([this.Convo.date0, this.Convo.dateF])
-        .range([this.mg, this.w - this.mg]);
+        .range([0, this.w]);
 
     // Y axis -> Number of words
     this.wordScale =
@@ -201,5 +201,20 @@ export default class VolumeTime {
     let allWords = this.words.authorA.concat(this.words.authorB);
 
     return d3.max(allWords, (d) => d.words );
+  }
+
+  addAxis () {
+    let axis = d3.axisBottom(this.timeScale)
+                  .ticks(5);
+
+    let midH = this.h / 2;
+
+    let axisTicks = this.svg.append("g")
+      .attr("class", "axis-g")
+      .attr("transform", 'translate(0, 10)')
+      .call(axis);
+
+    axisTicks.selectAll('.axis-g .domain')
+      .style("stroke", "none");
   }
 }

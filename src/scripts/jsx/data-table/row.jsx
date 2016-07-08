@@ -1,30 +1,21 @@
 'use strict';
 
-export default class Row extends React.Component {
+export default class RowTemp extends React.Component {
   constructor (props) {
     super(props);
   }
 
   renderViews () {
     let Convo = this.props.conversation;
+    let data = this.props.data;
     let viewParams = this.props.viewParams;
     let View = this.props.view;
-
+console.log(viewParams)
     let viewA = new View({
       Convo: Convo,
-      options: viewParams,
-      chatMode: this.props.chatMode,
-			author: "A"
-    }, "#" + this.props.metricID + "-A");
+      options: viewParams
+    }, this.props.metricID, data);
     viewA.render();
-
-    let viewB = new View({
-      Convo: Convo,
-      options: viewParams,
-      chatMode: this.props.chatMode,
-			author: "B"
-    }, "#" + this.props.metricID + "-B");
-    viewB.render();
   }
 
   componentDidMount () {
@@ -37,11 +28,9 @@ export default class Row extends React.Component {
     return (
       <div className="row">
         <div className="cell metric-label">{this.props.metricLabel}</div>
-        <div id={this.props.metricID + "-A"} className="cell metric">
-          {this.props.cellA}
-        </div>
-        <div id={this.props.metricID + "-B"} className="cell metric">
-          {this.props.cellB}
+        <div id={this.props.metricID} className="cell metric cell-chart">
+          <div className="svg">
+          </div>
         </div>
       </div>
     );

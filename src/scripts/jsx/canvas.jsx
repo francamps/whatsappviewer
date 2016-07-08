@@ -1,6 +1,7 @@
 'use strict';
 
 import Legend from './legend';
+import Summary from './summary';
 import Widget from './widget';
 import WidgetTitle from './widget-title';
 import DataTable from './data-table/table';
@@ -37,8 +38,10 @@ export default class Canvas extends React.Component {
         <div id="canvas" className={this.state.classes}>
           <WidgetTitle
             title={'Your conversation'} />
+          <Summary
+            conversation={this.props.conversation} />
           <Legend
-            conversation={this.props.conversation}/>
+            conversation={this.props.conversation} />
           <Widget
             title={'Volume of words over time'}
             view={VolumeTime}

@@ -26,13 +26,16 @@
 /* - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 .legend {
-  text-align: center;
+  text-align: left;
   background: $white;
   box-sizing: border-box;
   padding: 10px;
   border: 1px solid $verylight-grey;
   box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
   min-height: 40px;
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
 
   .legend-label {
     font-family: 'Roboto';
@@ -59,12 +62,6 @@
 
   .legend-label, .legend-col {
     display: inline-block;
-  }
-
-  .summary-metric {
-    font-size: 20px;
-    font-weight: 700;
-    padding: 0 10px;
   }
 }
 
@@ -96,13 +93,21 @@
       }
     }
 
+    .cell-chart {
+      width: 70%;
+
+      .svg {
+        border: none;
+      }
+    }
+
     &:first-child {
       color: $dark-grey;
       font-size: 16px;
       font-weight: bolder;
 
       .metric {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 400;
       }
     }
@@ -113,9 +118,9 @@
 
     .metric-label {
       width: 30%;
-      font-size: 16px;
+      font-size: 15px;
       text-align: left;
-      font-weight: 700;
+      font-weight: 400;
     }
   }
 }
@@ -183,8 +188,7 @@ svg {
 
 .svg {
   overflow: scroll;
-  border: 1px solid rgba($dark-green, 0.15);
-  border-radius: 5px;
+  border: 1px solid $border;
 
   svg {
     border: none;
