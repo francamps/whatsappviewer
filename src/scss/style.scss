@@ -52,7 +52,7 @@ h2 {
 }
 
 h3 {
-  font-family: 'Oswald';
+  font-family: 'Lato';
   text-transform: capitalize;
   font-weight: 400;
 }
@@ -68,92 +68,20 @@ h3 {
       padding: 0;
   }
 
-  .widget-title {
-    margin-bottom: 20px;
-    text-align:center;
+  @media (min-width: 1100px) {
+      width: 1100px;
+      padding: 0;
 
-    p {
-      background: $wapp-blue;
-      border-color: #e5e6e9 #dfe0e4 #d0d1d5;
-      box-shadow: 0px 5px 5px -7px rgba(0,0,0,.75);
-      border-radius: 10px;
-      width: 150px;
-      margin: 0 auto;
-      text-transform: uppercase;
-      font-size: 14px;
-      padding: 5px;
-      font-weight: lighter;
-    }
-  }
-
-  .widget {
-    background: $white;
-    box-sizing: border-box;
-    padding: 20px;
-    margin-bottom: 5px;
-    box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
-    border: 1px solid;
-    border-color: $border-top $border-sides $border-bottom;
-    overflow: auto;
-
-    @media (min-width: 900px) {
-        padding: 30px;
-    }
-
-    &::after {
-      position: relative;
-      float: right;
-      margin-right: -40px;
-      margin-top: -40px;
-    }
-
-    &:nth-child(even){
-      //background:$mess-green;
-    }
-
-    &:nth-child(odd){
-      //background:$white;
-    }
-
-    button {
-      float: right;
-    }
-
-    .svg + form {
-      margin: 10px 0 0 0;
-    }
-
-    .widget-extra-metric {
-      text-align: right;
-
-      p {
-        font-size: 15px;
-        margin: 0;
-
-        &:first-child {
-          margin: 10px 0 0 0;
-        }
-      }
-    }
-
-
-    &.summary {
-      padding: 15px 30px;
-
-      span {
-        float: right;
-
-        &:first-child {
-          float: left;
-        }
+      .summary {
+        width: 300px;
+        float: left;
+        display: inline-block;
       }
 
-      .summary-metric {
-        font-size: 15px;
-        font-weight: 700;
-        padding: 0 10px;
+      .canvas {
+        width: 800px;
+        display: inline-block;
       }
-    }
   }
 
   .notification {
@@ -183,6 +111,17 @@ h3 {
       transition: opacity .3s ease-in-out;
       transition-delay: height .3s;
       transition-duration: height 0;
+    }
+
+    .widget {
+      background: $white;
+      box-sizing: border-box;
+      padding: 20px;
+      margin-bottom: 5px;
+      box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
+      border: 1px solid;
+      border-color: $border-top $border-sides $border-bottom;
+      overflow: auto;
     }
   }
 }

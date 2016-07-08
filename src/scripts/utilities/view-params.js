@@ -1,10 +1,10 @@
 'use strict';
 
 export function getViewParams () {
-	let w = 740;
+	let w = 696;
 
-	if (document.querySelector(".widget")) {
-		w = document.querySelector(".widget").offsetWidth - 64;
+	if (document.querySelector(".canvas")) {
+		w = document.querySelector(".canvas").offsetWidth - 104;
 	}
 
 	let	pink = "rgb(243, 38, 114)",

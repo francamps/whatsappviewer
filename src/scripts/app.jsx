@@ -6,6 +6,8 @@ import { render } from 'react-dom';
 
 import Header from './jsx/header';
 import Form from './jsx/form';
+
+import Summary from './jsx/summary';
 import Canvas from './jsx/canvas';
 import Footer from './jsx/footer';
 
@@ -60,11 +62,21 @@ class App extends React.Component {
     }
   }
 
+  renderSummary () {
+    if (this.state.isAnalyzed) {
+      return (
+          <Summary
+            conversation={this.state.conversation} />
+      )
+    }
+  }
+
   render () {
     return (
       <div>
         <Header />
         <div className="page-wrap">
+          {this.renderSummary()}
           {this.renderForm()}
           {this.renderCanvas()}
         </div>

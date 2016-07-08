@@ -19,8 +19,111 @@
     transition-delay: .3s;
     transition-duration: .3s;
   }
+
+  .widget {
+    background: $white;
+    box-sizing: border-box;
+    padding: 20px;
+    margin-bottom: 0;
+    box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
+    border: 1px solid;
+    border-color: $border-top $border-sides $border-bottom;
+    border-bottom: none;
+    border-top: none;
+    overflow: auto;
+
+    @media (min-width: 900px) {
+        padding: 30px;
+    }
+
+    &:first-child {
+      border-top: 1px solid $border-top;
+    }
+
+    &:last-child {
+      border-bottom: 1px solid $border-bottom;
+    }
+
+    button {
+      float: right;
+    }
+
+    .svg + form {
+      margin: 10px 0 0 0;
+    }
+
+    .widget-extra-metric {
+      text-align: right;
+
+      p {
+        font-size: 15px;
+        margin: 0;
+
+        &:first-child {
+          margin: 10px 0 0 0;
+        }
+      }
+    }
+  }
 }
 
+.summary {
+  box-sizing: border-box;
+  padding: 20px;
+  padding-top: 30px;
+  margin-top: 20px;
+  background: $white;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
+  border: 1px solid;
+  border-color: $border-top $border-sides $border-bottom;
+  overflow: auto;
+
+  .summary-metric-section {
+    border-top: 1px solid $verylight-grey;
+    padding: 30px 0;
+    overflow: auto;
+
+    p {
+      margin: 0;
+
+      .summary-metric {
+        font-weight: 700;
+        margin-right: 5px;
+      }
+    }
+
+    .item {
+      font-size: 1em;
+      padding: 0;
+      margin-bottom: 20px;
+
+      p {
+        &.summary-metric {
+          font-weight: 700;
+          margin: 0;
+          margin-left: 10px;
+
+          span {
+            font-weight: 400;
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .widget-title {
+    margin-bottom: 20px;
+
+    p {
+      border-radius: 10px;
+      margin: 0;
+      text-transform: capitalize;
+      font-size: 20px;
+    }
+  }
+}
 
 /* Legend Widget
 /* - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -29,34 +132,26 @@
   text-align: left;
   background: $white;
   box-sizing: border-box;
-  padding: 10px;
-  border: 1px solid $verylight-grey;
-  box-shadow: 0px 4px 10px -8px rgba(0,0,0,.75);
+  padding: 10px 0;
   min-height: 40px;
-  position: fixed;
-  left: 20px;
-  bottom: 20px;
 
-  .legend-label {
-    font-family: 'Roboto';
-    text-transform: uppercase;
-  }
+  p {
+    .legend-col {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px 0 40px;
 
-  .legend-col {
-    width: 10px;
-    height: 10px;
-    margin: 0 5px 0 40px;
+      &:first-child {
+        margin-left: 0;
+      }
 
-    &:first-child {
-      margin-left: 0;
-    }
+      &.authorA {
+        background: $colorA;
+      }
 
-    &.authorA {
-      background: $colorA;
-    }
-
-    &.authorB {
-      background: $colorB;
+      &.authorB {
+        background: $colorB;
+      }
     }
   }
 

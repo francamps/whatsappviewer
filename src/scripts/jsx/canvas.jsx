@@ -1,9 +1,6 @@
 'use strict';
 
-import Legend from './legend';
-import Summary from './summary';
 import Widget from './widget';
-import WidgetTitle from './widget-title';
 import DataTable from './data-table/table';
 
 // views
@@ -36,12 +33,6 @@ export default class Canvas extends React.Component {
     } else {
       return (
         <div id="canvas" className={this.state.classes}>
-          <WidgetTitle
-            title={'Your conversation'} />
-          <Summary
-            conversation={this.props.conversation} />
-          <Legend
-            conversation={this.props.conversation} />
           <Widget
             title={'Volume of words over time'}
             view={VolumeTime}
