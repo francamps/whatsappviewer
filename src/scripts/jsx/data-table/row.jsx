@@ -6,16 +6,12 @@ export default class RowTemp extends React.Component {
   }
 
   renderViews () {
-    let Convo = this.props.conversation;
     let data = this.props.data;
     let viewParams = this.props.viewParams;
     let View = this.props.view;
-console.log(viewParams)
-    let viewA = new View({
-      Convo: Convo,
-      options: viewParams
-    }, this.props.metricID, data);
-    viewA.render();
+
+    let thisView = new View(this.props.metricID, viewParams);
+    thisView.render(data);
   }
 
   componentDidMount () {

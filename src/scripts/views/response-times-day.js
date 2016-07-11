@@ -1,50 +1,75 @@
 export default class ResponseTimesTime {
-  constructor (args) {
-    this.w = args.options.w;
-    this.mg = args.options.mg;
-    this.h = args.options.h;
-    this.colorA = args.options.colorA;
-    this.colorB = args.options.colorB;
-    this.gold = args.options.gold;
-    this.dayFormat = args.options.dayFormat;
-    this.labelFormat = args.options.labelFormat;
-    this.Convo = args.Convo;
+  constructor (el, props) {
+    console.log(el, props);
+    this.w = props.w;
+    this.mg = props.mg;
+    this.h = props.h;
+    this.colorA = props.colorA;
+    this.colorB = props.colorB;
+    this.gold = props.gold;
+    this.dayFormat = props.dayFormat;
+    this.labelFormat = props.labelFormat;
 
-  	this.respsDay = args.Convo.getResponseTimesByAuthorDay();
+    this.el = el;
 
     this.dayFormatParse = d3.timeParse(this.dayFormat);
   }
 
-  render () {
-    this.initializeSVG();
+  render (state) {
+    // Append SVG to the DOM
+    this.svg =
+      d3.select("#" + this.el)
+        .append("svg")
+        .attr("class", "dailyRT-svg")
+        .attr("width", this.w)
+        .attr("height", this.h);
 
-    this.computeScaleFns();
-    this.adjustSizeIfNeeded();
-    this.addEachResponseTime()
-    this.addEachResponseTimeColumns();
-    this.addSilences();
+    // Color column top, RT
+    this.svg.append("g")
+        .attr("class", "respsA");
+    this.svg.append("g")
+        .attr("class", "respsB");
+
+    // Grey background columns, RT
+    this.svg.append("g")
+      .attr("class", "bars-bg")
+    // Individual messages
+    this.svg.append("g")
+        .attr("class", "message-circles");
+
+    // Silent days
+    this.svg.append("g")
+        .attr("class", "silences");
+
+    this.update(state);
+  }
+
+  update (state) {
+    this.computeScaleFns(state.domain);
+    this.adjustSizeIfNeeded(state.domain);
+    this.addEachResponseTime(state.data)
+    this.addEachResponseTimeColumns(state.data);
+    this.addSilences(state);
     this.addAxis();
   }
 
-  initializeSVG () {
-    // Please find a better way to do this
-  	d3.select('#widget-3 .svg svg')
-      .remove();
+  updateSVG () {
+    d3.select("#" + this.el + ' svg')
+      .attr("width", this.w)
+      .attr("height", this.h);
+  }
 
-    // Append SVG to the DOM
-  	this.svg =
-      d3.select("#widget-3 .svg")
-        .append("svg")
-        .attr("class", "dailyRT-svg")
-  			.attr("width", this.w)
-  			.attr("height", this.h);
+  destroy () {
+    // Please find a better way to do this
+    d3.select('#' + this.el + ' svg')
+      .remove();
   }
 
   // Compute scale functions for x axis (time) and y axis (response time)
-  computeScaleFns () {
+  computeScaleFns (domain) {
     this.timeScale =
         d3.scaleTime()
-          .domain([this.Convo.date0, this.Convo.dateF])
+          .domain(domain.time)
           .range([0, this.w]);
 
   	this.yScale =
@@ -53,10 +78,22 @@ export default class ResponseTimesTime {
 					.range([0, this.h / 2]);
   }
 
-  adjustSizeIfNeeded () {
+  getDaysNum (domain) {
+    if (this.daysNum) return this.daysNum;
+
+    let dateF = domain.time[1],
+        date0 = domain.time[0];
+
+    this.daysNum = Math.floor((dateF - date0) / 86400000);
+
+    return this.daysNum;
+  }
+
+  adjustSizeIfNeeded (domain) {
+    let daysNum = this.getDaysNum(domain);
     // Minimum width of columns to be perceived well
     let minColW = 20,
-        minimumW = minColW * this.Convo.daysNum;
+        minimumW = minColW * daysNum;
 
     this.colW = minColW;
 
@@ -64,33 +101,32 @@ export default class ResponseTimesTime {
     if (this.w < minimumW) {
       this.w = minimumW;
       // Update SVG to minimum width
-      this.initializeSVG();
+      this.updateSVG();
 
       // Update the time scale as well
-      this.computeScaleFns();
+      this.computeScaleFns(domain);
 
       // Update the column width
-      let date0 = this.Convo.date0,
-          date1 = d3.timeDay.offset(this.Convo.date0, 1);
+      let date0 = domain.time[0],
+          date1 = d3.timeDay.offset(date0, 1);
 
       this.colW = this.timeScale(date1) - this.timeScale(date0);
     }
   }
 
-  addSilences () {
-    let date0 = this.Convo.date0,
-        dateF = this.Convo.dateF;
+  addSilences (state) {
+    let date0 = state.domain.time[0],
+        dateF = state.domain.time[1];
 
     let silentDays = [];
 
-    for (let i = 0; i < this.Convo.daysNum; i++) {
-      if (!this.respsDay.authorA[i] && !this.respsDay.authorB[i]) {
+    for (let i = 0; i < this.getDaysNum(state.domain); i++) {
+      if (!state.data.authorA[i] && !state.data.authorB[i]) {
         silentDays.push({datetime: d3.timeDay.offset(date0, i)});
       }
     }
 
-    let silences = this.svg.append("g")
-                      .attr("class", "silences");
+    let silences = this.svg.selectAll(".silences");
 
     let silence = silences.selectAll(".silentDay")
       .data(silentDays)
@@ -109,16 +145,14 @@ export default class ResponseTimesTime {
   }
 
   // Add response times column bar
-  addEachResponseTime () {
+  addEachResponseTime (data) {
     /* Author A */
     // Add RT for author A, grouped
-    let respsA =
-        this.svg.append("g")
-            .attr("class", "respsA");
+    let respsA = this.svg.selectAll(".respsA");
 
     // Append columns per each day with response time daya
     let lineA = respsA.selectAll(".lineA")
-      .data(this.respsDay.authorA.filter(Boolean))
+      .data(data.authorA.filter(Boolean))
       .enter().append("line")
       .attr("class", "lineA respLine")
 
@@ -137,13 +171,11 @@ export default class ResponseTimesTime {
 
     /* Author B */
     // Add RT for author B, grouped
-    let respsB =
-        this.svg.append("g")
-            .attr("class", "respsB");
+    let respsB = this.svg.selectAll(".respsB");
 
     // Append columns per each day with response time daya
     let lineB = respsB.selectAll(".lineB")
-      .data(this.respsDay.authorB.filter(Boolean))
+      .data(data.authorB.filter(Boolean))
       .enter().append("line")
       .attr("class", "lineB respLine")
 
@@ -162,10 +194,12 @@ export default class ResponseTimesTime {
   }
 
   // Add response times column bar
-  addEachResponseTimeColumns () {
+  addEachResponseTimeColumns (data) {
+    let bgs = this.svg.selectAll(".bars-bg");
+
     // Background
-    let bgA = this.svg.selectAll(".bgA")
-      .data(this.respsDay.authorA.filter(Boolean))
+    let bgA = bgs.selectAll(".bgA")
+      .data(data.authorA.filter(Boolean))
       .enter().append("rect")
       .attr("class", "bgA")
 
@@ -181,8 +215,8 @@ export default class ResponseTimesTime {
       .style("opacity", .1);
 
     // Background
-    let bgB = this.svg.selectAll(".bgB")
-      .data(this.respsDay.authorB.filter(Boolean))
+    let bgB = bgs.selectAll(".bgB")
+      .data(data.authorB.filter(Boolean))
       .enter().append("rect")
       .attr("class", "bgB")
 
@@ -200,12 +234,10 @@ export default class ResponseTimesTime {
 
   // Individual messages dot, to see variance
   addMessageDots () {
-    let msgs =
-        this.svg.append("g")
-            .attr("class", "message-circles");
+    let msgs = this.svg.selectAll(".message-circles")
 
-    let allMessagesA = d3.map(this.respsDay.authorAAll).entries(),
-        allMessagesB = d3.map(this.respsDay.authorBAll).entries();
+    let allMessagesA = d3.map(data.authorAAll).entries(),
+        allMessagesB = d3.map(data.authorBAll).entries();
 
     let r = 2,
         x = (i) => (i + 1/2) * this.colW - 1;

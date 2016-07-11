@@ -1,21 +1,15 @@
 export default class ResponseTimesHist {
-  constructor (args, svgID) {
+  constructor (el, props) {
     this.w = 400;
-    this.mg = args.options.mg;
+    this.mg = props.mg;
     this.h = 180;
-    this.colorA = args.options.colorA;
-    this.colorB = args.options.colorB;
-    this.dayFormat = args.options.dayFormat;
-    this.labelFormat = args.options.labelFormat;
-    this.Convo = args.Convo;
-    this.chatMode = args.options.chatMode;
-    this.author = args.author;
-    this.svgID = svgID;
-
-    this.resps = args.Convo.getResponseTimes();
-    this.getBuckets();
-    this.viewTypeAdjustments();
-    this.viewSizeAdjustments();
+    this.colorA = props.colorA;
+    this.colorB = props.colorB;
+    this.dayFormat = props.dayFormat;
+    this.labelFormat = props.labelFormat;
+    this.chatMode = props.chatMode;
+    this.author = props.author;
+    this.el = el;
   }
 
   viewSizeAdjustments () {
@@ -27,19 +21,16 @@ export default class ResponseTimesHist {
     }
   }
 
-  getBuckets () {
+  getBuckets (data) {
     // Buckitfy times on chat mode or not
     // INFO: Chat mode means any response time under 15 minutes
     if (this.chatMode) {
-      this.bucketsA = this.bucketify15m(this.resps.authorA);
-      this.bucketsB = this.bucketify15m(this.resps.authorB);
+      this.bucketsA = data.authorA;
+      this.bucketsB = data.authorB;
     } else {
-      this.bucketsA = this.bucketify(this.resps.authorA);
-      this.bucketsB = this.bucketify(this.resps.authorB);
+      this.bucketsA = data.authorA;
+      this.bucketsB = data.authorB;
     }
-
-    // Y axis limits depend on both author A and B
-    this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
   }
 
   viewTypeAdjustments () {
@@ -53,7 +44,37 @@ export default class ResponseTimesHist {
     }
   }
 
-  computeScaleFns () {
+  render (data) {
+    // Append SVG to div
+  	this.svg = d3.select("#" + this.el)
+                .append('svg')
+                .attr("class", "histoRT-svg")
+  							.attr('width', this.w)
+  							.attr('height', this.h);
+
+    this.getBuckets(data);
+    this.viewTypeAdjustments();
+    this.viewSizeAdjustments();
+
+    this.update(data);
+  }
+
+  update (data) {
+    // Do the thing
+    this.computeScaleFns(data);
+    this.addBars(data);
+    this.addLabels();
+  }
+
+  destroy () {
+    // Please find a better way to do this
+    d3.select("#" + this.el + " svg").remove();
+  }
+
+  computeScaleFns (data) {
+    // Y axis limits depend on both author A and B
+    this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
+
     this.timeScale =
       (value) => {
         return value * this.w / this.bucketsA.length;
@@ -66,22 +87,6 @@ export default class ResponseTimesHist {
 
     // Adjust column width based on type of buckets
     this.colW = this.w / this.bucketsA.length - 2;
-  }
-
-  render () {
-    // Please find a better way to do this
-    d3.select("#" + this.svgID + " svg").remove();
-
-    // Append SVG to div
-  	this.svg = d3.select("#" + this.svgID).append('svg')
-                .attr("class", "histoRT-svg")
-  							.attr('width', this.w)
-  							.attr('height', this.h);
-
-    // Do the thing
-    this.computeScaleFns();
-    this.addBars();
-    this.addLabels();
   }
 
   // Apend the bars on the histogram
@@ -138,60 +143,5 @@ export default class ResponseTimesHist {
       .attr("x", (d, i) => this.timeScale(i) + this.colW / 2)
       .attr("y", (d, i) => this.h - 5)
       .text((d, i) => this.labelsLow[i]);
-  }
-
-  // Get histogram data formatting,
-  // excluding those response times under 15 minutes,
-  // which will fall under the chat mode buckets
-  bucketify (times) {
-    let buckets = [
-      0, // 15min - 1 h
-      0, // 1 - 2 h
-      0, // 2 - 4 h
-      0, // 4 - 12 h
-      0, // 12 - 24 h
-      0 // > 24 h
-    ];
-
-    for (let i = 0; i < times.length; i++) {
-      if (times[i] < 3600001 && times[i] > 900000) {
-        buckets[0]++;
-      } else if (times[i] > 3600000 && times[i] < 7200001) {
-        buckets[1]++;
-      } else if (times[i] > 7200000 && times[i] < 14400001) {
-        buckets[2]++;
-      } else if (times[i] > 14400000 && times[i] < 43200001) {
-        buckets[3]++;
-      } else if (times[i] > 43200000 && times[i] < 86400001) {
-        buckets[4]++;
-      } else if (times[i] > 86400000) {
-        buckets[5]++;
-      }
-    }
-    return buckets;
-  }
-
-  // Put data as frequencies in buckets for histogram
-  // Only response times under 15 minutes will be included
-  bucketify15m (times) {
-    let buckets = [
-      0, // < 2min
-      0, // 2 - 5 min
-      0, // 5 - 10 min
-      0 // 10 - 15 min
-    ];
-
-    for (let i = 0; i < times.length; i++) {
-      if (times[i] < 120001) {
-        buckets[0]++;
-      } else if (times[i] > 120000 && times[i] < 300001) {
-        buckets[1]++;
-      } else if (times[i] > 300000 && times[i] < 600001) {
-        buckets[2]++;
-      } else if (times[i] > 600000 && times[i] < 900001) {
-        buckets[3]++;
-      }
-    }
-    return buckets;
   }
 }

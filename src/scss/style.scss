@@ -20,7 +20,7 @@ body {
 
   color: $dark-grey;
   font-family: 'Lato';
-  font-size: 1em;
+  font-size: 14px;
   font-kerning: auto;
   line-height: 20px;
 
@@ -116,7 +116,7 @@ h3 {
     .widget {
       background: $white;
       box-sizing: border-box;
-      padding: 20px;
+      padding: 30px;
       margin-bottom: 5px;
       box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
       border: 1px solid;

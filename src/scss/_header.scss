@@ -1,7 +1,8 @@
 header {
   height: 84px;
-  background: $dark-green;
+  background: $white;
   color: white;
+  text-align: center;
   text-transform: uppercase;
   border-bottom: 1px solid $lightish-grey;
 
@@ -9,15 +10,15 @@ header {
     margin: 20px;
     height: 20px;
     line-height: 20px;
-    float: left;
     background: none;
     text-decoration: none;
     font-family: 'Oswald', sans-serif;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 24px;
     padding: 10px;
     cursor: pointer;
     color: $wapp-green;
+    display: inline-block;
 
     &.view {
       float: right;

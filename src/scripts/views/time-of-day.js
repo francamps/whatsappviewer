@@ -1,39 +1,71 @@
+'use strict';
+
+import EventEmitter from 'events';
+
 export default class TimeOfDay {
-  constructor (args) {
-    this.w = args.options.w;
+  constructor (el, props) {
+    this.w = props.w;
     this.h = 140;
-    this.colorA = args.options.colorA;
-    this.colorB = args.options.colorB;
+    this.colorA = props.colorA;
+    this.colorB = props.colorB;
     this.r = 20;
     this.mg = 30;
     this.hourStep = (this.w - this.mg) / 24;
 
-    // Get response times
-    let messageTimes = args.Convo.getMessageTimes();
-
-    this.messageTimesA = messageTimes.authorATimes;
-    this.messageTimesB = messageTimes.authorBTimes;
+    this.el = el;
   }
 
-  render () {
-    // Make sure there is not one already
-    // TODO: This is dirty, fix it
-    d3.select('#widget-2 .svg svg').remove();
+  render (state) {
+    this.destroy();
 
     // Append SVG to div
-    this.svg = d3.select('#widget-2 .svg')
+    this.svg = d3.select('#' + this.el)
                 .append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
 
+    // Groups of bubbles
+    let bubbles = this.svg.append("g")
+                      .attr("class", "bubbles");
+
+    bubbles.append("g")
+        .attr("class", "bubblesA");
+
+    bubbles.append("g")
+      .attr("class", "bubblesB");
+
+    this.svg
+        .append("g")
+        .attr("class", "time-labels");
+
+    let dispatcher = new EventEmitter();
+
+    this.update(state, dispatcher);
+
+    return dispatcher;
+  }
+
+  update (state, dispatcher) {
+    // Get response times
+    let times = state.data;
+
+    this.timesA = times.authorATimes;
+    this.timesB = times.authorBTimes;
+
     this.computeScaleFns();
-    this.addBubbles();
+    this.addBubbles(dispatcher);
     this.renderTimeLabels();
   }
 
+  destroy () {
+    // Make sure there is not one already
+    // TODO: This is dirty, fix it
+    d3.select('#' + this.el + ' svg').remove();
+  }
+
   computeScaleFns () {
-    this.maxA = d3.max(this.messageTimesA),
-    this.maxB = d3.max(this.messageTimesB);
+    this.maxA = d3.max(this.timesA),
+    this.maxB = d3.max(this.timesB);
 
     // Define scale functions
     this.rScale = d3.scalePow().exponent(.5)
@@ -41,25 +73,22 @@ export default class TimeOfDay {
                   .range([1, 15]);
   }
 
-  addBubbles () {
+  addBubbles (dispatcher) {
     // Groups of bubbles
-    let bubbles = this.svg.append("g")
-                      .attr("class", "bubbles");
+    let bubbles = d3.selectAll(".bubbles");
 
-    let bubblesA = bubbles.append("g")
-        .attr("class", "bubblesA");
+    let bubblesA = bubbles.selectAll(".bubblesA");
 
-    let bubblesB = bubbles.append("g")
-      .attr("class", "bubblesB");
+    let bubblesB = bubbles.selectAll(".bubblesB");
 
     // Add bubbles and their classes
     bubblesA.selectAll(".bubbleA")
-        .data(this.messageTimesA)
-        .enter().append("circle")
-        .attr("class", "bubbleA bubble")
+      .data(this.timesA)
+      .enter().append("circle")
+      .attr("class", "bubbleA bubble")
 
     bubblesB.selectAll(".bubbleB")
-      .data(this.messageTimesB)
+      .data(this.timesB)
       .enter().append("circle")
       .attr("class", "bubbleB bubble");
 
@@ -67,7 +96,9 @@ export default class TimeOfDay {
     bubbles.selectAll(".bubble")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", (d) => this.rScale(d));
+      .attr("r", (d) => this.rScale(d))
+      .on("mouseover", (d) => { dispatcher.emit('bubble:mouseover', d)})
+      .on("mouseout", (d) => { dispatcher.emit('bubble:mouseout', d)});
 
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
@@ -92,10 +123,7 @@ export default class TimeOfDay {
   }
 
   renderTimeLabels () {
-    let timeLabels =
-        this.svg
-            .append("g")
-            .attr("class", "time-labels");
+    let timeLabels = d3.selectAll(".time-labels");
 
     let timeLabel = timeLabels.selectAll(".time-label")
       .data(new Array(24))

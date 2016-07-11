@@ -15,9 +15,8 @@ export default class DataTable extends React.Component {
     );
   }
 
-  extendParams () {
-    let chatParams = _.cloneDeep(this.props.viewParams);
-    chatParams["chatMode"] = true;
+  extendParamsForChatMode () {
+    let chatParams = Object.assign({"chatmode": true}, this.props.viewParams);
     return chatParams;
   }
 
@@ -27,26 +26,24 @@ export default class DataTable extends React.Component {
         {this.renderTitle()}
         <div className="data-table">
           <Row metricID={'word-count'}
-            conversation={this.props.conversation}
             data={this.props.conversation.getMessageWordCountAverage()}
             view={ComparisonBar}
             viewParams={this.props.viewParams}
             metricLabel={'Words per message (avg)'} />
           <Row metricID={'message-num'}
-            conversation={this.props.conversation}
             data={this.props.conversation.getNumberOfMessagesByAuthor()}
             view={ComparisonBar}
             viewParams={this.props.viewParams}
             metricLabel={'Number of messages'} />
           <Row metricID={'resp-times'}
-            conversation={this.props.conversation}
+            data={this.props.conversation.getResponseTimesBuckets()}
             view={DoubleRTHist}
             viewParams={this.props.viewParams}
             metricLabel={'Response time frequency'} />
           <Row metricID={'resp-times-chat'}
-            conversation={this.props.conversation}
+            data={this.props.conversation.getResponseTimesChatModeBuckets()}
             view={DoubleRTHist}
-            viewParams={this.extendParams()}
+            viewParams={this.extendParamsForChatMode()}
             metricLabel={'Response time frequency (chat mode, RT < 15min)'} />
         </div>
       </div>

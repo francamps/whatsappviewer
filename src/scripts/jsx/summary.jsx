@@ -45,18 +45,18 @@ export default class Summary extends React.Component {
 
   render () {
     return (
-      <div className="summary">
+      <div className="summary showing">
         <WidgetTitle
           title={'Your conversation'} />
         <Legend
           conversation={this.props.conversation} />
         <div className="summary-metric-section">
-          <p>
+          <p className="large">
             <span className="summary-metric">{this.state.messages}</span>
             total messages processed
           </p>
-          <p>
-            <span className="summary-metric">{this.state.medias}</span>
+          <p className="large">
+            <span className="summary-metric large">{this.state.medias}</span>
             media messages (skipped)
           </p>
         </div>

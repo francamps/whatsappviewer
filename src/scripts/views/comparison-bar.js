@@ -1,35 +1,38 @@
 export default class ComparisonBar {
-  constructor (args, svgID, data) {
+  constructor (el, props) {
     this.w = 400;
     this.h = 50;
-    this.colorA = args.options.colorA;
-    this.colorB = args.options.colorB;
+    this.colorA = props.colorA;
+    this.colorB = props.colorB;
     this.r = 20;
     this.mg = 30;
     this.hourStep = (this.w - this.mg) / 24;
-    this.svgID = svgID;
 
-    this.data = data;
+    this.el = el
   }
 
-  render () {
+  render (data) {
     // Make sure there is not one already
     // TODO: This is dirty, fix it
-    d3.select('#' + this.svgID + ' .svg svg').remove();
+    d3.select('#' + this.el + ' svg').remove();
 
     // Append SVG to div
-    this.svg = d3.select('#' + this.svgID + ' .svg')
+    this.svg = d3.select('#' + this.el)
                 .append('svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
 
-    this.computeScaleFns();
-    this.addBars();
-    this.addLabels();
+    this.update(data);
   }
 
-  computeScaleFns () {
-    let dataMax = d3.max([this.data.authorA, this.data.authorB]);
+  update (data) {
+    this.computeScaleFns(data);
+    this.addBars(data);
+    this.addLabels(data);
+  }
+
+  computeScaleFns (data) {
+    let dataMax = d3.max([data.authorA, data.authorB]);
 
   	this.xScale =
       d3.scaleLinear()
@@ -43,9 +46,9 @@ export default class ComparisonBar {
   }
 
   // Apend the bars on the histogram
-  addBars () {
+  addBars (data) {
     let barsHist = this.svg.selectAll('.compBar')
-      .data([this.data.authorA, this.data.authorB])
+      .data([data.authorA, data.authorB])
       .enter().append('rect')
       .attr("class", "compBar");
 
@@ -62,7 +65,7 @@ export default class ComparisonBar {
       });
 
     let bubbs = this.svg.selectAll('.compBubbs')
-      .data([this.data.authorA, this.data.authorB])
+      .data([data.authorA, data.authorB])
       .enter().append('circle')
       .attr("class", "compBubbs");
 
@@ -78,9 +81,9 @@ export default class ComparisonBar {
       });
   }
 
-  addLabels () {
+  addLabels (data) {
     let label = this.svg.selectAll(".label")
-      .data([this.data.authorA, this.data.authorB])
+      .data([data.authorA, data.authorB])
       .enter().append('text')
 
     label

@@ -301,7 +301,7 @@ export default class Conversation {
 			day.forEach((message) => {
 				let textWithOneSpace = message.text.replace(/[\s]+/gim, " ");
 				if (textWithOneSpace.length > 0) {
-					numberOfWords += textWithOneSpace.split(' ').length;					
+					numberOfWords += textWithOneSpace.split(' ').length;
 				}
 			});
 		}
@@ -531,6 +531,84 @@ export default class Conversation {
 		};
 
 		return this.responseTimes;
+	}
+
+	// Get histogram data formatting,
+  // excluding those response times under 15 minutes,
+  // which will fall under the chat mode buckets
+  getResponseTimesBuckets () {
+		let times = this.getResponseTimes();
+		let authorA = this._bucketifyRT(times.authorA);
+		let authorB = this._bucketifyRT(times.authorB);
+
+    return {
+			authorA: authorA,
+			authorB: authorB
+		};
+  }
+
+	_bucketifyRT (times) {
+		let buckets = [
+      0, // 15min - 1 h
+      0, // 1 - 2 h
+      0, // 2 - 4 h
+      0, // 4 - 12 h
+      0, // 12 - 24 h
+      0 // > 24 h
+    ];
+
+    for (let i = 0; i < times.length; i++) {
+      if (times[i] < 3600001 && times[i] > 900000) {
+        buckets[0]++;
+      } else if (times[i] > 3600000 && times[i] < 7200001) {
+        buckets[1]++;
+      } else if (times[i] > 7200000 && times[i] < 14400001) {
+        buckets[2]++;
+      } else if (times[i] > 14400000 && times[i] < 43200001) {
+        buckets[3]++;
+      } else if (times[i] > 43200000 && times[i] < 86400001) {
+        buckets[4]++;
+      } else if (times[i] > 86400000) {
+        buckets[5]++;
+      }
+    }
+    return buckets;
+	}
+
+  // Put data as frequencies in buckets for histogram
+  // Only response times under 15 minutes will be included
+  getResponseTimesChatModeBuckets () {
+		let times = this.getResponseTimes();
+		let authorA = this._bucketifyChatMode(times.authorA);
+		let authorB = this._bucketifyChatMode(times.authorB);
+
+    return {
+			authorA: authorA,
+			authorB: authorB
+		};
+  }
+
+	_bucketifyChatMode (times) {
+		let buckets = [
+			0, // < 2min
+			0, // 2 - 5 min
+			0, // 5 - 10 min
+			0 // 10 - 15 min
+		];
+
+		for (let i = 0; i < times.length; i++) {
+			if (times[i] < 120001) {
+				buckets[0]++;
+			} else if (times[i] > 120000 && times[i] < 300001) {
+				buckets[1]++;
+			} else if (times[i] > 300000 && times[i] < 600001) {
+				buckets[2]++;
+			} else if (times[i] > 600000 && times[i] < 900001) {
+				buckets[3]++;
+			}
+		}
+
+		return buckets;
 	}
 
 	_reduceResponseTimesPerDay (d, dayString) {

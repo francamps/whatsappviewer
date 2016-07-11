@@ -69,8 +69,7 @@
 
 .summary {
   box-sizing: border-box;
-  padding: 20px;
-  padding-top: 30px;
+  padding: 30px;
   margin-top: 20px;
   background: $white;
   box-sizing: border-box;
@@ -79,10 +78,22 @@
   border-color: $border-top $border-sides $border-bottom;
   overflow: auto;
 
+  &.showing {
+    opacity: 1;
+    height: auto;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;
+  }
+
   .summary-metric-section {
     border-top: 1px solid $verylight-grey;
     padding: 30px 0;
     overflow: auto;
+
+    &:last-child {
+      padding-bottom: 0;
+    }
 
     p {
       margin: 0;
@@ -90,6 +101,17 @@
       .summary-metric {
         font-weight: 700;
         margin-right: 5px;
+      }
+
+      &.large {
+        .summary-metric {
+          font-size: 24px;
+          display: block;
+        }
+
+        &:first-child {
+          margin-bottom: 15px;
+        }
       }
     }
 
@@ -283,7 +305,6 @@ svg {
 
 .svg {
   overflow: scroll;
-  border: 1px solid $border;
 
   svg {
     border: none;

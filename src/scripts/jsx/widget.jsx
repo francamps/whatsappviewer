@@ -6,6 +6,7 @@ export default class Widget extends React.Component {
     this.state = {
       longestSilence: 0
     }
+    this.dispatcher = null;
   }
 
   renderTitle () {
@@ -86,13 +87,45 @@ export default class Widget extends React.Component {
   renderSVGs () {
     let Convo = this.props.conversation;
     let viewParams = this.props.viewParams;
+
     let View = this.props.view;
 
-    let thisView = new View({
-      Convo: Convo,
-      options: viewParams
-    });
-    thisView.render();
+    // REDO THIS, THIS IS UNACCEPTABLE
+    // temporarily do this to check data-agnostic charts
+    let thisView = new View(this.props.svgID + ' .svg', viewParams);
+    let state = {
+      data: [],
+      domain: []
+    }
+
+    if (this.props.svgID === "widget-2") {
+      state = {
+        data: this.props.conversation.getMessageTimes()
+      }
+    } else if (this.props.svgID === 'graph-viewer') {
+      let domain = {
+        time: [Convo.date0, Convo.dateF],
+      };
+      state = {
+        data: this.props.conversation.getWordsByAuthorAndDay(),
+        domain: domain,
+        messages: this.props.conversation.getMessages()
+      };
+    } else if (this.props.svgID === "widget-3") {
+      let domain = {
+        time: [Convo.date0, Convo.dateF]
+      }
+      let data = this.props.conversation.getResponseTimesByAuthorDay();
+      state = {
+        data: data,
+        domain: domain
+      }
+    }
+    this.dispatcher = thisView.render(state);
+
+    if (this.dispatcher) {
+      this.dispatcher.on("bubble:mouseover", (d) => console.log('moused!', d));  
+    }
   }
 
   render () {
