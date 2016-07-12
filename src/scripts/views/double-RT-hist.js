@@ -1,3 +1,7 @@
+'use strict';
+
+import EventEmitter from 'events';
+
 export default class ResponseTimesHist {
   constructor (el, props) {
     this.w = 400;
@@ -52,17 +56,22 @@ export default class ResponseTimesHist {
   							.attr('width', this.w)
   							.attr('height', this.h);
 
+    let dispatcher = new EventEmitter();
+
     this.getBuckets(data);
     this.viewTypeAdjustments();
     this.viewSizeAdjustments();
 
-    this.update(data);
+    this.update(data, dispatcher);
+
+    return dispatcher;
   }
 
-  update (data) {
+  update (data, dispatcher) {
     // Do the thing
-    this.computeScaleFns(data);
-    this.addBars(data);
+    this.getBuckets(data);
+    this.computeScaleFns();
+    this.addBars(dispatcher);
     this.addLabels();
   }
 
@@ -71,7 +80,7 @@ export default class ResponseTimesHist {
     d3.select("#" + this.el + " svg").remove();
   }
 
-  computeScaleFns (data) {
+  computeScaleFns () {
     // Y axis limits depend on both author A and B
     this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
 
@@ -90,7 +99,7 @@ export default class ResponseTimesHist {
   }
 
   // Apend the bars on the histogram
-  addBars () {
+  addBars (dispatcher) {
     let barsHistA = this.svg.selectAll('.barsHistA')
       .data(this.bucketsA)
       .enter().append('rect')
@@ -105,6 +114,14 @@ export default class ResponseTimesHist {
     barsHistA
       .style("fill", this.colorA);
 
+    barsHistA
+      .on("mouseover", (d, i) => {
+        dispatcher.emit("barsHist:mouseover", d, i, 'A');
+      })
+      .on("mouseout", (d, i) => {
+        dispatcher.emit("barsHist:mouseout", d, i, 'A');
+      });
+
     let barsHistB = this.svg.selectAll('.barsHistB')
       .data(this.bucketsB)
       .enter().append('rect')
@@ -118,6 +135,14 @@ export default class ResponseTimesHist {
 
     barsHistB
       .style("fill", this.colorB);
+
+    barsHistB
+      .on("mouseover", (d, i) => {
+        dispatcher.emit("barsHist:mouseover", d, i, 'B');
+      })
+      .on("mouseout", (d, i) => {
+        dispatcher.emit("barsHist:mouseout", d, i, 'B');
+      });
   }
 
   // Add time buckets labels

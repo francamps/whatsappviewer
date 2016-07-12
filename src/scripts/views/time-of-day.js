@@ -97,8 +97,6 @@ export default class TimeOfDay {
       .attr("cx", 0)
       .attr("cy", 0)
       .attr("r", (d) => this.rScale(d))
-      .on("mouseover", (d) => { dispatcher.emit('bubble:mouseover', d)})
-      .on("mouseout", (d) => { dispatcher.emit('bubble:mouseout', d)});
 
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
@@ -120,6 +118,15 @@ export default class TimeOfDay {
 
     bubblesB.selectAll(".bubbleB")
       .style("fill", this.colorB);
+
+    // Event
+    bubblesA.selectAll(".bubbleA")
+      .on("mouseover", (d, i) => { dispatcher.emit('bubble:mouseover', d, i, 'A')})
+      .on("mouseout", (d, i) => { dispatcher.emit('bubble:mouseout', d, i, 'A')});
+
+    bubblesB.selectAll(".bubbleB")
+      .on("mouseover", (d, i) => { dispatcher.emit('bubble:mouseover', d, i, 'B')})
+      .on("mouseout", (d, i) => { dispatcher.emit('bubble:mouseout', d, i, 'B')});
   }
 
   renderTimeLabels () {

@@ -39,11 +39,15 @@ export default class DataTable extends React.Component {
             data={this.props.conversation.getResponseTimesBuckets()}
             view={DoubleRTHist}
             viewParams={this.props.viewParams}
+            handleShowTooltip={this.props.handleShowTooltip}
+            handleHideTooltip={this.props.handleHideTooltip}
             metricLabel={'Response time frequency'} />
           <Row metricID={'resp-times-chat'}
             data={this.props.conversation.getResponseTimesChatModeBuckets()}
             view={DoubleRTHist}
             viewParams={this.extendParamsForChatMode()}
+            handleShowTooltip={this.props.handleShowTooltip}
+            handleHideTooltip={this.props.handleHideTooltip}
             metricLabel={'Response time frequency (chat mode, RT < 15min)'} />
         </div>
       </div>

@@ -98,33 +98,43 @@ export default class Widget extends React.Component {
       domain: []
     }
 
-    if (this.props.svgID === "widget-2") {
-      state = {
-        data: this.props.conversation.getMessageTimes()
-      }
-    } else if (this.props.svgID === 'graph-viewer') {
-      let domain = {
-        time: [Convo.date0, Convo.dateF],
-      };
-      state = {
-        data: this.props.conversation.getWordsByAuthorAndDay(),
-        domain: domain,
-        messages: this.props.conversation.getMessages()
-      };
-    } else if (this.props.svgID === "widget-3") {
-      let domain = {
-        time: [Convo.date0, Convo.dateF]
-      }
-      let data = this.props.conversation.getResponseTimesByAuthorDay();
-      state = {
-        data: data,
-        domain: domain
-      }
+    switch (this.props.svgID) {
+      case 'widget-2':
+        state = {
+          data: this.props.conversation.getMessageTimes()
+        }
+        break;
+      case 'widget-3':
+        state = {
+          data: this.props.conversation.getResponseTimesByAuthorDay(),
+          domain: {
+            time: [Convo.date0, Convo.dateF]
+          }
+        }
+        break;
+      case 'graph-viewer':
+        state = {
+          data: this.props.conversation.getWordsByAuthorAndDay(),
+          domain: {
+            time: [Convo.date0, Convo.dateF]
+          },
+          messages: this.props.conversation.getMessages()
+        };
+        break;
     }
-    this.dispatcher = thisView.render(state);
 
-    if (this.dispatcher) {
-      this.dispatcher.on("bubble:mouseover", (d) => console.log('moused!', d));  
+    this.dispatcher = thisView.render(state);
+    this.eventHandlers(this.dispatcher);
+  }
+
+  eventHandlers (dispatcher) {
+    if (dispatcher) {
+      dispatcher.on("bubble:mouseover", (d, i, author) => {
+        this.props.handleShowTooltip('time-of-day', [d, i , author]);
+      });
+      dispatcher.on("bubble:mouseout", (d, i, author) => {
+        this.props.handleHideTooltip();
+      });
     }
   }
 

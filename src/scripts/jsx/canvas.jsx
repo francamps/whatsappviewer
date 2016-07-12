@@ -2,6 +2,7 @@
 
 import Widget from './widget';
 import DataTable from './data-table/table';
+import Tooltip from './tooltip';
 
 // views
 import TimeOfDay from '../views/time-of-day';
@@ -12,7 +13,10 @@ export default class Canvas extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      classes: "canvas hidden"
+      classes: "canvas hidden",
+      tooltipShowing: false,
+      typeOfInfo: undefined,
+      infoToShow: '-'
     }
   }
 
@@ -23,6 +27,21 @@ export default class Canvas extends React.Component {
       });
       document.body.scrollTop = 0;
     }
+  }
+
+  handleShowTooltip (typeOfInfo, info) {
+    this.setState({
+      tooltipShowing: true,
+      typeOfInfo: typeOfInfo,
+      infoToShow: info
+    });
+  }
+
+  handleHideTooltip () {
+    this.setState({
+      tooltipShowing: false,
+      infoToShow: '-'
+    });
   }
 
   render () {
@@ -45,6 +64,8 @@ export default class Canvas extends React.Component {
             view={TimeOfDay}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
+            handleShowTooltip={this.handleShowTooltip.bind(this)}
+            handleHideTooltip={this.handleHideTooltip.bind(this)}
             svgID={'widget-2'} />
           <Widget
             title={'Response times per day (average)'}
@@ -53,8 +74,15 @@ export default class Canvas extends React.Component {
             conversation={this.props.conversation}
             svgID={'widget-3'} />
           <DataTable
+            handleShowTooltip={this.handleShowTooltip.bind(this)}
+            handleHideTooltip={this.handleHideTooltip.bind(this)}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation} />
+          <Tooltip
+            conversation={this.props.conversation}
+            isShowing={this.state.tooltipShowing}
+            typeOfInfo={this.state.typeOfInfo}
+            infoToShow={this.state.infoToShow} />
         </div>
       );
     }

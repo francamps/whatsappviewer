@@ -11,12 +11,24 @@ export default class RowTemp extends React.Component {
     let View = this.props.view;
 
     let thisView = new View(this.props.metricID, viewParams);
-    thisView.render(data);
+    let dispatcher = thisView.render(data);
+    this.eventHandlers(dispatcher);
   }
 
   componentDidMount () {
     if (this.props.view) {
       this.renderViews();
+    }
+  }
+
+  eventHandlers (dispatcher) {
+    if (dispatcher) {
+      dispatcher.on("barsHist:mouseover", (d, i, author) => {
+        this.props.handleShowTooltip('double-RT-hist', [d, i , author]);
+      });
+      dispatcher.on("barsHist:mouseout", () => {
+        this.props.handleHideTooltip();
+      });
     }
   }
 

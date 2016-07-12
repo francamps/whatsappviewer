@@ -310,3 +310,27 @@ svg {
     border: none;
   }
 }
+
+/* Tooltip styling
+/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.tooltip {
+  width: 300px;
+  padding: 10px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  border-radius: 3px;
+  background: $dark-green;
+  color: white;  
+  transition: opacity;
+  transition-duration: .3s;
+
+  &.hidden {
+    opacity: 0;
+  }
+
+  &.showing {
+    opacity: 1;
+  }
+}
