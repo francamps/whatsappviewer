@@ -62,8 +62,8 @@ export default class Widget extends React.Component {
             <span className="summary-metric">{this.state.longestSilence}</span>
           </p>
           <p>
-            Total number of silent days (MADE UP!):
-            <span className="summary-metric">87</span>
+            Total number of silent days:
+            <span className="summary-metric">{this.state.silentDays}</span>
           </p>
         </div>
       );
@@ -76,10 +76,12 @@ export default class Widget extends React.Component {
       this.renderSVGs();
     }
     if (this.props.svgID === 'widget-3') {
-      let silence = this.props.conversation.getLongestSilence();
+      let silence = this.props.conversation.getLongestSilence(),
+          silentDays = this.props.conversation.getSilentDays();
 
       this.setState({
-        longestSilence: this.formatSilenceDuration(silence.duration)
+        longestSilence: this.formatSilenceDuration(silence.duration),
+        silentDays: silentDays
       });
     }
   }

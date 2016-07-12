@@ -2,7 +2,10 @@
   z-index: 0;
   box-sizing: border-box;
   width: 100%;
-  padding: 20px 20px 0 20px;
+  padding: 0;
+  border: 1px solid;
+  border-color: $border-top $border-sides $border-bottom;
+  border-left: 1px solid $wapp-green;
 
   &.hidden {
     opacity: 0;
@@ -25,23 +28,11 @@
     box-sizing: border-box;
     padding: 20px;
     margin-bottom: 0;
-    box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
-    border: 1px solid;
-    border-color: $border-top $border-sides $border-bottom;
-    border-bottom: none;
-    border-top: none;
+    border: none;
     overflow: auto;
 
     @media (min-width: 900px) {
         padding: 30px;
-    }
-
-    &:first-child {
-      border-top: 1px solid $border-top;
-    }
-
-    &:last-child {
-      border-bottom: 1px solid $border-bottom;
     }
 
     button {
@@ -56,11 +47,24 @@
       text-align: right;
 
       p {
-        font-size: 15px;
+        font-size: 1em;
         margin: 0;
 
         &:first-child {
           margin: 10px 0 0 0;
+        }
+
+        .summary-metric {
+          margin-left: 5px;
+        }
+      }
+    }
+
+    form {
+      input {
+        @media (min-width: 900px) {
+          width: 300px;
+          float: right;
         }
       }
     }
@@ -72,10 +76,9 @@
   padding: 30px;
   margin-top: 20px;
   background: $white;
-  box-sizing: border-box;
-  box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
   border: 1px solid;
   border-color: $border-top $border-sides $border-bottom;
+  border-left: 1px solid $wapp-green;
   overflow: auto;
 
   &.showing {
@@ -277,6 +280,15 @@ svg {
   }
 
   /*
+  * -- Time of Day ------ */
+  &.timeOfDay-svg {
+    .bubble {
+      cursor: pointer;
+    }
+  }
+
+
+  /*
   * -- Response Times Histogram ------ */
 
   &.histoRT-svg {
@@ -321,10 +333,12 @@ svg {
   right: 20px;
   bottom: 20px;
   border-radius: 3px;
-  background: $dark-green;
-  color: white;  
+  border: 1px solid $wapp-green;
+  color: $dark-green;
+  background: white;
   transition: opacity;
   transition-duration: .3s;
+  box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
 
   &.hidden {
     opacity: 0;

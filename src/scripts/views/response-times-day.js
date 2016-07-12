@@ -1,6 +1,5 @@
 export default class ResponseTimesTime {
   constructor (el, props) {
-    console.log(el, props);
     this.w = props.w;
     this.mg = props.mg;
     this.h = props.h;

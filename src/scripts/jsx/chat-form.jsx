@@ -22,7 +22,7 @@ export default class ChatForm extends React.Component{
 
   render () {
     return (
-      <div className="widget">
+      <div className="chat-form">
         <span>Paste your conversation text here:</span>
         <form id="form" className="form" onSubmit={this.onClickRender.bind(this)}>
           <textarea type="text"

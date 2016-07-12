@@ -79,7 +79,8 @@ h3 {
       }
 
       .canvas {
-        width: 800px;
+        width: 760px;
+        margin: 20px 0 0 20px;
         display: inline-block;
       }
   }
@@ -96,7 +97,6 @@ h3 {
   }
 
   .form-container {
-    height: 100%;
     width: 100%;
     box-sizing: border-box;
     padding: 20px 20px 0 20px;
@@ -114,13 +114,13 @@ h3 {
     }
 
     .widget {
+      width: 760px;
       background: $white;
-      box-sizing: border-box;
-      padding: 30px;
-      margin-bottom: 5px;
-      box-shadow: 0px 4px 6px -8px rgba(0,0,0,.75);
       border: 1px solid;
       border-color: $border-top $border-sides $border-bottom;
+      border-left: 1px solid $wapp-green;
+      padding: 30px;
+      margin: 0 auto;
       overflow: auto;
     }
   }

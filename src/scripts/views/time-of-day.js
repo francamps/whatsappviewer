@@ -21,6 +21,7 @@ export default class TimeOfDay {
     // Append SVG to div
     this.svg = d3.select('#' + this.el)
                 .append('svg')
+                .attr('class', 'timeOfDay-svg')
                 .attr('width', this.w)
                 .attr('height', this.h);
 

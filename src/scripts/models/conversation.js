@@ -34,6 +34,8 @@ Public methods
 * getTimeDifference
 * getResponseTimes
 * getResponseTimesByAuthorDay
+* getSilentDays
+* getLongestSilence
 
 */
 
@@ -687,6 +689,27 @@ export default class Conversation {
 		};
 
 		return this.responseTimesByAuthorDay;
+	}
+
+	getSilentDays () {
+		if (this.silentDays) return this.silentDays;
+
+		let messagesA = this.getWordsByAuthorAndDay().authorA,
+				messagesB = this.getWordsByAuthorAndDay().authorB,
+				formatFn = d3.timeFormat(this.dayFormat);
+
+		let silentDays = 0;
+
+		this.getDateRange().forEach((d, i) => {
+			let dayA = messagesA[i].words,
+			 		dayB = messagesB[i].words;
+			if (dayA === 0 && dayB === 0) {
+				silentDays += 1;
+			}
+		});
+
+		this.silentDays = silentDays;
+		return this.silentDays;
 	}
 
 	getLongestSilence () {

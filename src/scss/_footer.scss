@@ -1,12 +1,11 @@
 footer {
-  //background: linear-gradient(-30deg, $electric-green, $skyblue);
-  background: $dark-green;
+  background: linear-gradient(-60deg, $dark-grey, $dark-green);
   color: white;
-  //box-shadow: 0px -3px 5px #dddddd;
   text-align: center;
-  text-transform: uppercase;
-  padding: 30px 0;
-  margin-top: 60px;
+  padding: 20px 0;
+  margin-top: 90px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
 
   a {
     text-decoration: none;
