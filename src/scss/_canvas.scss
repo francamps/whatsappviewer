@@ -56,6 +56,7 @@
 
         .summary-metric {
           margin-left: 5px;
+          font-weight: 700;
         }
       }
     }
@@ -339,6 +340,10 @@ svg {
   transition: opacity;
   transition-duration: .3s;
   box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
+
+  .variable {
+    font-weight: 700;
+  }
 
   &.hidden {
     opacity: 0;

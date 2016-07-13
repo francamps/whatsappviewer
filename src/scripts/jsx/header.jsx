@@ -6,6 +6,9 @@ export default class Header extends React.Component {
       return (
         <header>
     			<a href="./index.html">WhatsApp Chat Explorer</a>
+          <span
+            onClick={this.props.onClickNewChat} 
+            className="new-chat">New chat</span>
     		</header>
       );
   }

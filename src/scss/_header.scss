@@ -27,4 +27,17 @@ header {
       color: $dark-green;
     }
   }
+
+  span {
+    float: right;
+    margin: 10px;
+    padding: 10px;
+    height: 20px;
+    line-height: 20px;
+    color: $wapp-green;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    cursor: pointer;
+  }
 }

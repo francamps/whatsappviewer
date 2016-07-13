@@ -71,10 +71,16 @@ class App extends React.Component {
     }
   }
 
+  renderChatForm () {
+    this.setState({
+      isAnalyzed: false
+    });
+  }
+
   render () {
     return (
       <div>
-        <Header />
+        <Header onClickNewChat={this.renderChatForm.bind(this)}/>
         <div className="page-wrap">
           {this.renderSummary()}
           {this.renderForm()}
