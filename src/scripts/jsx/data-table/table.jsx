@@ -11,7 +11,7 @@ export default class DataTable extends React.Component {
 
   renderTitle () {
     return (
-      <h3>Additional metrics</h3>
+      <h3>Response time frequency</h3>
     );
   }
 
@@ -25,16 +25,6 @@ export default class DataTable extends React.Component {
       <div className="widget">
         {this.renderTitle()}
         <div className="data-table">
-          <Row metricID={'word-count'}
-            data={this.props.conversation.getMessageWordCountAverage()}
-            view={ComparisonBar}
-            viewParams={this.props.viewParams}
-            metricLabel={'Words per message (avg)'} />
-          <Row metricID={'message-num'}
-            data={this.props.conversation.getNumberOfMessagesByAuthor()}
-            view={ComparisonBar}
-            viewParams={this.props.viewParams}
-            metricLabel={'Number of messages'} />
           <Row metricID={'resp-times'}
             data={this.props.conversation.getResponseTimesBuckets()}
             view={DoubleRTHist}

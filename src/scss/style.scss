@@ -57,6 +57,10 @@ h3 {
   font-weight: 400;
 }
 
+.app {
+  width: 100%;
+}
+
 .page-wrap {
   width: 100%;
   box-sizing: border-box;
@@ -114,7 +118,7 @@ h3 {
     }
 
     .widget {
-      width: 760px;
+      width: 100%;
       background: $white;
       border: 1px solid;
       border-color: $border-top $border-sides $border-bottom;
@@ -122,6 +126,11 @@ h3 {
       padding: 30px;
       margin: 0 auto;
       overflow: auto;
+      box-sizing: border-box;
+
+      @media (min-width: 900px) {
+        width: 760px;
+      }
     }
   }
 }

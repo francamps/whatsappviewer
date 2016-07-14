@@ -1,7 +1,7 @@
 export default class ComparisonBar {
   constructor (el, props) {
-    this.w = 400;
-    this.h = 50;
+    this.w = 230;
+    this.h = 60;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
     this.r = 20;
@@ -56,7 +56,7 @@ export default class ComparisonBar {
       .attr("x", (d, i) => 0)
       .attr("y", (d, i) => this.yScale(i))
       .attr("width",  (d, i) => this.xScale(d))
-      .attr("height", 2)
+      .attr("height", 8)
 
     barsHist
       .style("fill", (d, i) => {
@@ -71,7 +71,7 @@ export default class ComparisonBar {
 
     bubbs
       .attr("cx", (d, i) => this.xScale(d, i))
-      .attr("cy", (d, i) => this.yScale(i))
+      .attr("cy", (d, i) => this.yScale(i) + 4)
       .attr("r", 4)
 
     bubbs
@@ -88,7 +88,7 @@ export default class ComparisonBar {
 
     label
       .attr("x", (d, i) => this.w)
-      .attr("y", (d, i) => this.yScale(i) + 5)
+      .attr("y", (d, i) => this.yScale(i) + 9)
       .text((d) => d.toFixed(2))
       .style("text-anchor", "end")
       .style("font-size", "12px");

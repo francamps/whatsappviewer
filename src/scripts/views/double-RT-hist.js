@@ -22,6 +22,10 @@ export default class ResponseTimesHist {
     if (smallVersion) {
       this.w = 100;
       this.mg = 5;
+
+      this.svg
+          .attr('width', this.w)
+        	.attr('height', this.h);
     }
   }
 

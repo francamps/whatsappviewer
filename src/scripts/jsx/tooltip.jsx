@@ -26,10 +26,23 @@ export default class Tooltip extends React.Component {
   renderTimeOfDayInfo () {
     let messages = this.props.infoToShow[0],
         bubble = this.props.infoToShow[1],
-        author = this.props.infoToShow[2];
+        whichAuthor = this.props.infoToShow[2],
+        author,
+        conv = this.props.conversation;
+
+    if (whichAuthor === 'A') {
+      author = conv.authorAName;
+    } else {
+      author = conv.authorBName;
+    }
+
 
     return (
-      <span>{`Bubble ${bubble} shows ${messages} messages by author ${author}.`}</span>
+      <div>
+        <span className="variable">{author} </span>
+        sent <span className="variable">{messages} </span>
+        messages at {bubble}h.
+      </div>
     );
   }
 

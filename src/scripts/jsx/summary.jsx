@@ -3,6 +3,10 @@
 import Legend from './legend';
 import WidgetTitle from './widget-title';
 
+import Row from './data-table/row';
+import ComparisonBar from '../views/comparison-bar';
+import { getViewParams } from '../utilities/view-params';
+
 export default class Summary extends React.Component {
   constructor (props) {
     super(props);
@@ -43,6 +47,61 @@ export default class Summary extends React.Component {
     });
   }
 
+  renderFirstAndLast () {
+    return (
+      <div className="summary-metric-section">
+        <div className="item">
+          <p>First message:</p>
+          <p className="summary-metric">{this.state.date0}</p>
+          <p className="summary-metric">
+            <span>by:</span>
+            {this.state.author0}
+          </p>
+        </div>
+        <div className="item">
+          <p>Last message:</p>
+          <p className="summary-metric">{' ' + this.state.dateF}</p>
+          <p className="summary-metric">
+            <span>by:</span>
+            {this.state.authorF}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  renderMessagesProcessed () {
+    return (
+      <div className="summary-metric-section">
+        <p className="large">
+          <span className="summary-metric">{this.state.messages}</span>
+          total messages processed
+        </p>
+        <p className="large">
+          <span className="summary-metric large">{this.state.medias}</span>
+          skipped media messages
+        </p>
+      </div>
+    );
+  }
+
+  renderWordsAndMessages () {
+    return (
+      <div className="summary-metric-section">
+        <Row metricID={'message-num'}
+          data={this.props.conversation.getNumberOfMessagesByAuthor()}
+          view={ComparisonBar}
+          viewParams={getViewParams()}
+          metricLabel={'Number of messages'} />
+        <Row metricID={'word-count'}
+          data={this.props.conversation.getMessageWordCountAverage()}
+          view={ComparisonBar}
+          viewParams={getViewParams()}
+          metricLabel={'Words per message (avg)'} />
+      </div>
+    );
+  }
+
   render () {
     return (
       <div className="summary showing">
@@ -50,34 +109,9 @@ export default class Summary extends React.Component {
           title={'Your conversation'} />
         <Legend
           conversation={this.props.conversation} />
-        <div className="summary-metric-section">
-          <p className="large">
-            <span className="summary-metric">{this.state.messages}</span>
-            total messages processed
-          </p>
-          <p className="large">
-            <span className="summary-metric large">{this.state.medias}</span>
-            media messages (skipped)
-          </p>
-        </div>
-        <div className="summary-metric-section">
-          <div className="item">
-            <p>First message:</p>
-            <p className="summary-metric">{this.state.date0}</p>
-            <p className="summary-metric">
-              <span>by </span>
-              {this.state.author0}
-            </p>
-          </div>
-          <div className="item">
-            <p>Last message:</p>
-            <p className="summary-metric">{' ' + this.state.dateF}</p>
-            <p className="summary-metric">
-              <span>by </span>
-              {this.state.authorF}
-            </p>
-          </div>
-        </div>
+        {this.renderMessagesProcessed()}
+        {this.renderFirstAndLast()}
+        {this.renderWordsAndMessages()}
       </div>
     );
   }

@@ -75,7 +75,7 @@
 .summary {
   box-sizing: border-box;
   padding: 30px;
-  margin-top: 20px;
+  margin: 20px 0;
   background: $white;
   border: 1px solid;
   border-color: $border-top $border-sides $border-bottom;
@@ -92,8 +92,12 @@
 
   .summary-metric-section {
     border-top: 1px solid $verylight-grey;
-    padding: 30px 0;
+    padding: 20px 0;
     overflow: auto;
+
+    @media (min-width: 900px) {
+      padding: 30px 0;
+    }
 
     &:last-child {
       padding-bottom: 0;
@@ -132,9 +136,13 @@
 
           span {
             font-weight: 400;
-            margin-right: 5px;
+            margin-right: 4px;
           }
         }
+      }
+
+      &:last-child {
+        margin-bottom: 0;
       }
     }
   }
@@ -146,7 +154,7 @@
       border-radius: 10px;
       margin: 0;
       text-transform: capitalize;
-      font-size: 20px;
+      font-size: 24px;
     }
   }
 }
@@ -297,6 +305,10 @@ svg {
       font-size: 10px;
       font-weight: 300;
       text-anchor: middle;
+    }
+
+    .barsHistA, .barsHistB {
+      cursor: pointer;
     }
   }
 
