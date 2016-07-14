@@ -11,12 +11,23 @@ export default class DataTable extends React.Component {
 
   renderTitle () {
     return (
-      <h3>Response time frequency</h3>
+      <h3>Response time (RT)</h3>
+    );
+  }
+
+  renderDetails () {
+    return (
+        <p>
+          Each bar corresponds to the number of messages that responded to
+           others within the time shown. Say a message in the bar '1-2h'
+           is a message that was responding to another message sent
+           between 1 and 2 hours before that one.
+        </p>
     );
   }
 
   extendParamsForChatMode () {
-    let chatParams = Object.assign({"chatmode": true}, this.props.viewParams);
+    let chatParams = Object.assign({"chatMode": true}, this.props.viewParams);
     return chatParams;
   }
 
@@ -24,21 +35,22 @@ export default class DataTable extends React.Component {
     return (
       <div className="widget">
         {this.renderTitle()}
+        {this.renderDetails()}
         <div className="data-table">
-          <Row metricID={'resp-times'}
-            data={this.props.conversation.getResponseTimesBuckets()}
-            view={DoubleRTHist}
-            viewParams={this.props.viewParams}
-            handleShowTooltip={this.props.handleShowTooltip}
-            handleHideTooltip={this.props.handleHideTooltip}
-            metricLabel={'Response time frequency'} />
           <Row metricID={'resp-times-chat'}
             data={this.props.conversation.getResponseTimesChatModeBuckets()}
             view={DoubleRTHist}
             viewParams={this.extendParamsForChatMode()}
             handleShowTooltip={this.props.handleShowTooltip}
             handleHideTooltip={this.props.handleHideTooltip}
-            metricLabel={'Response time frequency (chat mode, RT < 15min)'} />
+            metricLabel={'Chat mode, (RT < 15min)'} />
+          <Row metricID={'resp-times'}
+            data={this.props.conversation.getResponseTimesBuckets()}
+            view={DoubleRTHist}
+            viewParams={this.props.viewParams}
+            handleShowTooltip={this.props.handleShowTooltip}
+            handleHideTooltip={this.props.handleHideTooltip}
+            metricLabel={'Non-chat mode (RT > 15min)'} />
         </div>
       </div>
     )

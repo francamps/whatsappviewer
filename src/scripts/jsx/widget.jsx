@@ -54,7 +54,7 @@ export default class Widget extends React.Component {
   }
 
   renderMetric () {
-    if (this.props.svgID === 'widget-3') {
+    if (this.props.svgID === 'response-time-day-widget') {
       return (
         <div className="widget-extra-metric">
           <p>
@@ -75,7 +75,7 @@ export default class Widget extends React.Component {
     if (this.props.view) {
       this.renderSVGs();
     }
-    if (this.props.svgID === 'widget-3') {
+    if (this.props.svgID === 'response-time-day-widget') {
       let silence = this.props.conversation.getLongestSilence(),
           silentDays = this.props.conversation.getSilentDays();
 
@@ -101,12 +101,12 @@ export default class Widget extends React.Component {
     }
 
     switch (this.props.svgID) {
-      case 'widget-2':
+      case 'time-of-day-widget':
         state = {
           data: this.props.conversation.getMessageTimes()
         }
         break;
-      case 'widget-3':
+      case 'response-time-day-widget':
         state = {
           data: this.props.conversation.getResponseTimesByAuthorDay(),
           domain: {
@@ -114,7 +114,7 @@ export default class Widget extends React.Component {
           }
         }
         break;
-      case 'graph-viewer':
+      case 'word-volume-widget':
         state = {
           data: this.props.conversation.getWordsByAuthorAndDay(),
           domain: {
@@ -145,7 +145,7 @@ export default class Widget extends React.Component {
       <div id={this.props.svgID} className="widget">
         {this.renderTitle()}
         {this.renderSVG()}
-        {this.renderSearchBox()}
+        {/*this.renderSearchBox()*/}
         {this.renderMetric()}
       </div>
     );

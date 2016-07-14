@@ -1,6 +1,7 @@
 'use strict';
 
 import Widget from './widget';
+import SectionTitle from './section-title';
 import DataTable from './data-table/table';
 import Tooltip from './tooltip';
 
@@ -52,12 +53,14 @@ export default class Canvas extends React.Component {
     } else {
       return (
         <div id="canvas" className={this.state.classes}>
+          <SectionTitle
+            title={"Insights"} />
           <Widget
             title={'Volume of words over time'}
             view={VolumeTime}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
-            svgID={'graph-viewer'}
+            svgID={'word-volume-widget'}
             renderSearchBox={true} />
           <Widget
             title={'Volume of messages per time of day'}
@@ -66,13 +69,13 @@ export default class Canvas extends React.Component {
             conversation={this.props.conversation}
             handleShowTooltip={this.handleShowTooltip.bind(this)}
             handleHideTooltip={this.handleHideTooltip.bind(this)}
-            svgID={'widget-2'} />
+            svgID={'time-of-day-widget'} />
           <Widget
             title={'Response times per day (average)'}
             view={ResponseTimesTime}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
-            svgID={'widget-3'} />
+            svgID={'response-time-day-widget'} />
           <DataTable
             handleShowTooltip={this.handleShowTooltip.bind(this)}
             handleHideTooltip={this.handleHideTooltip.bind(this)}
@@ -83,6 +86,9 @@ export default class Canvas extends React.Component {
             isShowing={this.state.tooltipShowing}
             typeOfInfo={this.state.typeOfInfo}
             infoToShow={this.state.infoToShow} />
+          <div className="wide-button">
+            <button>Try another chat</button>
+          </div>
         </div>
       );
     }

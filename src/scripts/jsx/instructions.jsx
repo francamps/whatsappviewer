@@ -1,11 +1,10 @@
 'use strict';
 
-import WidgetTitle from './widget-title';
-
 export default class Instructions extends React.Component {
   render () {
     return (
       <div className="instructions">
+        <h2>Get some insight into your daily WhatsApp conervsations</h2>
         <h3>How to use this</h3>
         <p>To use this dashboard, you'll have to use your own whatsapp
         app to email the conversation you'd like to explore to yourself. For the moment, IT'LL ONLY WORK WITH CONVERSATIONS ONE ON ONE</p>

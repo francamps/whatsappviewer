@@ -2,7 +2,7 @@ export default class ResponseTimesTime {
   constructor (el, props) {
     this.w = props.w;
     this.mg = props.mg;
-    this.h = props.h;
+    this.h = 200;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
     this.gold = props.gold;
@@ -46,9 +46,10 @@ export default class ResponseTimesTime {
   update (state) {
     this.computeScaleFns(state.domain);
     this.adjustSizeIfNeeded(state.domain);
-    this.addEachResponseTime(state.data)
+    //this.addEachResponseTime(state.data)
     this.addEachResponseTimeColumns(state.data);
     this.addSilences(state);
+    this.addMessageDots(state.data);
     this.addAxis();
   }
 
@@ -69,12 +70,12 @@ export default class ResponseTimesTime {
     this.timeScale =
         d3.scaleTime()
           .domain(domain.time)
-          .range([0, this.w]);
+          .range([this.mg, this.w - this.mg]);
 
   	this.yScale =
         d3.scaleLinear()
 					.domain([0, 86400000])
-					.range([0, this.h / 2]);
+					.range([0, this.h - this.mg]);
   }
 
   getDaysNum (domain) {
@@ -136,11 +137,11 @@ export default class ResponseTimesTime {
       .attr("x", (d) => this.timeScale(d.datetime))
       .attr("y", 0)
       .attr("width", this.colW)
-      .attr("height", this.h);
+      .attr("height", this.h - this.mg);
 
     silence
       .style("fill", "#c0c0c0")
-      .style("opacity", .1);
+      .style("opacity", .2);
   }
 
   // Add response times column bar
@@ -152,21 +153,20 @@ export default class ResponseTimesTime {
     // Append columns per each day with response time daya
     let lineA = respsA.selectAll(".lineA")
       .data(data.authorA.filter(Boolean))
-      .enter().append("line")
+      .enter().append("circle")
       .attr("class", "lineA respLine")
 
     // Positioning and sizing
     lineA
-      .attr("x1", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .attr("x2",  (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW)
-      .attr("y1", (d) => this.h / 2 - this.yScale(d.responseTime))
-      .attr("y2", (d) => this.h / 2 - this.yScale(d.responseTime));
+      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2)
+      .attr("cy", (d) => this.h - this.mg - this.yScale(d.responseTime))
+      .attr("r", this.colW / 4);
 
     // Styling for RT columns
     lineA
       .style("opacity", .8)
-			.style("stroke", this.colorA)
-      .style("stroke-width", "4px");
+      .style("fill", this.colorA)
+			.style("stroke", "none");
 
     /* Author B */
     // Add RT for author B, grouped
@@ -175,21 +175,20 @@ export default class ResponseTimesTime {
     // Append columns per each day with response time daya
     let lineB = respsB.selectAll(".lineB")
       .data(data.authorB.filter(Boolean))
-      .enter().append("line")
+      .enter().append("circle")
       .attr("class", "lineB respLine")
 
     // Positioning and sizing
     lineB
-      .attr("x1", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .attr("x2",  (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW)
-      .attr("y1", (d) => this.h / 2 + this.yScale(d.responseTime))
-      .attr("y2", (d) => this.h / 2 + this.yScale(d.responseTime));
+      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2)
+      .attr("cy", (d) => this.h - this.mg - this.yScale(d.responseTime))
+      .attr("r", this.colW / 4);
 
     // Styling for RT columns
     lineB
-      .style("opacity", .8)
-      .style("stroke", this.colorB)
-      .style("stroke-width", "4px");
+      .style("opacity", .5)
+      .style("fill", "this.colorB")
+      .style("stroke", "none");
   }
 
   // Add response times column bar
@@ -206,12 +205,12 @@ export default class ResponseTimesTime {
     bgA
       .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .attr("width",  this.colW)
-      .attr("y", (d) => this.h / 2 - this.yScale(d.responseTime))
+      .attr("y", (d) => this.h - this.mg - this.yScale(d.responseTime))
       .attr("height", (d) => this.yScale(d.responseTime));
 
     bgA
-      .style("fill", "#c0c0c0")
-      .style("opacity", .1);
+      .style("fill", this.colorA)
+      .style("opacity", .3);
 
     // Background
     let bgB = bgs.selectAll(".bgB")
@@ -223,23 +222,23 @@ export default class ResponseTimesTime {
     bgB
       .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .attr("width",  this.colW)
-      .attr("y", (d) => this.h / 2)
+      .attr("y", (d) => this.h - this.mg - this.yScale(d.responseTime))
       .attr("height", (d) => this.yScale(d.responseTime));
 
     bgB
-      .style("fill", "#c0c0c0")
-      .style("opacity", .1);
+      .style("fill", this.colorB)
+      .style("opacity", .3);
   }
 
   // Individual messages dot, to see variance
-  addMessageDots () {
+  addMessageDots (data) {
     let msgs = this.svg.selectAll(".message-circles")
 
     let allMessagesA = d3.map(data.authorAAll).entries(),
         allMessagesB = d3.map(data.authorBAll).entries();
 
-    let r = 2,
-        x = (i) => (i + 1/2) * this.colW - 1;
+    let r = 3,
+        x = (i) => (i + 3/2) * this.colW - 1;
 
     // Add messages for author A
     // grouping them per day
@@ -256,7 +255,7 @@ export default class ResponseTimesTime {
       // Position and dimension
       circle
         .attr("cx", x(i))
-        .attr("cy", (b) => this.h / 2 - this.yScale(b))
+        .attr("cy", (b) => this.h - this.mg - this.yScale(b))
         .attr("r", r)
 
       // Styling, please move to stylesheet
@@ -280,7 +279,7 @@ export default class ResponseTimesTime {
       // Position and dimension
       circle
         .attr("cx", x(i))
-        .attr("cy", (b) => this.h / 2 + this.yScale(b))
+        .attr("cy", (b) => this.h - this.mg - this.yScale(b))
         .attr("r", r)
 
       // Styling, please move to stylesheet
@@ -295,9 +294,10 @@ export default class ResponseTimesTime {
   }
 
   addAxis () {
+    // Over time, horizontal axis
     let axis = d3.axisBottom(this.timeScale);
 
-    let midH = this.h / 2;
+    let midH = this.h;
 
     let axisTicks = this.svg.append("g")
       .attr("class", "axis-g")
@@ -306,5 +306,19 @@ export default class ResponseTimesTime {
 
     axisTicks.selectAll('.axis-g .domain')
       .attr("transform", `translate(0, ${midH - 10})`);
-  }
+
+    // Response time axis
+    let axisRT = d3.axisLeft(this.yScale)
+                    .tickValues([0, 86400000/4, 86400000/2, 86400000 * 3/4, 86400000])
+                    .tickSize(this.w - this.mg);
+
+    let axisTicksRT = this.svg.append("g")
+      .attr("class", "axisRT-g")
+      .attr("transform", 'translate(' + this.w + ', 0)')
+      .call(axisRT);
+
+    axisTicksRT.selectAll('.axisRT-g .tick line')
+      .style("stroke", "#a0a0a0")
+      .style("stroke-dasharray", "2px 5px");
+    }
 }

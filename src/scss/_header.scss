@@ -4,6 +4,14 @@ header {
   color: white;
   text-transform: capitalize;
   border-bottom: 1px solid $wapp-green;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  @media (min-width: 900px) {
+    position: absolute;
+  }
 
   a {
     margin: 10px;

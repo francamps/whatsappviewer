@@ -10,7 +10,7 @@ export default class RowTemp extends React.Component {
     let viewParams = this.props.viewParams;
     let View = this.props.view;
 
-    let thisView = new View(this.props.metricID, viewParams);
+    let thisView = new View(this.props.metricID + ' .svg', viewParams);
     let dispatcher = thisView.render(data);
     this.eventHandlers(dispatcher);
   }

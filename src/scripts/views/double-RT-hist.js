@@ -4,8 +4,8 @@ import EventEmitter from 'events';
 
 export default class ResponseTimesHist {
   constructor (el, props) {
-    this.w = 400;
-    this.mg = props.mg;
+    this.w = 280;
+    this.mg = 50
     this.h = 180;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
@@ -14,19 +14,6 @@ export default class ResponseTimesHist {
     this.chatMode = props.chatMode;
     this.author = props.author;
     this.el = el;
-  }
-
-  viewSizeAdjustments () {
-    // Make sure the dimensions are correct for the viewport
-    let smallVersion = (document.querySelector(".page-wrap").offsetWidth < 800);
-    if (smallVersion) {
-      this.w = 100;
-      this.mg = 5;
-
-      this.svg
-          .attr('width', this.w)
-        	.attr('height', this.h);
-    }
   }
 
   getBuckets (data) {
@@ -44,11 +31,9 @@ export default class ResponseTimesHist {
   viewTypeAdjustments () {
     // Choos labels of histogram based on either chatMode or not
     if (this.chatMode) {
-      this.labels = ["<2'", "2'-", "5'-", "10'-"];
-      this.labelsLow = ["", "5'", "10'", "15'"];
+      this.labels = ["<2'", "2'-5'", "5'-10'", "10'-15'"];
     } else {
-      this.labels = ["15'-", "1-", "2-", "4-", "12-", ">24h"];
-      this.labelsLow = ["1h", "2h", "4h", "12h", "24h"];
+      this.labels = ["15'- 1h", "1-2h", "2-4h", "4-12h", "12-24h", ">24h"];
     }
   }
 
@@ -64,7 +49,6 @@ export default class ResponseTimesHist {
 
     this.getBuckets(data);
     this.viewTypeAdjustments();
-    this.viewSizeAdjustments();
 
     this.update(data, dispatcher);
 
@@ -76,6 +60,7 @@ export default class ResponseTimesHist {
     this.getBuckets(data);
     this.computeScaleFns();
     this.addBars(dispatcher);
+    this.addLine();
     this.addLabels();
   }
 
@@ -86,20 +71,35 @@ export default class ResponseTimesHist {
 
   computeScaleFns () {
     // Y axis limits depend on both author A and B
-    this.yMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
+    this.xMax = d3.max([d3.max(this.bucketsA), d3.max(this.bucketsB)]);
 
     this.timeScale =
       (value) => {
-        return value * this.w / this.bucketsA.length;
+        return value * this.h / this.bucketsA.length;
       }
 
-  	this.yScale =
+  	this.xScale =
       d3.scaleLinear()
-				.domain([0, this.yMax])
-				.range([0, (this.h - 30) / 2]);
+				.domain([0, this.xMax])
+				.range([0, (this.w - this.mg * 2) / 2]);
 
     // Adjust column width based on type of buckets
-    this.colW = this.w / this.bucketsA.length - 2;
+    this.colH = this.h / this.bucketsA.length - 6;
+  }
+
+  addLine () {
+    let midLine = this.svg.append("line")
+      .attr("class", ".midLine");
+
+    midLine
+      .attr("x1", this.w/2)
+      .attr("x2", this.w/2)
+      .attr("y1", 0)
+      .attr("y2", this.h - 6);
+
+    midLine
+      .style("stroke", "#000000")
+      .style("stroke-dasharray", "2px 5px");
   }
 
   // Apend the bars on the histogram
@@ -109,14 +109,30 @@ export default class ResponseTimesHist {
       .enter().append('rect')
       .attr("class", "barsHistA");
 
-    barsHistA
-      .attr("x", (d, i) => this.timeScale(i))
-      .attr("y", (d, i) => this.h / 2 - this.yScale(d))
-      .attr("width", this.colW)
-      .attr("height", (d, i) => this.yScale(d))
+    let barsHistB = this.svg.selectAll('.barsHistB')
+      .data(this.bucketsB)
+      .enter().append('rect')
+      .attr("class", "barsHistB");
 
     barsHistA
-      .style("fill", this.colorA);
+      .attr("x", (d) => this.w / 2 - this.xScale(d))
+      .attr("y", (d, i) => this.timeScale(i))
+      .attr("width", (d, i) => this.xScale(d))
+      .attr("height", this.colH);
+
+    barsHistB
+      .attr("x", (d, i) => this.w / 2)
+      .attr("y", (d, i) => this.timeScale(i))
+      .attr("width", (d, i) => this.xScale(d))
+      .attr("height", this.colH);
+
+    barsHistA
+      .style("fill", this.colorA)
+      .style("opacity", .3);
+
+    barsHistB
+      .style("fill", this.colorB)
+      .style("opacity", .3);
 
     barsHistA
       .on("mouseover", (d, i) => {
@@ -126,20 +142,6 @@ export default class ResponseTimesHist {
         dispatcher.emit("barsHist:mouseout", d, i, 'A');
       });
 
-    let barsHistB = this.svg.selectAll('.barsHistB')
-      .data(this.bucketsB)
-      .enter().append('rect')
-      .attr("class", "barsHistB");
-
-    barsHistB
-      .attr("x", (d, i) => this.timeScale(i))
-      .attr("y", (d, i) => this.h / 2)
-      .attr("width", this.colW)
-      .attr("height", (d, i) => this.yScale(d))
-
-    barsHistB
-      .style("fill", this.colorB);
-
     barsHistB
       .on("mouseover", (d, i) => {
         dispatcher.emit("barsHist:mouseover", d, i, 'B');
@@ -147,6 +149,30 @@ export default class ResponseTimesHist {
       .on("mouseout", (d, i) => {
         dispatcher.emit("barsHist:mouseout", d, i, 'B');
       });
+
+    let barsHistAtop = this.svg.selectAll('.barsHistAtop')
+      .data(this.bucketsA)
+      .enter().append('rect')
+      .attr("class", "barsHistA");
+
+    let barsHistBtop = this.svg.selectAll('.barsHistBtop')
+      .data(this.bucketsB)
+      .enter().append('rect')
+      .attr("class", "barsHistBtop");
+
+    barsHistAtop
+      .attr("x", (d) => this.w / 2 - this.xScale(d))
+      .attr("y", (d, i) => this.timeScale(i))
+      .attr("width", 6)
+      .attr("height", this.colH)
+      .style("fill", this.colorA);
+
+    barsHistBtop
+      .attr("x", (d, i) => this.w / 2 + this.xScale(d))
+      .attr("y", (d, i) => this.timeScale(i))
+      .attr("width", 6)
+      .attr("height", this.colH)
+      .style("fill", this.colorB);
   }
 
   // Add time buckets labels
@@ -158,19 +184,8 @@ export default class ResponseTimesHist {
       .attr("class", "labelHigh label");
 
     labelsHigh
-      .attr("x", (d, i) => this.timeScale(i) + this.colW / 2)
-      .attr("y", (d, i) => this.h - 17)
+      .attr("x", (d, i) => 40)
+      .attr("y", (d, i) => this.timeScale(i) + this.colH / 2)
       .text((d, i) => this.labels[i]);
-
-    // Second row of labels
-    let labelsLow = this.svg.selectAll(".labelLow")
-      .data(this.labelsLow)
-      .enter().append("text")
-      .attr("class", "labelLow label");
-
-    labelsLow
-      .attr("x", (d, i) => this.timeScale(i) + this.colW / 2)
-      .attr("y", (d, i) => this.h - 5)
-      .text((d, i) => this.labelsLow[i]);
   }
 }

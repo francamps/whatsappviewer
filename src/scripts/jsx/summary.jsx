@@ -1,7 +1,7 @@
 'use strict';
 
 import Legend from './legend';
-import WidgetTitle from './widget-title';
+import SectionTitle from './section-title';
 
 import Row from './data-table/row';
 import ComparisonBar from '../views/comparison-bar';
@@ -52,19 +52,19 @@ export default class Summary extends React.Component {
       <div className="summary-metric-section">
         <div className="item">
           <p>First message:</p>
-          <p className="summary-metric">{this.state.date0}</p>
           <p className="summary-metric">
             <span>by:</span>
             {this.state.author0}
           </p>
+          <p className="summary-metric">{this.state.date0}</p>
         </div>
         <div className="item">
           <p>Last message:</p>
-          <p className="summary-metric">{' ' + this.state.dateF}</p>
           <p className="summary-metric">
             <span>by:</span>
             {this.state.authorF}
           </p>
+          <p className="summary-metric">{' ' + this.state.dateF}</p>
         </div>
       </div>
     );
@@ -105,13 +105,15 @@ export default class Summary extends React.Component {
   render () {
     return (
       <div className="summary showing">
-        <WidgetTitle
+        <SectionTitle
           title={'Your conversation'} />
-        <Legend
-          conversation={this.props.conversation} />
-        {this.renderMessagesProcessed()}
-        {this.renderFirstAndLast()}
-        {this.renderWordsAndMessages()}
+        <div className="summary-content">
+          <Legend
+            conversation={this.props.conversation} />
+          {this.renderFirstAndLast()}
+          {this.renderMessagesProcessed()}
+          {this.renderWordsAndMessages()}
+        </div>
       </div>
     );
   }

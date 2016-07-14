@@ -1,11 +1,24 @@
+.section-title {
+  background: none;
+  border: none;
+  border-bottom: 1px solid $wapp-green;
+  padding: 0;
+  margin: 10px 0;
+
+  h2 {
+    background: none;
+    padding: 10px 0;
+    background: 0;
+    margin-bottom: 0;
+    text-align: left;
+  }
+}
+
 .canvas {
   z-index: 0;
   box-sizing: border-box;
   width: 100%;
   padding: 0;
-  border: 1px solid;
-  border-color: $border-top $border-sides $border-bottom;
-  border-left: 1px solid $wapp-green;
 
   &.hidden {
     opacity: 0;
@@ -23,6 +36,14 @@
     transition-duration: .3s;
   }
 
+  h2 {
+    padding: 20px;
+    text-align: left;
+    border-bottom: 1px solid $verylight-grey;
+    margin-bottom: 0;
+    background: $white;
+  }
+
   .widget {
     background: $white;
     box-sizing: border-box;
@@ -30,9 +51,15 @@
     margin-bottom: 0;
     border: none;
     overflow: auto;
+    border: 1px solid;
+    border-color: $border-top $border-sides $border-bottom;
+    border-left: 1px solid $wapp-green;
+    margin: 20px;
+    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
 
     @media (min-width: 900px) {
         padding: 30px;
+        margin: 20px 0;
     }
 
     button {
@@ -70,17 +97,29 @@
       }
     }
   }
+
+  .section-title {
+    margin: 10px 20px;
+
+    @media (min-width: 900px) {
+      margin: 10px 0;
+    }
+
+    h2 {
+      padding: 10px 0;
+      background: none;
+    }
+  }
 }
 
 .summary {
   box-sizing: border-box;
-  padding: 30px;
-  margin: 20px 0;
-  background: $white;
-  border: 1px solid;
-  border-color: $border-top $border-sides $border-bottom;
-  border-left: 1px solid $wapp-green;
+  margin: 20px 20px 20px 20px;
   overflow: auto;
+
+  @media (min-width: 900px) {
+    margin: 20px 0;
+  }
 
   &.showing {
     opacity: 1;
@@ -90,71 +129,81 @@
     transition-duration: .3s;
   }
 
-  .summary-metric-section {
-    border-top: 1px solid $verylight-grey;
-    padding: 20px 0;
-    overflow: auto;
+  .summary-content {
+    background: $white;
+    border: 1px solid;
+    border-color: $border-top $border-sides $border-bottom;
+    border-left: 1px solid $wapp-green;
+    padding: 30px;
+    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
+    margin-top: 20px;
 
-    @media (min-width: 900px) {
-      padding: 30px 0;
-    }
+    .summary-metric-section {
+      border-top: 1px solid $verylight-grey;
+      padding: 20px 0;
+      overflow: auto;
 
-    &:last-child {
-      padding-bottom: 0;
-    }
-
-    p {
-      margin: 0;
-
-      .summary-metric {
-        font-weight: 700;
-        margin-right: 5px;
+      &:first-child {
+        border-top: none;
+        padding-top: 0;
       }
 
-      &.large {
-        .summary-metric {
-          font-size: 24px;
-          display: block;
-        }
-
-        &:first-child {
-          margin-bottom: 15px;
-        }
+      @media (min-width: 900px) {
+        padding: 20px 0;
       }
-    }
 
-    .item {
-      font-size: 1em;
-      padding: 0;
-      margin-bottom: 20px;
+      &:last-child {
+        padding-bottom: 0;
+      }
 
       p {
-        &.summary-metric {
-          font-weight: 700;
-          margin: 0;
-          margin-left: 10px;
+        margin: 0;
 
-          span {
-            font-weight: 400;
-            margin-right: 4px;
+        .summary-metric {
+          font-weight: 700;
+          margin-right: 5px;
+        }
+
+        &.large {
+          .summary-metric {
+            font-size: 20px;
+            display: block;
+          }
+
+          &:first-child {
+            margin-bottom: 15px;
           }
         }
       }
 
-      &:last-child {
-        margin-bottom: 0;
+      .item {
+        font-size: 1em;
+        padding: 0;
+        float: left;
+        width: 50%;
+
+        @media (min-width: 900px) {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        p {
+          &.summary-metric {
+            font-weight: 400;
+            margin: 0;
+            margin-left: 10px;
+
+            span {
+              font-weight: 400;
+              margin-right: 4px;
+            }
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
-    }
-  }
-
-  .widget-title {
-    margin-bottom: 20px;
-
-    p {
-      border-radius: 10px;
-      margin: 0;
-      text-transform: capitalize;
-      font-size: 24px;
     }
   }
 }
@@ -194,6 +243,16 @@
   }
 }
 
+/* Big button
+/* -------------------------------------------------- */
+
+.wide-button {
+  margin: 20px;
+
+  button {
+    width: 100%;
+  }
+}
 
 /* Table for metrics
 /* - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -205,11 +264,11 @@
 
   .row {
     box-sizing: border-box;
-    display: flex;
     width: 100%;
     padding: 26px 0;
     font-family: 'Lato', sans-serif;
     font-weight: 300;
+    float: left;
     border-bottom: 1px solid $lightish-grey;
 
     .cell {
@@ -220,10 +279,14 @@
         font-size: 18px;
         font-weight: 400;
       }
+
+      .svg {
+        text-align: center;
+      }
     }
 
     .cell-chart {
-      width: 70%;
+      width: 100%;
 
       .svg {
         border: none;
@@ -246,10 +309,16 @@
     }
 
     .metric-label {
-      width: 30%;
+      width: 100%;
       font-size: 15px;
       text-align: left;
       font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    @media (min-width: 900px) {
+      width: 50%;
+      border-bottom: none;
     }
   }
 }
@@ -272,7 +341,7 @@ svg {
     stroke-width: 1px;
   }
 
-  .axis-g {
+  .axis-g, .axisRT-g {
     .domain {
       stroke: $light-grey;
       stroke-dasharray: 2px 5px;
@@ -304,7 +373,7 @@ svg {
     .label {
       font-size: 10px;
       font-weight: 300;
-      text-anchor: middle;
+      text-anchor: end;
     }
 
     .barsHistA, .barsHistB {

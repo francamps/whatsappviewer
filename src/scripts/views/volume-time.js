@@ -40,7 +40,7 @@ export default class VolumeTime {
     this.computeScaleFns(state);
     this.addLines(state);
     this.addAxis();
-    this.addSearchFunctionality();
+    //this.addSearchFunctionality();
   }
 
   destroy () {
@@ -181,7 +181,6 @@ export default class VolumeTime {
   }
 
   getMaxNumWords (data) {
-    console.log()
     let allWords = data.authorA.concat(data.authorB);
 
     return d3.max(allWords, (d) => d.words );
