@@ -55,6 +55,7 @@ class App extends React.Component {
     if (this.state.isAnalyzed) {
       return (
         <Canvas
+          onClickNewChat={this.renderChatForm.bind(this)}
           viewParams={this.state.viewParams}
           conversation={this.state.conversation}
           isShowing={this.state.isAnalyzed}/>
@@ -75,6 +76,7 @@ class App extends React.Component {
     this.setState({
       isAnalyzed: false
     });
+    document.body.scrollTop = 0;    
   }
 
   render () {

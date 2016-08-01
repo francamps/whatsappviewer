@@ -56,14 +56,14 @@ export default class Canvas extends React.Component {
           <SectionTitle
             title={"Insights"} />
           <Widget
-            title={'Volume of words over time'}
+            title={'Words over time'}
             view={VolumeTime}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
             svgID={'word-volume-widget'}
             renderSearchBox={true} />
           <Widget
-            title={'Volume of messages per time of day'}
+            title={'Messages per time of day'}
             view={TimeOfDay}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
@@ -87,7 +87,9 @@ export default class Canvas extends React.Component {
             typeOfInfo={this.state.typeOfInfo}
             infoToShow={this.state.infoToShow} />
           <div className="wide-button">
-            <button>Try another chat</button>
+            <button onClick={this.props.onClickNewChat}>
+              Try another chat
+            </button>
           </div>
         </div>
       );

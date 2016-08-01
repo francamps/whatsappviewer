@@ -48,8 +48,9 @@ export default class ResponseTimesTime {
     this.adjustSizeIfNeeded(state.domain);
     //this.addEachResponseTime(state.data)
     this.addEachResponseTimeColumns(state.data);
+    this.addEachResponseTimeLine(state.data);
     this.addSilences(state);
-    this.addMessageDots(state.data);
+    //this.addMessageDots(state.data);
     this.addAxis();
   }
 
@@ -70,7 +71,7 @@ export default class ResponseTimesTime {
     this.timeScale =
         d3.scaleTime()
           .domain(domain.time)
-          .range([this.mg, this.w - this.mg]);
+          .range([this.mg * 2, this.w - this.mg]);
 
   	this.yScale =
         d3.scaleLinear()
@@ -191,6 +192,28 @@ export default class ResponseTimesTime {
       .style("stroke", "none");
   }
 
+  addEachResponseTimeLine (data) {
+    let line = d3.line()
+        .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
+        .y((d) => this.h - this.mg - this.yScale(d.responseTime))
+        .curve(d3.curveStep)
+        .defined((d) => d);
+
+    this.svg.append("path")
+      .attr("class", "lineA")
+      .attr("d", line(data.authorA))
+      .style("stroke", this.colorA)
+      .style("stroke-width", "2px")
+      .style("fill", "none")
+
+    this.svg.append("path")
+      .attr("class", "lineB")
+      .attr("d", line(data.authorB))
+      .style("stroke", this.colorB)
+      .style("stroke-width", "2px")
+      .style("fill", "none")
+  }
+
   // Add response times column bar
   addEachResponseTimeColumns (data) {
     let bgs = this.svg.selectAll(".bars-bg");
@@ -209,8 +232,8 @@ export default class ResponseTimesTime {
       .attr("height", (d) => this.yScale(d.responseTime));
 
     bgA
-      .style("fill", this.colorA)
-      .style("opacity", .3);
+      .style("fill", "#c0c0c0")
+      .style("opacity", .2);
 
     // Background
     let bgB = bgs.selectAll(".bgB")
@@ -226,8 +249,8 @@ export default class ResponseTimesTime {
       .attr("height", (d) => this.yScale(d.responseTime));
 
     bgB
-      .style("fill", this.colorB)
-      .style("opacity", .3);
+      .style("fill", "#c0c0c0")
+      .style("opacity", .2);
   }
 
   // Individual messages dot, to see variance
@@ -309,8 +332,9 @@ export default class ResponseTimesTime {
 
     // Response time axis
     let axisRT = d3.axisLeft(this.yScale)
-                    .tickValues([0, 86400000/4, 86400000/2, 86400000 * 3/4, 86400000])
-                    .tickSize(this.w - this.mg);
+                    .tickValues([86400000, 3 * 86400000/4, 86400000/2, 86400000/4, 0])
+                    .tickSize(this.w - this.mg)
+                    .tickFormat((d) => (24 - d / 3600000) + 'h');
 
     let axisTicksRT = this.svg.append("g")
       .attr("class", "axisRT-g")
