@@ -74,22 +74,22 @@ h3 {
       padding: 0;
 
       .summary {
-        width: 300px;
+        width: 320px;
         float: left;
         display: inline-block;
       }
 
       .canvas {
-        width: 760px;
-        margin: 20px 0 0 20px;
+        width: 740px;
+        margin: 20px 0 0 10px;
         display: inline-block;
       }
   }
 
   .notification {
     background: $warn-pink !important;
-    min-height: 60px;
     color: white;
+    padding: 20px;
     text-align: center;
 
     &.hidden {

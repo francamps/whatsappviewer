@@ -1,7 +1,7 @@
 'use strict';
 
 export function getViewParams () {
-	let w = 696;
+	let w = 676;
 
 	if (document.querySelector(".canvas")) {
 		w = document.querySelector(".canvas").offsetWidth - 104;
