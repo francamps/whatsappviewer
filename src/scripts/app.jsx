@@ -27,7 +27,7 @@ class App extends React.Component {
     let viewParams = getViewParams();
     let Chat = new Conversation(text);
 
-    if (Chat.isParsed) {
+    if (Chat.isParsed && !Chat.parsingError) {
       this.setState({
         conversation: Chat,
         viewParams: viewParams,

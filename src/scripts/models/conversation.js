@@ -105,8 +105,11 @@ export default class Conversation {
 		return d3.timeDays(this.date0, d3.timeDay.offset(this.dateF, 1));
 	}
 
-	_parseErrorHandler () {
+	_parseErrorHandler (specificError) {
 		this.parsingError = "There was an error parsing your chat. Sorry :/";
+		if (specificError === "tooManyAuthors") {
+			this.parsingError = "Your chat contains messages by more than 2 authors. For now, please use one-on-one chats, with only 2 authors.";
+		}
 	}
 
 	_parseTextData () {
@@ -172,6 +175,10 @@ export default class Conversation {
 							'text': message
 						});
 					}
+				}
+				if (_.keys(this.authors).length > 2) {
+					this._parseErrorHandler("tooManyAuthors");
+					break;
 				}
 			}
 			// Date limits
