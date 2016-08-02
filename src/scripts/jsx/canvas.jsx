@@ -51,17 +51,23 @@ export default class Canvas extends React.Component {
   }
 
   renderWordsAndMessages () {
+    let params = getViewParams();
+
+    // Add a paramter to show integers
+    let paramsInt = Object.assign({"decimalNum": 0}, params);
+    let paramsOne = Object.assign({"decimalNum": 1}, params);
+
     return (
       <div className="widget">
         <ChartCell metricID={'message-num'}
           data={this.props.conversation.getNumberOfMessagesByAuthor()}
           view={ComparisonBar}
-          viewParams={getViewParams()}
+          viewParams={paramsInt}
           metricLabel={'Number of messages'} />
         <ChartCell metricID={'word-count'}
           data={this.props.conversation.getMessageWordCountAverage()}
           view={ComparisonBar}
-          viewParams={getViewParams()}
+          viewParams={paramsOne}
           metricLabel={'Words per message (avg)'} />
       </div>
     );

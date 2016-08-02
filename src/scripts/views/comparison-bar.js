@@ -1,12 +1,13 @@
 export default class ComparisonBar {
   constructor (el, props) {
-    this.w = 230;
-    this.h = 60;
+    this.w = 250;
+    this.h = 40;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
     this.r = 20;
-    this.mg = 30;
+    this.mg = 50;
     this.hourStep = (this.w - this.mg) / 24;
+    this.decimalNum = props.decimalNum;
 
     this.el = el
   }
@@ -37,9 +38,9 @@ export default class ComparisonBar {
   	this.xScale =
       d3.scaleLinear()
 				.domain([0, dataMax])
-				.range([0, this.w - 100]);
+				.range([this.mg, this.w - this.mg * 2]);
 
-    this.yScale = (i) => { return this.h / 4 + i * this.colW; }
+    this.yScale = (i) => { return 15 + i * this.colW; }
 
     // Adjust column width based on type of buckets
     this.colW = 15;
@@ -53,7 +54,7 @@ export default class ComparisonBar {
       .attr("class", "compBar");
 
     barsHist
-      .attr("x", (d, i) => 0)
+      .attr("x", (d, i) => this.xScale(0))
       .attr("y", (d, i) => this.yScale(i))
       .attr("width",  (d, i) => this.xScale(d))
       .attr("height", 8)
@@ -70,7 +71,7 @@ export default class ComparisonBar {
       .attr("class", "compBubbs");
 
     bubbs
-      .attr("cx", (d, i) => this.xScale(d, i))
+      .attr("cx", (d, i) => this.mg + this.xScale(d, i))
       .attr("cy", (d, i) => this.yScale(i) + 4)
       .attr("r", 4)
 
@@ -87,10 +88,10 @@ export default class ComparisonBar {
       .enter().append('text')
 
     label
-      .attr("x", (d, i) => this.w)
+      .attr("x", (d, i) => 0)
       .attr("y", (d, i) => this.yScale(i) + 9)
-      .text((d) => d.toFixed(2))
-      .style("text-anchor", "end")
+      .text((d) => d.toFixed(this.decimalNum))
+      .style("text-anchor", "start")
       .style("font-size", "12px");
   }
 }
