@@ -1,0 +1,25 @@
+form {
+  input, textarea {
+    width: 100%;
+    outline: none;
+    border: 1px solid $border;
+    padding: 10px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    color: $mid-grey;
+  }
+
+  input {
+    margin: 0;
+  }
+
+  textarea {
+    margin: 10px 0;
+    resize: none;
+  }
+
+  input:focus, textarea:focus {
+    border-color: $wapp-green;
+    box-shadow: 0 0 3px $wapp-green;
+  }
+}

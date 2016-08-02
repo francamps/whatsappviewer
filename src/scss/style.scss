@@ -6,6 +6,7 @@
 @import 'summary';
 @import 'svg';
 @import 'tooltip';
+@import 'form';
 
 body {
   position: absolute;
@@ -25,6 +26,99 @@ body {
 
   @media (min-width: 900px) {
     line-height: 1.5em;
+  }
+}
+
+html, body {
+  height: 100%;
+}
+
+.app {
+  width: 100%;
+}
+
+.page-wrap {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100%;
+  margin: 0 auto;
+  padding-top: 80px;
+  margin-bottom: -60px;
+
+  &:after {
+    content: "";
+    display: block;
+    height: 60px;
+  }
+
+  @media (min-width: 900px) {
+      width: 800px;
+      padding: 0;
+      padding-top: 80px;
+  }
+
+  @media (min-width: 1100px) {
+      width: 1100px;
+      padding: 0;
+      padding-top: 80px;
+
+      .summary {
+        width: 320px;
+        float: left;
+        display: inline-block;
+      }
+
+      .canvas {
+        width: 740px;
+        margin: 20px 0 0 10px;
+        display: inline-block;
+      }
+  }
+}
+
+.form-container {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0px 20px 0 20px;
+  transition: width 2s, padding 2s;
+  margin-bottom: 60px;
+  opacity: 1;
+  transition: opacity, height .3s ease-in-out;
+
+  &.hidden {
+    opacity: 0;
+    height: 0;
+    transition: opacity .3s ease-in-out;
+    transition-delay: height .3s;
+    transition-duration: height 0;
+  }
+
+  .widget {
+    width: 100%;
+    background: $white;
+    border: 1px solid;
+    border-color: $border-top $border-sides $border-bottom;
+    border-left: 1px solid $wapp-green;
+    padding: 30px;
+    margin: 0 auto;
+    overflow: auto;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
+
+    @media (min-width: 900px) {
+      width: 760px;
+    }
+  }
+}
+
+.notification {
+  background: $warn-pink !important;
+  color: white;
+  padding: 20px;
+  text-align: center;
+
+  &.hidden {
+    display: none;
   }
 }
 
@@ -53,111 +147,4 @@ h2 {
 
 h3 {
   font-weight: 400;
-}
-
-.app {
-  width: 100%;
-}
-
-.page-wrap {
-  width: 100%;
-  box-sizing: border-box;
-  min-height: 1000px;
-  margin: 0 auto;
-  margin-top: 60px;
-
-  @media (min-width: 900px) {
-      width: 800px;
-      padding: 0;
-      margin-top: 60px;
-  }
-
-  @media (min-width: 1100px) {
-      width: 1100px;
-      padding: 0;
-
-      .summary {
-        width: 320px;
-        float: left;
-        display: inline-block;
-      }
-
-      .canvas {
-        width: 740px;
-        margin: 20px 0 0 10px;
-        display: inline-block;
-      }
-  }
-
-  .notification {
-    background: $warn-pink !important;
-    color: white;
-    padding: 20px;
-    text-align: center;
-
-    &.hidden {
-      display: none;
-    }
-  }
-
-  .form-container {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 20px 20px 0 20px;
-    transition: width 2s, padding 2s;
-    margin-top: 60px;
-    opacity: 1;
-    transition: opacity, height .3s ease-in-out;
-
-    &.hidden {
-      opacity: 0;
-      height: 0;
-      transition: opacity .3s ease-in-out;
-      transition-delay: height .3s;
-      transition-duration: height 0;
-    }
-
-    .widget {
-      width: 100%;
-      background: $white;
-      border: 1px solid;
-      border-color: $border-top $border-sides $border-bottom;
-      border-left: 1px solid $wapp-green;
-      padding: 30px;
-      margin: 0 auto;
-      overflow: auto;
-      box-sizing: border-box;
-      box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
-
-      @media (min-width: 900px) {
-        width: 760px;
-      }
-    }
-  }
-}
-
-form {
-  input, textarea {
-    width: 100%;
-    outline: none;
-    border: 1px solid $border;
-    padding: 10px;
-    font-size: 14px;
-    font-family: 'Lato', sans-serif;
-    color: $mid-grey;
-  }
-
-  input {
-    margin: 0;
-  }
-
-  textarea {
-    margin: 10px 0;
-    resize: none;
-  }
-
-  input:focus, textarea:focus {
-    border-color: $wapp-green;
-    box-shadow: 0 0 3px $wapp-green;
-  }
 }
