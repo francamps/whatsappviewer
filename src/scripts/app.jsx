@@ -67,6 +67,7 @@ class App extends React.Component {
     if (this.state.isAnalyzed) {
       return (
           <Summary
+            isShowing={this.state.isAnalyzed}
             conversation={this.state.conversation} />
       )
     }

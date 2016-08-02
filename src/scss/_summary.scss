@@ -23,6 +23,14 @@
     }
   }
 
+  &.hidden {
+    opacity: 0;
+    height: 0;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;
+  }
+
   &.showing {
     opacity: 1;
     height: auto;

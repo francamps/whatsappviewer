@@ -11,6 +11,7 @@ export default class Summary extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
+      classes: "summary hidden",
       messages: 'unknown',
       medias: 'unknown',
       date0: 'unknown',
@@ -36,8 +37,10 @@ export default class Summary extends React.Component {
         authorF = messageF.author;
 
     let format = this.props.conversation.datetimeFormat;
+    let classes = (this.props.isShowing) ? "summary showing" : "summary hidden";
 
     this.setState({
+      classes: classes,
       messages: messageNum,
       medias: medias,
       date0: d3.timeFormat(format)(date0),
@@ -87,14 +90,14 @@ export default class Summary extends React.Component {
 
   render () {
     return (
-      <div className="summary showing">
+      <div className={this.state.classes}>
         <SectionTitle
           title={'Your conversation'} />
         <div className="summary-content">
           <Legend
             conversation={this.props.conversation} />
           {this.renderMessagesProcessed()}
-          {this.renderFirstAndLast()}          
+          {this.renderFirstAndLast()}
         </div>
       </div>
     );
