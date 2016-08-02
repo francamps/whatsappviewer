@@ -4,11 +4,16 @@ import Widget from './widget';
 import SectionTitle from './section-title';
 import DataTable from './data-table/table';
 import Tooltip from './tooltip';
+import ChartCell from './chart-cell';
 
 // views
 import TimeOfDay from '../views/time-of-day';
 import ResponseTimesTime from '../views/response-times-day';
 import VolumeTime from '../views/volume-time';
+import ComparisonBar from '../views/comparison-bar';
+
+// params
+import { getViewParams } from '../utilities/view-params';
 
 export default class Canvas extends React.Component {
   constructor (props) {
@@ -45,6 +50,23 @@ export default class Canvas extends React.Component {
     });
   }
 
+  renderWordsAndMessages () {
+    return (
+      <div className="widget">
+        <ChartCell metricID={'message-num'}
+          data={this.props.conversation.getNumberOfMessagesByAuthor()}
+          view={ComparisonBar}
+          viewParams={getViewParams()}
+          metricLabel={'Number of messages'} />
+        <ChartCell metricID={'word-count'}
+          data={this.props.conversation.getMessageWordCountAverage()}
+          view={ComparisonBar}
+          viewParams={getViewParams()}
+          metricLabel={'Words per message (avg)'} />
+      </div>
+    );
+  }
+
   render () {
     if (!this.props.isShowing) {
       return (
@@ -62,6 +84,7 @@ export default class Canvas extends React.Component {
             conversation={this.props.conversation}
             svgID={'word-volume-widget'}
             renderSearchBox={true} />
+          {this.renderWordsAndMessages()}
           <Widget
             title={'Messages per time of day'}
             view={TimeOfDay}

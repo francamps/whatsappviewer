@@ -85,23 +85,6 @@ export default class Summary extends React.Component {
     );
   }
 
-  renderWordsAndMessages () {
-    return (
-      <div className="summary-metric-section">
-        <Row metricID={'message-num'}
-          data={this.props.conversation.getNumberOfMessagesByAuthor()}
-          view={ComparisonBar}
-          viewParams={getViewParams()}
-          metricLabel={'Number of messages'} />
-        <Row metricID={'word-count'}
-          data={this.props.conversation.getMessageWordCountAverage()}
-          view={ComparisonBar}
-          viewParams={getViewParams()}
-          metricLabel={'Words per message (avg)'} />
-      </div>
-    );
-  }
-
   render () {
     return (
       <div className="summary showing">
@@ -110,9 +93,8 @@ export default class Summary extends React.Component {
         <div className="summary-content">
           <Legend
             conversation={this.props.conversation} />
-          {this.renderFirstAndLast()}
           {this.renderMessagesProcessed()}
-          {this.renderWordsAndMessages()}
+          {this.renderFirstAndLast()}          
         </div>
       </div>
     );

@@ -112,170 +112,23 @@
   }
 }
 
-.summary {
-  box-sizing: border-box;
-  margin: 20px 0;
-  overflow: auto;
+.chart-cell {
+  width: 100%;
 
-  .section-title {
-    margin: 20px;
+  .metric-label {
+    font-size: 14px;
+    font-weight: 400;
   }
 
   @media (min-width: 900px) {
-    margin: 0px;
+    width: 50%;
+    float: left;
 
-    .section-title {
-      margin: 0px;
+    &:last-child {
+      padding-left: 30px;
+      box-sizing: border-box;
+      border-left: 1px solid $border-sides;
     }
-  }
-
-  @media (min-width: 1100px) {
-    margin: 20px 10px;
-
-    .section-title {
-      margin: 10px;
-    }
-  }
-
-  &.showing {
-    opacity: 1;
-    height: auto;
-    transition: opacity, height;
-    transition-delay: .3s;
-    transition-duration: .3s;
-  }
-
-  .summary-content {
-    background: $white;
-    border: 1px solid;
-    border-color: $border-top $border-sides $border-bottom;
-    border-left: 1px solid $wapp-green;
-    padding: 30px;
-    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
-    margin: 20px;
-
-    @media (min-width: 900px) {
-      margin: 20px 0px;
-    }
-
-    @media (min-width: 1100px) {
-      margin: 20px 10px;
-    }
-
-
-    .summary-metric-section {
-      border-top: 1px solid $verylight-grey;
-      padding: 20px 0;
-      overflow: auto;
-
-      &:first-child {
-        border-top: none;
-        padding-top: 0;
-      }
-
-      @media (min-width: 900px) {
-        padding: 20px 0;
-      }
-
-      &:last-child {
-        padding-bottom: 0;
-      }
-
-      p {
-        margin: 0;
-
-        .summary-metric {
-          font-weight: 700;
-          margin-right: 5px;
-        }
-
-        &.large {
-          .summary-metric {
-            font-size: 20px;
-            display: block;
-          }
-
-          &:first-child {
-            margin-bottom: 15px;
-          }
-        }
-      }
-
-      .item {
-        font-size: 1em;
-        padding: 0;
-        float: left;
-        width: 50%;
-
-        @media (min-width: 900px) {
-          width: 100%;
-          margin-bottom: 20px;
-        }
-
-        p {
-          &.summary-metric {
-            font-weight: 400;
-            margin: 0;
-            margin-left: 10px;
-
-            span {
-              font-weight: 400;
-              margin-right: 4px;
-            }
-          }
-        }
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-      }
-    }
-  }
-}
-
-/* Legend Widget
-/* - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-.legend {
-  text-align: left;
-  background: $white;
-  box-sizing: border-box;
-  padding: 10px 0;
-  min-height: 40px;
-
-  p {
-    .legend-col {
-      width: 10px;
-      height: 10px;
-      margin: 0 5px 0 40px;
-
-      &:first-child {
-        margin-left: 0;
-      }
-
-      &.authorA {
-        background: $colorA;
-      }
-
-      &.authorB {
-        background: $colorB;
-      }
-    }
-  }
-
-  .legend-label, .legend-col {
-    display: inline-block;
-  }
-}
-
-/* Big button
-/* -------------------------------------------------- */
-
-.wide-button {
-  margin: 20px;
-
-  button {
-    width: 100%;
   }
 }
 
@@ -335,7 +188,7 @@
 
     .metric-label {
       width: 100%;
-      font-size: 15px;
+      font-size: 14px;
       text-align: left;
       font-weight: 400;
       margin-bottom: 20px;
@@ -348,114 +201,13 @@
   }
 }
 
-/* SVG Styling
-/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* Big button
+/* -------------------------------------------------- */
 
-svg {
-  //border: 1px solid rgba($dark-green, 0.15);
-  //border-radius: 5px;
+.wide-button {
+  margin: 20px;
 
-  .time-label {
-    font-family: 'Roboto';
-    font-size: 11px;
-    fill: $mid-grey;
-  }
-
-  .tick {
-    stroke: $mid-grey;
-    stroke-width: 1px;
-  }
-
-  .axis-g, .axisRT-g {
-    .domain {
-      stroke: $light-grey;
-      stroke-dasharray: 2px 5px;
-    }
-
-    line {
-      stroke: $mid-grey;
-    }
-
-    text {
-      stroke: none;
-      fill: $mid-grey;
-    }
-  }
-
-  /*
-  * -- Time of Day ------ */
-  &.timeOfDay-svg {
-    .bubble {
-      cursor: pointer;
-    }
-  }
-
-
-  /*
-  * -- Response Times Histogram ------ */
-
-  &.histoRT-svg {
-    .label {
-      font-size: 10px;
-      font-weight: 300;
-      text-anchor: end;
-    }
-
-    .barsHistA, .barsHistB {
-      cursor: pointer;
-    }
-  }
-
-  &.dailyRT-svg {
-    rect {
-      &.respLine {
-        stroke: none;
-      }
-    }
-
-    path {
-      &.diffLine {
-        stroke-width: 2px;
-        fill: none;
-      }
-    }
-  }
-}
-
-.svg {
-  overflow: scroll;
-
-  svg {
-    border: none;
-  }
-}
-
-/* Tooltip styling
-/* - - - - - - - - - - - - - - - - - - - - - - - - - */
-
-.tooltip {
-  width: 300px;
-  padding: 10px;
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  border-radius: 3px;
-  border: 1px solid $wapp-green;
-  color: $dark-green;
-  background: white;
-  transition: opacity;
-  transition-duration: .3s;
-  box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
-
-  .variable {
-    font-weight: 700;
-  }
-
-  &.hidden {
-    opacity: 0;
-  }
-
-  &.showing {
-    opacity: 1;
+  button {
+    width: 100%;
   }
 }

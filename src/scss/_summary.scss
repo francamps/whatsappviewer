@@ -1,0 +1,155 @@
+.summary {
+  box-sizing: border-box;
+  margin: 20px 0;
+  overflow: auto;
+
+  .section-title {
+    margin: 20px;
+  }
+
+  @media (min-width: 900px) {
+    margin: 0px;
+
+    .section-title {
+      margin: 0px;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    margin: 20px 10px;
+
+    .section-title {
+      margin: 10px;
+    }
+  }
+
+  &.showing {
+    opacity: 1;
+    height: auto;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;
+  }
+
+  .summary-content {
+    background: $white;
+    border: 1px solid;
+    border-color: $border-top $border-sides $border-bottom;
+    border-left: 1px solid $wapp-green;
+    padding: 30px;
+    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
+    margin: 20px;
+
+    @media (min-width: 900px) {
+      margin: 20px 0px;
+    }
+
+    @media (min-width: 1100px) {
+      margin: 20px 10px;
+    }
+
+
+    .summary-metric-section {
+      border-top: 1px solid $verylight-grey;
+      padding: 20px 0;
+      overflow: auto;
+
+      &:first-child {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      @media (min-width: 900px) {
+        padding: 20px 0;
+      }
+
+      &:last-child {
+        padding-bottom: 0;
+      }
+
+      p {
+        margin: 0;
+
+        .summary-metric {
+          font-weight: 700;
+          margin-right: 5px;
+        }
+
+        &.large {
+          .summary-metric {
+            font-size: 20px;
+            display: block;
+          }
+
+          &:first-child {
+            margin-bottom: 15px;
+          }
+        }
+      }
+
+      .item {
+        font-size: 1em;
+        padding: 0;
+        float: left;
+        width: 50%;
+
+        @media (min-width: 900px) {
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        p {
+          &.summary-metric {
+            font-weight: 400;
+            margin: 0;
+            margin-left: 10px;
+
+            span {
+              font-weight: 400;
+              margin-right: 4px;
+            }
+          }
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+/* Legend Widget
+/* - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.legend {
+  text-align: left;
+  background: $white;
+  box-sizing: border-box;
+  padding: 10px 0;
+  min-height: 40px;
+
+  p {
+    .legend-col {
+      width: 10px;
+      height: 10px;
+      margin: 0 5px 0 40px;
+
+      &:first-child {
+        margin-left: 0;
+      }
+
+      &.authorA {
+        background: $colorA;
+      }
+
+      &.authorB {
+        background: $colorB;
+      }
+    }
+  }
+
+  .legend-label, .legend-col {
+    display: inline-block;
+  }
+}
