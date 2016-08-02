@@ -76,13 +76,15 @@ class App extends React.Component {
     this.setState({
       isAnalyzed: false
     });
-    document.body.scrollTop = 0;    
+    document.body.scrollTop = 0;
   }
 
   render () {
     return (
       <div className="app">
-        <Header onClickNewChat={this.renderChatForm.bind(this)}/>
+        <Header
+          isAnalyzed={this.state.isAnalyzed}
+          onClickNewChat={this.renderChatForm.bind(this)}/>
         <div className="page-wrap">
           {this.renderSummary()}
           {this.renderForm()}
