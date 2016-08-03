@@ -153,26 +153,38 @@ export default class ResponseTimesHist {
     let barsHistAtop = this.svg.selectAll('.barsHistAtop')
       .data(this.bucketsA)
       .enter().append('rect')
-      .attr("class", "barsHistA");
+      .attr("class", "barsHistAtop barsHistTop");
 
     let barsHistBtop = this.svg.selectAll('.barsHistBtop')
       .data(this.bucketsB)
       .enter().append('rect')
-      .attr("class", "barsHistBtop");
+      .attr("class", "barsHistBtop barsHistTop");
 
     barsHistAtop
       .attr("x", (d) => this.w / 2 - this.xScale(d))
       .attr("y", (d, i) => this.timeScale(i))
       .attr("width", 6)
       .attr("height", this.colH)
-      .style("fill", this.colorA);
+      .style("fill", this.colorA)
+      .on("mouseover", (d, i) => {
+        dispatcher.emit("barsHist:mouseover", d, i, 'A');
+      })
+      .on("mouseout", (d, i) => {
+        dispatcher.emit("barsHist:mouseout", d, i, 'A');
+      });
 
     barsHistBtop
       .attr("x", (d, i) => this.w / 2 + this.xScale(d))
       .attr("y", (d, i) => this.timeScale(i))
       .attr("width", 6)
       .attr("height", this.colH)
-      .style("fill", this.colorB);
+      .style("fill", this.colorB)
+      .on("mouseover", (d, i) => {
+        dispatcher.emit("barsHist:mouseover", d, i, 'B');
+      })
+      .on("mouseout", (d, i) => {
+        dispatcher.emit("barsHist:mouseout", d, i, 'B');
+      });
   }
 
   // Add time buckets labels

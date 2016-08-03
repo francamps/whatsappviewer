@@ -38,6 +38,11 @@ svg {
     .bubble {
       cursor: pointer;
     }
+
+    text {
+      font-size: 10px;
+      font-family: 'Lato';
+    }
   }
 
 
@@ -46,12 +51,12 @@ svg {
 
   &.histoRT-svg {
     .label {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 300;
       text-anchor: end;
     }
 
-    .barsHistA, .barsHistB {
+    .barsHistA, .barsHistB, .barsHistTop {
       cursor: pointer;
     }
   }

@@ -63,8 +63,8 @@ export default class Tooltip extends React.Component {
     return (
       <div>
         <span className="variable">{author} </span>
-        sent <span className="variable">{value} </span>
-        messages within this response time range.
+        responded to <span className="variable">{value} </span>
+        messages within this time range.
       </div>
     )
   }

@@ -86,6 +86,22 @@ export default class Widget extends React.Component {
     }
   }
 
+  renderExplanation () {
+    if (this.props.svgID === "response-time-day-widget") {
+      return (
+        <p>
+          This graph shows a daily average of response times per author.
+          That is, an average of the time taken by each author to respond to
+          each message sent on a given day. Days without messages are shown
+          in light grey. Some days have a low number of message, so the average
+           may be a relatively inadequate summary metric. To get a more
+           accurate view, you can display the individual messages of any
+           given day by clicking on the day.
+        </p>
+      );
+    }
+  }
+
   renderSVGs () {
     let Convo = this.props.conversation;
     let viewParams = this.props.viewParams;
@@ -144,6 +160,7 @@ export default class Widget extends React.Component {
     return (
       <div id={this.props.svgID} className="widget">
         {this.renderTitle()}
+        {this.renderExplanation()}
         {this.renderSVG()}
         {/*this.renderSearchBox()*/}
         {this.renderMetric()}

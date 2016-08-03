@@ -5,10 +5,11 @@ import EventEmitter from 'events';
 export default class TimeOfDay {
   constructor (el, props) {
     this.w = props.w;
-    this.h = 140;
+    this.h = 100;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
     this.r = 20;
+    this.rMax = 15;
     this.mg = 30;
     this.hourStep = (this.w - this.mg) / 24;
 
@@ -71,7 +72,7 @@ export default class TimeOfDay {
     // Define scale functions
     this.rScale = d3.scalePow().exponent(.5)
                   .domain([0, d3.max([this.maxA, this.maxB])])
-                  .range([1, 15]);
+                  .range([1, this.rMax]);
   }
 
   addBubbles (dispatcher) {
@@ -102,14 +103,14 @@ export default class TimeOfDay {
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
         let x = this.mg + i * this.hourStep,
-            y = this.h / 4;
+            y = this.rMax;
         return `translate(${x}, ${y})`;
       });
 
     bubblesB.selectAll(".bubbleB")
       .attr("transform", (d, i) => {
         let x = this.mg + i * this.hourStep,
-            y = 3 * this.h / 4;
+            y = this.rScale(this.maxA) + 70;
         return `translate(${x}, ${y})`;
       });
 
@@ -150,7 +151,7 @@ export default class TimeOfDay {
 
     timeLabel
       .attr("x", (d, i) => (this.mg + i * this.hourStep))
-      .attr("y", this.h / 2 + 5)
+      .attr("y", this.rMax + 40)
       .style("text-anchor", "middle");
   }
 }

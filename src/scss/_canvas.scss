@@ -58,7 +58,7 @@
     margin: 20px;
     box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
 
-    @media (min-width: 900px) {
+    @media (min-width: 800px) {
         padding: 30px;
         margin: 20px 0;
     }
@@ -72,7 +72,7 @@
     }
 
     .widget-extra-metric {
-      text-align: right;
+      text-align: left;
 
       p {
         font-size: 1em;
@@ -91,7 +91,7 @@
 
     form {
       input {
-        @media (min-width: 900px) {
+        @media (min-width: 800px) {
           width: 300px;
           float: right;
         }
@@ -102,7 +102,7 @@
   .section-title {
     margin: 10px 20px;
 
-    @media (min-width: 900px) {
+    @media (min-width: 800px) {
       margin: 10px 0;
     }
 
@@ -129,7 +129,7 @@
     line-height: 14px;
   }
 
-  @media (min-width: 900px) {
+  @media (min-width: 800px) {
     width: 50%;
     float: left;
     border-bottom: none;
@@ -159,6 +159,14 @@
     font-weight: 300;
     float: left;
     border-bottom: 1px solid $lightish-grey;
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    @media (min-width: 800px) {
+      padding: 0;
+    }
 
     .cell {
       width: 35%;
@@ -205,7 +213,7 @@
       margin-bottom: 20px;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 800px) {
       width: 50%;
       border-bottom: none;
     }

@@ -76,7 +76,7 @@ export default class ResponseTimesTime {
   	this.yScale =
         d3.scaleLinear()
 					.domain([0, 86400000])
-					.range([0, this.h - this.mg]);
+					.range([this.h - this.mg, this.mg]);
   }
 
   getDaysNum (domain) {
@@ -136,9 +136,9 @@ export default class ResponseTimesTime {
 
     silence
       .attr("x", (d) => this.timeScale(d.datetime))
-      .attr("y", 0)
+      .attr("y", this.mg)
       .attr("width", this.colW)
-      .attr("height", this.h - this.mg);
+      .attr("height", this.h - this.mg * 2);
 
     silence
       .style("fill", "#c0c0c0")
@@ -159,8 +159,10 @@ export default class ResponseTimesTime {
 
     // Positioning and sizing
     lineA
-      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2)
-      .attr("cy", (d) => this.h - this.mg - this.yScale(d.responseTime))
+      .attr("cx", (d) => {
+        return this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2;
+      })
+      .attr("cy", (d) => this.yScale(d.responseTime))
       .attr("r", this.colW / 4);
 
     // Styling for RT columns
@@ -181,8 +183,10 @@ export default class ResponseTimesTime {
 
     // Positioning and sizing
     lineB
-      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2)
-      .attr("cy", (d) => this.h - this.mg - this.yScale(d.responseTime))
+      .attr("cx", (d) => {
+        return this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2;
+      })
+      .attr("cy", (d) => this.yScale(d.responseTime))
       .attr("r", this.colW / 4);
 
     // Styling for RT columns
@@ -192,26 +196,55 @@ export default class ResponseTimesTime {
       .style("stroke", "none");
   }
 
-  addEachResponseTimeLine (data) {
-    let line = d3.line()
-        .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
-        .y((d) => this.h - this.mg - this.yScale(d.responseTime))
-        .curve(d3.curveStep)
-        .defined((d) => d);
+  // Custom line function for path
+  lineCustomPath (data) {
+    let path = '';
+    let xFn = (datetime) => this.timeScale(this.dayFormatParse(datetime));
+    for (var i = 0; i < data.length; i++) {
+      let d = data[i];
+      if (data[i] && i === 0) {
+        let x = xFn(d.datetime),
+            xF = this.colW,
+            y = this.yScale(d.responseTime);
+        path += 'M' + x + ' ' + y + ' ' + ' h' + xF;
+      } else if (d && i < data.length - 1 && !data[i - 1] && data[i + 1]) {
+        let x = xFn(d.datetime),
+            y = this.yScale(d.responseTime);
+        path += 'M' + x + ' ' + y + ' ';
+      } else if (!d && data[i - 1]) {
+        let x = xFn(data[i - 1].datetime),
+            xF = this.colW,
+            y = this.yScale(data[i - 1].responseTime);
+        path += 'M' + x + ' '+ y + 'h' + xF + ' ';
+      } else if (d && data[i - 1]) {
+        let x0 = xFn(data[i - 1].datetime) + this.colW;
+        let y0 = this.yScale(d.responseTime);
+        path += 'H' + (x0) + ' V' + (y0) + ' ';
+      } else if (d && !data[i - 1] && !data[i + 1]) {
+        let x = xFn(d.datetime),
+            y = this.yScale(d.responseTime);
+        path += 'M' + x + ' ' + y + ' H' + x + ' Z ';
+      }
+    }
+    return path;
+  }
 
+  addEachResponseTimeLine (data) {
     this.svg.append("path")
       .attr("class", "lineA")
-      .attr("d", line(data.authorA))
+      .attr("d", this.lineCustomPath(data.authorA))
       .style("stroke", this.colorA)
       .style("stroke-width", "2px")
       .style("fill", "none")
+      .style("stroke-linecap", "round");
 
     this.svg.append("path")
       .attr("class", "lineB")
-      .attr("d", line(data.authorB))
+      .attr("d", this.lineCustomPath(data.authorB))
       .style("stroke", this.colorB)
       .style("stroke-width", "2px")
       .style("fill", "none")
+      .style("stroke-linecap", "round");
   }
 
   // Add response times column bar
@@ -228,8 +261,8 @@ export default class ResponseTimesTime {
     bgA
       .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .attr("width",  this.colW)
-      .attr("y", (d) => this.h - this.mg - this.yScale(d.responseTime))
-      .attr("height", (d) => this.yScale(d.responseTime));
+      .attr("y", (d) => this.yScale(d.responseTime))
+      .attr("height", (d) => this.h - this.mg- this.yScale(d.responseTime));
 
     bgA
       .style("fill", "#c0c0c0")
@@ -245,8 +278,8 @@ export default class ResponseTimesTime {
     bgB
       .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .attr("width",  this.colW)
-      .attr("y", (d) => this.h - this.mg - this.yScale(d.responseTime))
-      .attr("height", (d) => this.yScale(d.responseTime));
+      .attr("y", (d) => this.yScale(d.responseTime))
+      .attr("height", (d) => this.h - this.mg - this.yScale(d.responseTime));
 
     bgB
       .style("fill", "#c0c0c0")
@@ -318,13 +351,13 @@ export default class ResponseTimesTime {
 
   addAxis () {
     // Over time, horizontal axis
-    let axis = d3.axisBottom(this.timeScale);
+    let axis = d3.axisTop(this.timeScale);
 
     let midH = this.h;
 
     let axisTicks = this.svg.append("g")
       .attr("class", "axis-g")
-      .attr("transform", 'translate(0, 10)')
+      .attr("transform", 'translate(0, 18)')
       .call(axis);
 
     axisTicks.selectAll('.axis-g .domain')

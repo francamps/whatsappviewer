@@ -17,12 +17,20 @@ export default class DataTable extends React.Component {
 
   renderDetails () {
     return (
+      <div>
         <p>
           Each bar corresponds to the number of messages that responded to
            others within the time shown. Say a message in the bar '1-2h'
            is a message that was responding to another message sent
            between 1 and 2 hours before that one.
         </p>
+        <p>
+          NOTE: only messages that follow a message from another author
+          are counted as messages with a countable response time. If an author
+          sends a message following one of her own, that message is not counted
+          (and this happens very often).
+        </p>
+      </div>
     );
   }
 

@@ -4,6 +4,7 @@ var source = require('vinyl-source-stream');
 var sass = require('gulp-sass');
 var babelify = require('babelify');
 var factor = require('factor-bundle');
+var uglify = require('gulp-uglify');
 
 gulp.task('browserify', function() {
     return browserify({
@@ -41,6 +42,12 @@ gulp.task('watch', function () {
   gulp.watch(['./src/scripts/**/*.js', './src/scripts/**/*.jsx'], ['browserify']);
   gulp.watch('./src/scss/*.scss', ['sass']);
   gulp.watch('./src/*.html', ['copy']);
+});
+
+gulp.task('compress', function () {
+  return gulp.src('public/*.js')
+    .pipe(uglify())
+    .pipe(gulp.dest('public'));
 });
 
 gulp.task('default', ['browserify', 'watch']);
