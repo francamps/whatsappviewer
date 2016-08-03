@@ -367,7 +367,7 @@ export default class ResponseTimesTime {
     let axisRT = d3.axisLeft(this.yScale)
                     .tickValues([86400000, 3 * 86400000/4, 86400000/2, 86400000/4, 0])
                     .tickSize(this.w - this.mg)
-                    .tickFormat((d) => (24 - d / 3600000) + 'h');
+                    .tickFormat((d) => (d / 3600000) + 'h');
 
     let axisTicksRT = this.svg.append("g")
       .attr("class", "axisRT-g")
