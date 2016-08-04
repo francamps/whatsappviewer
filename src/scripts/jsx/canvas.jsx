@@ -54,8 +54,8 @@ export default class Canvas extends React.Component {
     let params = getViewParams();
 
     // Add a paramter to show integers
-    let paramsInt = Object.assign({"decimalNum": 0}, params);
-    let paramsOne = Object.assign({"decimalNum": 1}, params);
+    let paramsInt = _.assignIn({"decimalNum": 0}, params);
+    let paramsOne = _.assignIn({"decimalNum": 1}, params);
 
     return (
       <div className="widget">

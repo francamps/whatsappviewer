@@ -92,7 +92,7 @@ export default class VolumeTime {
 	Search utilities on the dashboard
 	*/
 
-	addSearchFunctionality () {
+	/*addSearchFunctionality () {
 		let searchForm = document.getElementById("search-form"),
         searchBox = document.getElementById("search-box");
 
@@ -171,7 +171,7 @@ export default class VolumeTime {
     // Blur focus from input field
     let searchBox = document.getElementById("search-box");
     searchBox.blur()
-  }
+  }*/
 
   getDayWidth () {
     let date0 = d3.timeParse(this.dayFormat)(this.messages[0].datetime),

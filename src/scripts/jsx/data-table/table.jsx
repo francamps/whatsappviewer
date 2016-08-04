@@ -35,7 +35,7 @@ export default class DataTable extends React.Component {
   }
 
   extendParamsForChatMode () {
-    let chatParams = Object.assign({"chatMode": true}, this.props.viewParams);
+    let chatParams = _.assignIn({"chatMode": true}, this.props.viewParams);
     return chatParams;
   }
 

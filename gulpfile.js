@@ -5,6 +5,8 @@ var sass = require('gulp-sass');
 var babelify = require('babelify');
 var factor = require('factor-bundle');
 var uglify = require('gulp-uglify');
+var polyfill = require("babel-polyfill");
+
 
 gulp.task('browserify', function() {
     return browserify({
