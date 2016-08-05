@@ -5,7 +5,8 @@ import React from 'react';
 import { render } from 'react-dom';
 
 import Header from './jsx/header';
-import Form from './jsx/form';
+
+import Landing from './jsx/landing';
 
 import Summary from './jsx/summary';
 import Canvas from './jsx/canvas';
@@ -40,10 +41,10 @@ class App extends React.Component {
     }
   }
 
-  renderForm () {
+  renderLanding () {
     if (!this.state.isAnalyzed) {
       return (
-        <Form
+        <Landing
           parsingError={this.state.parsingError}
           isAnalyzed={this.state.isAnalyzed}
           onClickRender={this.analyzeAndRender.bind(this)}/>
@@ -80,15 +81,22 @@ class App extends React.Component {
     document.body.scrollTop = 0;
   }
 
+  renderHeader () {
+    if (this.state.isAnalyzed) {
+      return (
+        <Header
+          onClickNewChat={this.renderChatForm.bind(this)}/>
+      );
+    }
+  }
+
   render () {
     return (
       <div className="app">
-        <Header
-          isAnalyzed={this.state.isAnalyzed}
-          onClickNewChat={this.renderChatForm.bind(this)}/>
+        {this.renderHeader()}
         <div className="page-wrap">
           {this.renderSummary()}
-          {this.renderForm()}
+          {this.renderLanding()}
           {this.renderCanvas()}
         </div>
         <Footer />

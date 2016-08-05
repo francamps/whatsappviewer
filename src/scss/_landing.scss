@@ -1,0 +1,54 @@
+.landing-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0px 20px 0 20px;
+  transition: width 2s, padding 2s;
+  margin-bottom: 60px;
+  opacity: 1;
+  transition: opacity, height .3s ease-in-out;
+
+  &.hidden {
+    opacity: 0;
+    height: 0;
+    transition: opacity .3s ease-in-out;
+    transition-delay: height .3s;
+    transition-duration: height 0;
+  }
+
+  img {
+    width: 100px;
+  }
+
+  .top-logo {
+    text-align: center;
+    img {
+      width: 100px;
+    }
+  }
+
+  .widget {
+    margin-bottom: 30px;
+  }
+
+  .title {
+    font-size: 48px;
+    font-family: 'Oswald';
+    font-weight: 400;
+    color: $wapp-green;
+  }
+}
+
+.whatsthis-wrapper {
+  img {
+    float: left;
+    width: 100%;
+
+    @media (min-width: 800px) {
+      width: 300px;
+    }
+  }
+
+  .row {
+    display: inline-block;
+  }
+}

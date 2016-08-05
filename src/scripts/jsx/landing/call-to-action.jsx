@@ -4,7 +4,6 @@ export default class Instructions extends React.Component {
   render () {
     return (
       <div className="instructions">
-        <h2>Get some insight into your daily WhatsApp conervsations</h2>
         <h3>How to use this</h3>
         <ol>
           <li>Open your Whatsapp and enter the conversation you'd like to explore.</li>

@@ -38,10 +38,16 @@ gulp.task('copy', function () {
     .pipe(gulp.dest('./public/'));
 });
 
+gulp.task('copy-assets', function () {
+  return gulp.src('./src/assets/*')
+    .pipe(gulp.dest('./public/assets/'));
+});
+
 gulp.task('watch', function () {
   gulp.watch(['./src/scripts/**/*.js', './src/scripts/**/*.jsx'], ['browserify']);
   gulp.watch('./src/scss/*.scss', ['sass']);
   gulp.watch('./src/*.html', ['copy']);
+  gulp.watch('./src/assets/*', ['copy-assets']);
 });
 
 gulp.task('compress', function () {

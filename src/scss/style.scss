@@ -7,6 +7,7 @@
 @import 'svg';
 @import 'tooltip';
 @import 'form';
+@import 'landing';
 
 body {
   position: absolute;
@@ -77,38 +78,20 @@ html, body {
   }
 }
 
-.form-container {
+.widget {
   width: 100%;
+  background: $white;
+  border: 1px solid;
+  border-color: $border-top $border-sides $border-bottom;
+  border-left: 1px solid $wapp-green;
+  padding: 30px;
+  margin: 0 auto;
+  overflow: auto;
   box-sizing: border-box;
-  padding: 0px 20px 0 20px;
-  transition: width 2s, padding 2s;
-  margin-bottom: 60px;
-  opacity: 1;
-  transition: opacity, height .3s ease-in-out;
+  box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
 
-  &.hidden {
-    opacity: 0;
-    height: 0;
-    transition: opacity .3s ease-in-out;
-    transition-delay: height .3s;
-    transition-duration: height 0;
-  }
-
-  .widget {
-    width: 100%;
-    background: $white;
-    border: 1px solid;
-    border-color: $border-top $border-sides $border-bottom;
-    border-left: 1px solid $wapp-green;
-    padding: 30px;
-    margin: 0 auto;
-    overflow: auto;
-    box-sizing: border-box;
-    box-shadow: 0px 2px 11px -5px rgba(0, 0, 0, 0.75);
-
-    @media (min-width: 800px) {
-      width: 760px;
-    }
+  @media (min-width: 800px) {
+    width: 760px;
   }
 }
 
@@ -148,4 +131,14 @@ h2 {
 
 h3 {
   font-weight: 400;
+}
+
+a {
+  color: $wapp-green;
+  text-decoration: none;
+
+  &:hover {
+    color: $electric-green;
+    text-decoration: none;
+  }
 }

@@ -2,32 +2,11 @@
 
 import Instructions from './instructions';
 import ChatForm from './chat-form';
-import Notification from './notification';
+import Notification from '../notification';
 
 export default class Form extends React.Component {
   constructor (props) {
     super(props);
-    this.state = {
-      classes: "form-container"
-    }
-  }
-
-  showForm () {
-    this.setState({
-      classes: "form-container"
-    });
-  }
-
-  hideForm () {
-    this.setState({
-      classes: "form-container hidden"
-    });
-  }
-
-  componentWillUnmount () {
-    if (this.props.isAnalyzed) {
-      this.hideForm();
-    }
   }
 
   renderNotification () {
@@ -41,9 +20,9 @@ export default class Form extends React.Component {
 
   render () {
     return (
-      <div id="form-container" className={this.state.classes}>
+      <div id="form-container" className="form-container">
         <div className="widget">
-          <Instructions />
+          <p>Email yourself your conversation from your app and paste the text of it here. (<span>How do I do this?</span>)</p>
           <ChatForm onClickRender={this.props.onClickRender}/>
           {this.renderNotification()}
         </div>
