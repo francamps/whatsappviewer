@@ -1,7 +1,7 @@
 export default class VolumeTime {
   constructor (el, props) {
     this.w = props.w;
-    this.mg = props.mg || 20;
+    this.mg = 40;
     this.h = props.h;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
@@ -31,6 +31,10 @@ export default class VolumeTime {
     this.svg.append("g")
         .attr("class", "axis-g");
 
+    // Max
+    this.svg.append("g")
+        .attr("class", "max-words");
+
     // Infuse data
     this.messages = state.messages;
     this.update(state);
@@ -40,6 +44,7 @@ export default class VolumeTime {
     this.computeScaleFns(state);
     this.addLines(state);
     this.addAxis();
+    this.addMaxWords(state);
     //this.addSearchFunctionality();
   }
 
@@ -61,7 +66,7 @@ export default class VolumeTime {
     this.wordScale =
       d3.scaleLinear()
         .domain([0, maxWords])
-        .range([this.h / 2, 0]);
+        .range([this.h / 2, this.mg]);
   }
 
   // Add areas
@@ -70,20 +75,19 @@ export default class VolumeTime {
       .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .y0((d) => this.wordScale(d.words))
       .y1((d) => this.wordScale(0))
-      .curve(d3.curveBasis);
+      .curve(d3.curveMonotoneX);
 
     let lineFunctionB = d3.area()
       .x((d) => this.timeScale(this.dayFormatParse(d.datetime)))
       .y0((d) => this.wordScale(-d.words))
       .y1((d) => this.wordScale(0))
-      .curve(d3.curveBasis);
+      .curve(d3.curveMonotoneX);
 
     let lineA = d3.selectAll(".lineA")
       .attr("d", lineFunctionA(state.data.authorA))
       .attr("fill", this.colorA);
 
-    let lineB = this.svg.append("path")
-      .attr("class", "lineB")
+    let lineB = d3.selectAll(".lineB")
       .attr("d", lineFunctionB(state.data.authorB))
       .attr("fill", this.colorB);
   }
@@ -193,10 +197,59 @@ export default class VolumeTime {
     let midH = this.h / 2;
 
     let axisTicks = d3.selectAll(".axis-g")
-      .attr("transform", 'translate(0, 10)')
+      .attr("transform", 'translate(0, 0)')
       .call(axis);
 
     axisTicks.selectAll('.axis-g .domain')
       .style("stroke", "none");
+  }
+
+  addMaxWords (state) {
+    let data = state.data;
+
+    let getMax = (data) => {
+      let max = 0;
+      let obj;
+      for (var d of data) {
+        if (d.words > max) {
+          max = d.words;
+          obj = d;
+        }
+      }
+      return obj;
+    }
+
+    let maxA = getMax(data.authorA);
+    let maxB = getMax(data.authorB);
+
+    let maxWords = d3.selectAll(".max-words");
+
+    let circle = maxWords
+                  .append("circle")
+                  .attr("class", "max-label");
+
+    let max = (maxA.words > maxB.words) ? maxA : maxB;
+
+    circle
+      .attr("cx", this.timeScale(this.dayFormatParse(max.datetime)))
+      .attr("r", 5)
+      .style("stroke", "#d0d0d0")
+      .style("stroke-width", 1)
+      .style("fill", "none");
+
+    let label = maxWords
+          .append("text")
+          .text(max.words)
+          .attr("x", this.timeScale(this.dayFormatParse(max.datetime)))
+          .style("text-anchor", "middle")
+          .style("font-size", "10px");
+
+    if (maxA.words > maxB.words) {
+      circle.attr("cy", this.wordScale(max.words));
+      label.attr("y", this.wordScale(max.words) - 7);
+    } else {
+      circle.attr("cy", this.wordScale(-max.words));
+      label.attr("y", this.wordScale(-max.words) + 15);
+    }
   }
 }
