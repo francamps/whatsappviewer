@@ -38,7 +38,7 @@ export default class Landing extends React.Component {
           <img src="./assets/thumbnail05top.png" />
         </div>
         <h1 className="title">WhatsApp Explorer</h1>
-        <h2>See interesting analytics on your chat communication habits</h2>
+        <h2>See revealing analytics about your chat communication habits</h2>
         <Form
           parsingError={this.props.parsingError}
           isAnalyzed={this.props.isAnalyzed}
