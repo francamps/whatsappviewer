@@ -36,6 +36,30 @@
     font-weight: 400;
     color: $wapp-green;
   }
+
+  .show-instructions {
+    color: $wapp-green;
+    cursor: pointer;
+
+    &:hover {
+      color: $electric-green;
+    }
+  }
+}
+
+.instructions {
+  &.hidden {
+    opacity: 0;
+    height: 0;
+  }
+
+  &.showing {
+    opacity: 1;
+    height: auto;
+    transition: opacity, height;
+    transition-delay: .3s;
+    transition-duration: .3s;
+  }
 }
 
 .whatsthis-wrapper {
