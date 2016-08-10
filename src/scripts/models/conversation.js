@@ -84,6 +84,7 @@ export default class Conversation {
 				console.log('Unknown parsing error.');
 			}
 		}
+
 		return error;
 	}
 
@@ -214,9 +215,10 @@ export default class Conversation {
 
 	_createObjectWithDateKeys () {
 		let dates = this.getDateRange();
-		let obj = {}
+		let obj = {};
 
 		dates.forEach((d) => obj[d3.timeFormat(this.dayFormat)(d)] = []);
+
 		return obj;
 	}
 

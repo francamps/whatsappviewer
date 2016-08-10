@@ -43,6 +43,11 @@ gulp.task('copy-assets', function () {
     .pipe(gulp.dest('./public/assets/'));
 });
 
+// Make sure React is in production mode
+gulp.task('apply-prod-environment', function() {
+    process.env.NODE_ENV = 'production';
+});
+
 gulp.task('watch', function () {
   gulp.watch(['./src/scripts/**/*.js', './src/scripts/**/*.jsx'], ['browserify']);
   gulp.watch('./src/scss/*.scss', ['sass']);
@@ -56,4 +61,4 @@ gulp.task('compress', function () {
     .pipe(gulp.dest('public'));
 });
 
-gulp.task('default', ['browserify', 'watch']);
+gulp.task('default', ['apply-prod-environment', 'browserify', 'watch']);
