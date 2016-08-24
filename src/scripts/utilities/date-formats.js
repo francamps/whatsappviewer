@@ -18,16 +18,6 @@ export default function getDateFormats () {
       "%-m/%-d/%y, %-H:%M",
       "%-m/%-d/%Y, %-H:%M",
 
-      /* 06/15/2009 13:45:30 */
-      "%m/%d/%Y, %H:%M:%S",
-      "%m/%d/%y, %H:%M:%S",
-      "%m/%d/%Y, %-H:%M:%S",
-      "%m/%d/%y, %-H:%M:%S",
-      "%-m/%-d/%Y, %H:%M:%S",
-      "%-m/%-d/%y, %H:%M:%S",
-      "%-m/%-d/%Y, %-H:%M:%S",
-      "%-m/%-d/%y, %-H:%M:%S",
-
       /* 6/15/2009 1:45 PM */
       "%m/%d/%y, %I:%M %p",
       "%m/%d/%Y, %I:%M %p",
@@ -37,16 +27,6 @@ export default function getDateFormats () {
       "%-m/%-d/%Y, %I:%M %p",
       "%-m/%-d/%y, %-I:%M %p",
       "%-m/%-d/%Y, %-I:%M %p",
-
-      /* 06/16/2009 1:45:30 PM */
-      "%m/%d/%Y, %I:%M:%S %p",
-      "%m/%d/%y, %I:%M:%S %p",
-      "%m/%d/%Y, %-I:%M:%S %p",
-      "%m/%d/%y, %-I:%M:%S %p",
-      "%-m/%-d/%Y, %I:%M:%S %p",
-      "%-m/%-d/%y, %I:%M:%S %p",
-      "%-m/%-d/%Y, %-I:%M:%S %p",
-      "%-m/%-d/%y, %-I:%M:%S %p",
 
       /*** YEAR FIRST ***/
       /* 2009/06/15 */
@@ -61,30 +41,7 @@ export default function getDateFormats () {
       "%Y/%m/%d, %I:%M %p",
       "%Y/%m/%d, %-I:%M %p",
       "%Y/%-m/%-d, %I:%M %p",
-      "%Y/%-m/%-d, %-I:%M %p",
-
-      /* 2009/6/15 13:45:30 */
-      "%Y/%m/%d, %H:%M:%S",
-      "%Y/%-m/%-d, %H:%M:%S",
-      "%Y/%m/%d, %-H:%M:%S",
-      "%Y/%-m/%-d, %-H:%M:%S",
-
-      "%Y/%m/%d, %I:%M:%S %p",
-      "%Y/%m/%-d, %I:%M:%S %p",
-      "%Y/%m/%d, %-I:%M:%S %p",
-      "%Y/%m/%-d, %-I:%M:%S %p",
-
-      /* 2009-06-15T13:45:30 */
-      "%Y-%-m-%-dT%H:%M:%S",
-      "%Y-%-m-%-dT%H:%M:%SZ",
-      "%Y-%-m-%-dT%I:%M:%S %p",
-      "%Y-%-m-%-dT%I:%M:%S %p",
-
-      "%Y-%m-%d, %H:%M:%S",
-      "%Y-%m-%d, %-H:%M:%S",
-      "%Y-%-m-%-d, %H:%M:%S",
-      "%Y-%-m-%-d, %-H:%M:%S",
-      "%Y-%m-%d, %I:%M:%S %p"
+      "%Y/%-m/%-d, %-I:%M %p"
     ],
     "EU": [
       /** EUROPEAN FORMATS **/
@@ -104,16 +61,6 @@ export default function getDateFormats () {
       "%-d/%-m/%y, %-H:%M",
       "%-d/%-m/%Y, %-H:%M",
 
-      /* 15/06/2009 13:45:30 */
-      "%d/%m/%Y, %H:%M:%S",
-      "%d/%m/%y, %H:%M:%S",
-      "%d/%m/%Y, %-H:%M:%S",
-      "%d/%m/%y, %-H:%M:%S",
-      "%-d/%-m/%Y, %H:%M:%S",
-      "%-d/%-m/%y, %H:%M:%S",
-      "%-d/%-m/%Y, %-H:%M:%S",
-      "%-d/%-m/%y, %-H:%M:%S",
-
       /* 15/6/2009 1:45 PM */
       "%d/%m/%y, %I:%M %p",
       "%d/%m/%Y, %I:%M %p",
@@ -122,17 +69,7 @@ export default function getDateFormats () {
       "%-d/%-m/%y, %I:%M %p",
       "%-d/%-m/%Y, %I:%M %p",
       "%-d/%-m/%y, %-I:%M %p",
-      "%-d/%-m/%Y, %-I:%M %p",
-
-      /* 15/06/2009 1:45:30 PM */
-      "%d/%m/%Y, %I:%M:%S %p",
-      "%d/%m/%y, %I:%M:%S %p",
-      "%d/%m/%Y, %-I:%M:%S %p",
-      "%d/%m/%y, %-I:%M:%S %p",
-      "%-d/%-m/%Y, %I:%M:%S %p",
-      "%-d/%-m/%y, %I:%M:%S %p",
-      "%-d/%-m/%Y, %-I:%M:%S %p",
-      "%-d/%-m/%y, %-I:%M:%S %p"
+      "%-d/%-m/%Y, %-I:%M %p"
     ],
     "UN": [
       /* Monday, June 15, 2009 */
@@ -160,21 +97,10 @@ export default function getDateFormats () {
       "%b %-d, '%y, %I:%M %p",
       "%b, %-d, %Y, %I:%M %p",
       "%b, %-d, '%y, %I:%M %p",
-      /* Monday, June 15, 2009 1:45:30 PM */
-      "%b %d, %Y, %H:%M:%S",
-      "%b %d, '%y, %H:%M:%S",
-      "%b, %d, %Y, %H:%M:%S",
-      "%b, %d, '%y, %H:%M:%S",
 
-      "%b %d, %Y, %I:%M:%S %p",
-      "%b %d, '%y, %I:%M:%S %p",
-      "%b, %d, %Y, %I:%M:%S %p",
-      "%b, %d, '%y, %I:%M:%S %p",
       /* Monday, June 15, 2009 8:45:30 PM */
-      "%b, %m %d, %H:%M:%S",
       "%b %d, %Y, %H:%M",
       "%b %d, '%y, %H:%M",
-      "%b, %m %d, %I:%M:%S %p",
       "%b %d, %Y, %I:%M %p",
       "%b %d, '%y, %I:%M %p"
     ]

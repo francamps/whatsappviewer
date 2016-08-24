@@ -11,12 +11,22 @@ export default class DateDropDown extends React.Component{
     return d3.timeFormat(format)(new Date('09/19/2016 09:50:00'));
   }
 
+  printOption (date) {
+    return (
+      <option value={date}>{this.printDateSample(date)}</option>
+    );
+  }
+
   renderOptions () {
-    return getDateFormats()['EU'].map((d) => {
-      return (
-        <option value={d}>{this.printDateSample(d)}</option>
-      );
-    });
+    return [
+      <option selected="true" disabled="disabled">Choose a date format</option>,
+      <option disabled="disabled">/* ----- Day number first (Non-US) ----- */</option>,
+      getDateFormats()['EU'].map((date) => this.printOption(date)),
+      <option disabled="disabled">/* ----- Month first (US) ----- */</option>,
+      getDateFormats()['US'].map((date) => this.printOption(date)),
+      <option disabled="disabled">/* ----- Others ----- */</option>,
+      getDateFormats()['UN'].map((date) => this.printOption(date))
+    ];
   }
 
   render () {
