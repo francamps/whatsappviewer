@@ -24,9 +24,9 @@ class App extends React.Component {
     }
   }
 
-  analyzeAndRender (text) {
+  analyzeAndRender (text, dateFormat) {
     let viewParams = getViewParams();
-    let Chat = new Conversation(text);
+    let Chat = new Conversation(text, dateFormat);
 
     if (Chat.isParsed && !Chat.parsingError) {
       this.setState({
@@ -76,7 +76,9 @@ class App extends React.Component {
 
   renderChatForm () {
     this.setState({
-      isAnalyzed: false
+      isAnalyzed: false,
+      conversation: false,
+      parsingError: false
     });
     document.body.scrollTop = 0;
   }

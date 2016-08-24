@@ -4,7 +4,7 @@ export default class Footer extends React.Component {
   render () {
     return (
       <footer>
-        <a href="www.franc.ly">www.franc.ly</a> - 2016
+         2016 - <a href="http://www.franc.ly">www.franc.ly</a>
       </footer>
     );
   }

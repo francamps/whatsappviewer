@@ -15,10 +15,10 @@ export default class FAQ extends React.Component {
           <h3>Why did you do this?</h3>
           <p>I took some time off and felt like having a project I could take on to learn new stuff. I had been doing large prints about <a href="http://franc.ly/#/projects/whatsapp?_k=9v8u55">my own WhatsApp conversations</a>, so this just came as a spin off of that.</p>
 
-          <h3>I have more questions</h3>
+          <h3>I have more questions!</h3>
           <p>Shoot me an email at hi@franc.ly or buy me a beer.</p>
 
-          <h3>We're WhatsApp the company and want to sue you for something you don't even understand</h3>
+          <h3>We're WhatsApp the company and want to sue you for something you don't even understand.</h3>
           <p>Sure, I'll take down the website.</p>
         </div>
       </div>

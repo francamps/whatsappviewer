@@ -23,4 +23,24 @@ form {
     border-color: $wapp-green;
     box-shadow: 0 0 3px $wapp-green;
   }
+
+  .date-selector {
+    select {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      height: 40px;
+      float: right;
+      margin: 20px 0;
+      padding: 2px 10px;
+      background:$white url(../assets/ddarrow.png) no-repeat right 15px;
+      border: solid 1px $wapp-green;
+      font-size: 12px;
+      font-weight: 300;
+      outline: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+  }
 }

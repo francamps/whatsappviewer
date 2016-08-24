@@ -40,9 +40,9 @@ Public methods
 */
 
 export default class Conversation {
-	constructor (data) {
+	constructor (data, dateFormat) {
 		// Some initializing functions
-		this.datetimeFormat = "%-m/%-d/%-y, %-H:%M %p";
+		this.datetimeFormat = dateFormat;
 		this.dayFormat = "%Y-%m-%d";
 		this.data = data || '';
 		this.authors = {};
@@ -64,28 +64,56 @@ export default class Conversation {
 
 	// Go through possible date formats to find the one
 	// the format that will let us parse through the messages
-	_parseDateFormat (date) {
+	_parseDateFormat (date, dateSystem) {
 		let error = true,
-				formats = this.dateFormats,
+				formats = this.dateFormats[dateSystem],
 				i = 0;
 
-		while (i < formats.length && error === true) {
-			try {
-				if (d3.timeParse(formats[i])(date) !== null) {
-					error = false;
-					this.datetimeFormat = formats[i];
-					break;
-				}
-				i++;
-			} catch (e) {
-				if (e instanceof TypeError) {
+		if (!this.datetimeFormat) {
+			while (i < formats.length && error === true) {
+				try {
+					let parseFn = d3.timeParse(formats[i]);
+					if (parseFn(date) !== null) {
+						error = false;
+						this.datetimeFormat = formats[i];
+						break;
+					}
 					i++;
+				} catch (e) {
+					if (e instanceof TypeError) {
+						i++;
+					}
+					console.log('Unknown parsing error.');
 				}
-				console.log('Unknown parsing error.');
+			}
+
+			return error;
+		} else {
+			if (d3.timeParse(this.datetimeFormat)(date) === null) {
+				return error;
 			}
 		}
+	}
 
-		return error;
+	_chooseFormatSystem (lines) {
+		let xx = [],
+				yy = [];
+
+		lines.forEach((line) => {
+			let	thisline = line.split('\n'),
+					date = thisline[thisline.length - 1];
+
+				xx.push(parseInt(date.split("/")[0]))
+				yy.push(parseInt(date.split("/")[1]));
+		});
+
+		if (d3.max(xx) > 12) {
+			this.dateSystem = "EU";
+			return this.dateSystem;
+		} else if (d3.max(yy) > 12) {
+			this.dateSystem = "US";
+			return this.dateSystem;
+		}
 	}
 
 	_parseAuthors () {
@@ -110,6 +138,8 @@ export default class Conversation {
 		this.parsingError = "There was an error parsing your chat. Sorry :/";
 		if (specificError === "tooManyAuthors") {
 			this.parsingError = "Your chat contains messages by more than 2 authors. For now, please use one-on-one chats, with only 2 authors.";
+		} else if (specificError === "unknownDateSystem") {
+			this.parsingError = "I was unable to identify the date format. Please select it manually from the drop down menu.";
 		}
 	}
 
@@ -124,11 +154,18 @@ export default class Conversation {
 		// First item is the date of first message
 		// Use this to decide on date formatting
 		let previousDate = this.linesAuthored[0];
-		let parseErrorFound = this._parseDateFormat(previousDate);
+		let dateSystem = this._chooseFormatSystem(this.linesAuthored),
+			parseErrorFound;
+
+		if (dateSystem || this.datetimeFormat) {
+			parseErrorFound = this._parseDateFormat(previousDate, dateSystem);
+		} else {
+			parseErrorFound = "unknownDateSystem";
+		}
 
 		if (parseErrorFound) {
 			// Unable to parse datetime formatting
-			this._parseErrorHandler();
+			this._parseErrorHandler(parseErrorFound);
 		} else {
 			for (let i = 1; i < this.linesAuthored.length; i++) {
 				// Author, message text for THIS message,
@@ -171,6 +208,7 @@ export default class Conversation {
 						let datetimeObj = d3.timeParse(this.datetimeFormat)(datetime);
 						this.messages.push({
 							'datetime': d3.timeFormat(this.dayFormat)(datetimeObj),
+							'datetimeStr': datetime,
 							'datetimeObj': datetimeObj,
 							'author': author,
 							'text': message
@@ -182,6 +220,7 @@ export default class Conversation {
 					break;
 				}
 			}
+
 			// Date limits
 			this._calculateDateLimits();
 

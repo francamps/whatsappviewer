@@ -45,7 +45,7 @@ html, body {
   min-height: 100%;
   margin: 0 auto;
   padding-top: 80px;
-  margin-bottom: -60px;
+  margin-bottom: -80px;
 
   &:after {
     content: "";
@@ -96,13 +96,18 @@ html, body {
 }
 
 .notification {
-  background: $warn-pink !important;
+  background: $warn-pink;
   color: white;
   padding: 20px;
   text-align: center;
 
   &.hidden {
     display: none;
+  }
+
+  &.warning {
+    background: $gold;
+    color: $dark-grey;
   }
 }
 

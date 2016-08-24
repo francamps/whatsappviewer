@@ -1,9 +1,7 @@
 'use strict';
 
 import Form from './landing/form';
-
 import FAQ from './landing/faq';
-import Whatsthis from './landing/whatsthis';
 import Share from './landing/share';
 
 export default class Landing extends React.Component {
@@ -31,6 +29,7 @@ export default class Landing extends React.Component {
       this.hideForm();
     }
   }
+
   render () {
     return (
       <div id="landing-wrapper" className={this.state.classes}>
@@ -43,7 +42,6 @@ export default class Landing extends React.Component {
           parsingError={this.props.parsingError}
           isAnalyzed={this.props.isAnalyzed}
           onClickRender={this.props.onClickRender}/>
-        {/*<Whatsthis />*/}
         <FAQ />
         <Share />
       </div>
