@@ -5,9 +5,9 @@ import getDateFormats from '../utilities/date-formats';
 /* Model for parsed Chat.
 (Pseudo) Private methods
 * _parseDateFormat
+* _chooseFormatSystem
 * _parseAuthors
 * _calculateDateLimits
-* _parseErrorHandler
 * _parseTextData
 * _createObjectWithDateKeys
 * _bundleByAuthorAndDay
@@ -134,15 +134,6 @@ export default class Conversation {
 		return d3.timeDays(this.date0, d3.timeDay.offset(this.dateF, 1));
 	}
 
-	_parseErrorHandler (specificError) {
-		this.parsingError = "There was an error parsing your chat. Sorry :/";
-		if (specificError === "tooManyAuthors") {
-			this.parsingError = "Your chat contains messages by more than 2 authors. For now, please use one-on-one chats, with only 2 authors.";
-		} else if (specificError === "unknownDateSystem") {
-			this.parsingError = "I was unable to identify the date format. Please select it manually from the drop down menu.";
-		}
-	}
-
 	_parseTextData () {
 		// It is a new line if it contains date time and author
 		// Every line as chopped by ' - ' contains author, message
@@ -165,7 +156,7 @@ export default class Conversation {
 
 		if (parseErrorFound) {
 			// Unable to parse datetime formatting
-			this._parseErrorHandler(parseErrorFound);
+			this.parsingError = parseErrorFound;
 		} else {
 			for (let i = 1; i < this.linesAuthored.length; i++) {
 				// Author, message text for THIS message,
@@ -195,7 +186,7 @@ export default class Conversation {
 				// If message seems properly pased, store it
 				if (author && message) {
 					// Store authors
-					if (!(author in this.authors)) {
+					if (!(author in this.authors) && _.size(this.authors) < 2) {
 						this.authors[author] = true;
 					}
 
@@ -204,7 +195,7 @@ export default class Conversation {
 
 					// TODO: Catch all weird cases
 					// TODO: More resilient parsing, please!
-					if (datetime && author && message) {
+					if (datetime && author && message && author in this.authors) {
 						let datetimeObj = d3.timeParse(this.datetimeFormat)(datetime);
 						this.messages.push({
 							'datetime': d3.timeFormat(this.dayFormat)(datetimeObj),
@@ -215,15 +206,15 @@ export default class Conversation {
 						});
 					}
 				}
+
 				if (_.keys(this.authors).length > 2) {
-					this._parseErrorHandler("tooManyAuthors");
+					this.parsingError = "tooManyAuthors";
 					break;
 				}
 			}
 
 			// Date limits
 			this._calculateDateLimits();
-
 			// Flag success
 			this.isParsed = true;
 		}

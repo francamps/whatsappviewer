@@ -34,13 +34,13 @@ export default class ChatForm extends React.Component{
       return (
         <Notification
           type={this.props.notificationType || 'warning'}
-          message={this.props.parsingError} />
+          error={this.props.parsingError} />
       );
     }
   }
 
   renderDropDown () {
-    if (this.props.parsingError) {
+    if (this.props.parsingError === "unknownDateSystem") {
       return (
         <DateDropDown
           onChangeFormat={this.changeDateFormat.bind(this)}
