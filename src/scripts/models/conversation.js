@@ -134,17 +134,29 @@ export default class Conversation {
 		return d3.timeDays(this.date0, d3.timeDay.offset(this.dateF, 1));
 	}
 
-	_parseTextData () {
-		// It is a new line if it contains date time and author
-		// Every line as chopped by ' - ' contains author, message
-		// plus the author of the NEXT message.
-		// If we chopped using '\n' we would risk chopping also messages that have
-		// line breaks in the text, so we use ' - '
-		this.linesAuthored = this.data.split(' - ');
+	_checkIfIPhone () {
+		this.isIPhone = false;
+		// iPhone whatsapp seems to be mostly based on ':', as in
+		// -> 8/23/16, 9:33:15 AM: Oriol Nieto: California doesn't totally suck
+		// In order to check if this is the case, randomly sample the Chat
+		// Take 5 messages at random, and check if they have at least 3 ':' per
+		// messages, and if that is so, apply iPhone specific parsing
+		this.linesAuthored = this.data.split('\n');
+		let sample = _.sampleSize(this.linesAuthored, 5);
+		let sampleChunks = sample.map((element) => element.split(':').length);
+		let minColonSeparatedChunks = d3.min(sampleChunks);
+
+		if (minColonSeparatedChunks >= 4) {
+			this.isIPhone = true;
+		}
+	}
+
+	_parseTextDataIPhone () {
+		this.linesAuthored = this.data.split('\n');
 
 		// First item is the date of first message
 		// Use this to decide on date formatting
-		let previousDate = this.linesAuthored[0];
+		let previousDate = this.linesAuthored[0].split(": ")[0];
 		let dateSystem = this._chooseFormatSystem(this.linesAuthored),
 			parseErrorFound;
 
@@ -161,31 +173,17 @@ export default class Conversation {
 			for (let i = 1; i < this.linesAuthored.length; i++) {
 				// Author, message text for THIS message,
 				// together with datetime for the FOLLOWING message
-				let line = this.linesAuthored[i];
+				let line = this.linesAuthored[i],
+						chunks = line.split(": ");
 
 				// Datetime for this message is contained in the previous line item
-				let datetime = previousDate;
+				let datetime = chunks[0],
+						author = chunks[1],
+						message = chunks[2];
 
-				// The message text will be finished by a \n,
-				// so even if there are more line breaks within the text,
-				// we'll catch the whole thing
-				let	thisline = line.split('\n');
-
-				// Set this line's datetime as the FOLLOWING's message datetime
-				previousDate = thisline[thisline.length - 1];
-
-				// Message is the whole thing minus de number of characters
-				// taken by the datetime at the end of the line
-				let authorPlusMessageLength = line.length - previousDate.length,
-						authorPlusMessage = line.substr(0, authorPlusMessageLength);
-
-				// Author is the first part of splitting by a colon
-				let author = authorPlusMessage.split(': ')[0],
-						message = authorPlusMessage.substr(author.length, authorPlusMessageLength);
-
-				// If message seems properly pased, store it
+				// If message seems properly parsed, store it
 				if (author && message) {
-					// Store authors
+					// Store authors, only first 2 if group chat
 					if (!(author in this.authors) && _.size(this.authors) < 2) {
 						this.authors[author] = true;
 					}
@@ -217,6 +215,98 @@ export default class Conversation {
 			this._calculateDateLimits();
 			// Flag success
 			this.isParsed = true;
+		}
+	}
+
+	_parseTextData () {
+		// It is a new line if it contains date time and author
+		// Every line as chopped by ' - ' (if Android) contains author, message
+		// plus the author of the NEXT message.
+		// If we chopped using '\n' we would risk chopping also messages that have
+		// line breaks in the text, so we use ' - '
+		this._checkIfIPhone();
+
+		if (this.isIPhone) {
+			this._parseTextDataIPhone();
+		} else {
+			this.linesAuthored = this.data.split(' - ');
+
+			// First item is the date of first message
+			// Use this to decide on date formatting
+			let previousDate = this.linesAuthored[0];
+			let dateSystem = this._chooseFormatSystem(this.linesAuthored),
+				parseErrorFound;
+
+			if (dateSystem || this.datetimeFormat) {
+				parseErrorFound = this._parseDateFormat(previousDate, dateSystem);
+			} else {
+				parseErrorFound = "unknownDateSystem";
+			}
+
+			if (parseErrorFound) {
+				// Unable to parse datetime formatting
+				this.parsingError = parseErrorFound;
+			} else {
+				for (let i = 1; i < this.linesAuthored.length; i++) {
+					// Author, message text for THIS message,
+					// together with datetime for the FOLLOWING message
+					let line = this.linesAuthored[i];
+
+					// Datetime for this message is contained in the previous line item
+					let datetime = previousDate;
+
+					// The message text will be finished by a \n,
+					// so even if there are more line breaks within the text,
+					// we'll catch the whole thing
+					let	thisline = line.split('\n');
+
+					// Set this line's datetime as the FOLLOWING's message datetime
+					previousDate = thisline[thisline.length - 1];
+
+					// Message is the whole thing minus de number of characters
+					// taken by the datetime at the end of the line
+					let authorPlusMessageLength = line.length - previousDate.length,
+							authorPlusMessage = line.substr(0, authorPlusMessageLength);
+
+					// Author is the first part of splitting by a colon
+					let author = authorPlusMessage.split(': ')[0],
+							message = authorPlusMessage.substr(author.length, authorPlusMessageLength);
+
+					// If message seems properly parsed, store it
+					if (author && message) {
+						// Store authors
+						if (!(author in this.authors) && _.size(this.authors) < 2) {
+							this.authors[author] = true;
+						}
+
+						// Store author names in variables
+						this._parseAuthors();
+
+						// TODO: Catch all weird cases
+						// TODO: More resilient parsing, please!
+						if (datetime && author && message && author in this.authors) {
+							let datetimeObj = d3.timeParse(this.datetimeFormat)(datetime);
+							this.messages.push({
+								'datetime': d3.timeFormat(this.dayFormat)(datetimeObj),
+								'datetimeStr': datetime,
+								'datetimeObj': datetimeObj,
+								'author': author,
+								'text': message
+							});
+						}
+					}
+
+					if (_.keys(this.authors).length > 2) {
+						this.parsingError = "tooManyAuthors";
+						break;
+					}
+				}
+
+				// Date limits
+				this._calculateDateLimits();
+				// Flag success
+				this.isParsed = true;
+			}
 		}
 	}
 

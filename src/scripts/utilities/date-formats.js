@@ -28,6 +28,11 @@ export default function getDateFormats () {
       "%-m/%-d/%y, %-I:%M %p",
       "%-m/%-d/%Y, %-I:%M %p",
 
+      "%m/%d/%y, %H:%M:%S",
+      "%-m/%-d/%y, %H:%M:%S",
+      "%m/%d/%y, %I:%M:%S %p",
+      "%-m/%-d/%y, %I:%M:%S %p",
+
       /*** YEAR FIRST ***/
       /* 2009/06/15 */
       "%Y/%m/%d",
