@@ -20,6 +20,8 @@ export default class Tooltip extends React.Component {
       return this.renderTimeOfDayInfo();
     } else if (this.props.typeOfInfo === 'double-RT-hist') {
       return this.renderDoubleRTHist();
+    } else if (this.props.typeOfInfo === 'volume-time') {
+      return this.renderWordsTime();
     }
   }
 
@@ -52,13 +54,7 @@ export default class Tooltip extends React.Component {
         whichAuthor = this.props.infoToShow[2],
         conv = this.props.conversation,
         buckets = conv.getResponseTimesBuckets(),
-        author;
-
-    if (whichAuthor === 'A') {
-      author = conv.authorAName;
-    } else {
-      author = conv.authorBName;
-    }
+        author = (whichAuthor === 'A') ? conv.authorAName : conv.authorBName;
 
     return (
       <div>
@@ -66,7 +62,23 @@ export default class Tooltip extends React.Component {
         responded to <span className="variable">{value} </span>
         messages within this time range.
       </div>
-    )
+    );
+  }
+
+  renderWordsTime () {
+    let value = this.props.infoToShow[0].words,
+        date = this.props.infoToShow[0].datetime,
+        whichAuthor = this.props.infoToShow[2],
+        conv = this.props.conversation,
+        author = (whichAuthor === 'A') ? conv.authorAName : conv.authorBName;
+
+    return (
+      <div>
+        <span className="variable">{author} </span>
+        sent <span className="variable">{value} </span>
+        words on <span className="variable">{date} </span>.
+      </div>
+    );
   }
 
   render ()  {

@@ -1,3 +1,7 @@
+'use strict';
+
+import EventEmitter from 'events';
+
 export default class VolumeTime {
   constructor (el, props) {
     this.w = props.w;
@@ -35,15 +39,24 @@ export default class VolumeTime {
     this.svg.append("g")
         .attr("class", "max-words");
 
+    // Add hoverable
+    this.svg.append("g")
+        .attr("class", "hoverables");
+
+    let dispatcher = new EventEmitter();
+
     // Infuse data
     this.messages = state.messages;
-    this.update(state);
+    this.update(state, dispatcher);
+
+    return dispatcher;
   }
 
-  update (state) {
+  update (state, dispatcher) {
     this.computeScaleFns(state);
     this.addLines(state);
     this.addAxis();
+    this.addHoverables(state, dispatcher);
     this.addMaxWords(state);
     //this.addSearchFunctionality();
   }
@@ -92,90 +105,33 @@ export default class VolumeTime {
       .attr("fill", this.colorB);
   }
 
-  /*
-	Search utilities on the dashboard
-	*/
+  addHoverables (state, dispatcher) {
+    let hoverables = d3.selectAll(".hoverables");
 
-	/*addSearchFunctionality () {
-		let searchForm = document.getElementById("search-form"),
-        searchBox = document.getElementById("search-box");
+    hoverables.selectAll(".hoverableA")
+      .data(state.data.authorA)
+      .enter().append("circle")
+      .attr("class", "hoverableA")
+      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("cy", (d) => this.wordScale(d.words))
+      .attr("r", 5);
 
-    // Do not fire the form itself
-		searchForm.addEventListener('submit', (e) => e.preventDefault());
+    hoverables.selectAll(".hoverableB")
+      .data(state.data.authorB)
+      .enter().append("circle")
+      .attr("class", "hoverableB")
+      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
+      .attr("cy", (d) => this.wordScale(-d.words))
+      .attr("r", 5);
 
-    // Search it
-		searchBox.addEventListener('keypress', (e) => {
-      // Get the query value in the input field
-      let searchBoxQuery = searchBox.value;
+    hoverables
+      .style("opacity", "0")
+      .style("cursor", "pointer");
 
-      // Search for it
-      this.searchText(e, searchBoxQuery);
-    })
-
-	}
-
-  searchText (e, searchBoxQuery) {
-    // If there is a query, and enter is pressed
-    if (e.keyCode === 13 && searchBoxQuery.length > 0){
-      let toDisplay = [],
-          queryRE = new RegExp("(" + searchBoxQuery + ")");
-
-      for (let i = 0; i < this.messages.length; i++) {
-        let queryResult = this.messages[i].text.search(queryRE);
-      	if (queryResult !== -1) {
-      		toDisplay.push(this.messages[i]);
-      	};
-      }
-
-      // Display messages
-      this.displaySomeMessages(toDisplay);
-      this.blurSearchField();
-    }
-    return false;
+    hoverables.selectAll(".hoverableA")
+      .on("mouseover", (d, i) => { dispatcher.emit('hoverable:mouseover', d, i, 'A')})
+      .on("mouseout", (d, i) => { dispatcher.emit('hoverable:mouseout', d, i, 'A')});
   }
-
-  // Flag days where those messages are sent
-	displaySomeMessages (messages) {
-    let selectedMsg =
-        this.svg.selectAll('.selected-msg')
-            .data(messages)
-
-    // Remove previously selected messages
-    selectedMsg
-            .exit().remove()
-
-    // Add new ones, if there are any
-    if (messages.length > 0) {
-      let width = this.getDayWidth();
-
-      // X position
-      let x = (d) => {
-        let parsedDate = this.dayFormatParse(d.datetime);
-        return this.timeScale(parsedDate) - width / 2;
-      }
-
-      // Add new messages
-  		selectedMsg
-  				.enter().append('rect')
-  				.attr('class', 'selected-msg');
-
-      selectedMsg
-  				.attr('x', x)
-  				.attr('y', 0)
-  				.attr('width', width)
-  				.attr('height', this.h);
-
-      selectedMsg
-          .style('fill', this.purple)
-  				.style('opacity', .2);
-    }
-	}
-
-  blurSearchField () {
-    // Blur focus from input field
-    let searchBox = document.getElementById("search-box");
-    searchBox.blur()
-  }*/
 
   getDayWidth () {
     let date0 = d3.timeParse(this.dayFormat)(this.messages[0].datetime),

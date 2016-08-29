@@ -5,12 +5,6 @@ svg {
   //border: 1px solid rgba($dark-green, 0.15);
   //border-radius: 5px;
 
-  .time-label {
-    font-family: 'Roboto';
-    font-size: 11px;
-    fill: $mid-grey;
-  }
-
   .tick {
     stroke: $mid-grey;
     stroke-width: 1px;
@@ -34,7 +28,8 @@ svg {
 
   /*
   * -- Time of Day ------ */
-  &.timeOfDay-svg {
+  &.timeOfDay-svg,
+  &.day-of-week-svg {
     .bubble {
       cursor: pointer;
     }

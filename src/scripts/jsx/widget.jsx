@@ -94,9 +94,9 @@ export default class Widget extends React.Component {
           That is, an average of the time taken by each author to respond to
           each message sent on a given day. Days without messages are shown
           in light grey. Some days have a low number of message, so the average
-           may be a relatively inadequate summary metric. To get a more
+           may be a relatively inadequate summary metric. {/*To get a more
            accurate view, you can display the individual messages of any
-           given day by clicking on the day.
+           given day by clicking on the day.*/}
         </p>
       );
     }
@@ -117,6 +117,11 @@ export default class Widget extends React.Component {
     }
 
     switch (this.props.svgID) {
+      case 'day-of-week-widget':
+        state = {
+          data: this.props.conversation.getMessageWeekday()
+        }
+        break;
       case 'time-of-day-widget':
         state = {
           data: this.props.conversation.getMessageTimes()
@@ -151,6 +156,12 @@ export default class Widget extends React.Component {
         this.props.handleShowTooltip('time-of-day', [d, i , author]);
       });
       dispatcher.on("bubble:mouseout", (d, i, author) => {
+        this.props.handleHideTooltip();
+      });
+      dispatcher.on("hoverable:mouseover", (d, i, author) => {
+        this.props.handleShowTooltip('volume-time', [d, i , author]);
+      });
+      dispatcher.on("hoverable:mouseout", (d, i, author) => {
         this.props.handleHideTooltip();
       });
     }

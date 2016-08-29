@@ -34,7 +34,9 @@ export default class Summary extends React.Component {
         author0 = message0.author,
 
         dateF = messageF.datetimeObj,
-        authorF = messageF.author;
+        authorF = messageF.author,
+
+        days = Math.floor((dateF - date0)/86400000);
 
     let format = this.props.conversation.datetimeFormat;
     let classes = (this.props.isShowing) ? "summary showing" : "summary hidden";
@@ -45,6 +47,7 @@ export default class Summary extends React.Component {
       medias: medias,
       date0: d3.timeFormat(format)(date0),
       dateF: d3.timeFormat(format)(dateF),
+      days: days,
       author0: author0,
       authorF: authorF
     });
@@ -78,7 +81,7 @@ export default class Summary extends React.Component {
       <div className="summary-metric-section">
         <p className="large">
           <span className="summary-metric">{this.state.messages}</span>
-          total messages processed
+          total messages processed in <b>{this.state.days}</b> days
         </p>
         <p className="large">
           <span className="summary-metric large">{this.state.medias}</span>

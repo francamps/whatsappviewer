@@ -623,6 +623,37 @@ export default class Conversation {
 		return this.messageTimes;
 	}
 
+	getMessageWeekday () {
+		// If already computed, return it
+		if (this.messageWeekday) return this.messageWeekday;
+
+		let weekdayFormat = d3.timeFormat('%a');
+
+		// Empty arrays with 24 items, one for each position
+		let authorA = Array.apply(null, Array(7)).map(Number.prototype.valueOf,0),
+				authorB = Array.apply(null, Array(7)).map(Number.prototype.valueOf,0);
+
+		let weekdaysIndex = {
+			"Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3, "Fri": 4, "Sat": 5, "Sun": 6
+		};
+
+		this.messages.forEach((message) => {
+			let weekday = weekdayFormat(message.datetimeObj);
+			if (message.author === this.authorAName) {
+				authorA[weekdaysIndex[weekday]] += 1;
+			} else {
+				authorB[weekdaysIndex[weekday]] += 1;
+			}
+		});
+
+		this.messageWeekday = {
+			authorAweekdays: authorA,
+			authorBweekdays: authorB
+		};
+
+		return this.messageWeekday;
+	}
+
 	getTimeDifference (responder, prompter) {
 		let dateResponse = responder.datetimeObj.getTime(),
 				datePrompt = prompter.datetimeObj.getTime();

@@ -8,6 +8,7 @@ import ChartCell from './chart-cell';
 
 // views
 import TimeOfDay from '../views/time-of-day';
+import DayOfWeek from '../views/day-of-week';
 import ResponseTimesTime from '../views/response-times-day';
 import VolumeTime from '../views/volume-time';
 import ComparisonBar from '../views/comparison-bar';
@@ -88,6 +89,8 @@ export default class Canvas extends React.Component {
             view={VolumeTime}
             viewParams={this.props.viewParams}
             conversation={this.props.conversation}
+            handleShowTooltip={this.handleShowTooltip.bind(this)}
+            handleHideTooltip={this.handleHideTooltip.bind(this)}            
             svgID={'word-volume-widget'}
             renderSearchBox={true} />
           {this.renderWordsAndMessages()}
@@ -99,6 +102,14 @@ export default class Canvas extends React.Component {
             handleShowTooltip={this.handleShowTooltip.bind(this)}
             handleHideTooltip={this.handleHideTooltip.bind(this)}
             svgID={'time-of-day-widget'} />
+          <Widget
+            title={'Messages per day of week'}
+            view={DayOfWeek}
+            viewParams={this.props.viewParams}
+            conversation={this.props.conversation}
+            handleShowTooltip={this.handleShowTooltip.bind(this)}
+            handleHideTooltip={this.handleHideTooltip.bind(this)}
+            svgID={'day-of-week-widget'} />
           <Widget
             title={'Response times per day (average)'}
             view={ResponseTimesTime}
