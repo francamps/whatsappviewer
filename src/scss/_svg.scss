@@ -40,6 +40,16 @@ svg {
     }
   }
 
+  &.words-time-svg {
+    .hoverables rect {
+      opacity: 0;
+      cursor: pointer;
+      &:hover {
+        opacity: .1;
+      }
+    }
+  }
+
 
   /*
   * -- Response Times Histogram ------ */

@@ -21,6 +21,7 @@ export default class VolumeTime {
     // Append SVG do the div
     this.svg = d3.select('#' + this.el)
                 .append('svg')
+                .attr("class", "words-time-svg")
                 .attr('width', this.w)
                 .attr('height', this.h);
 
@@ -110,27 +111,29 @@ export default class VolumeTime {
 
     hoverables.selectAll(".hoverableA")
       .data(state.data.authorA)
-      .enter().append("circle")
+      .enter().append("rect")
       .attr("class", "hoverableA")
-      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .attr("cy", (d) => this.wordScale(d.words))
-      .attr("r", 5);
+      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)) - 2)
+      .attr("y", this.mg)
+      .attr("height", this.h / 2 - this.mg)
+      .attr("width", 5);
 
     hoverables.selectAll(".hoverableB")
       .data(state.data.authorB)
-      .enter().append("circle")
+      .enter().append("rect")
       .attr("class", "hoverableB")
-      .attr("cx", (d) => this.timeScale(this.dayFormatParse(d.datetime)))
-      .attr("cy", (d) => this.wordScale(-d.words))
-      .attr("r", 5);
-
-    hoverables
-      .style("opacity", "0")
-      .style("cursor", "pointer");
+      .attr("x", (d) => this.timeScale(this.dayFormatParse(d.datetime)) - 2)
+      .attr("y", this.h / 2)
+      .attr("height", this.h / 2 - this.mg)
+      .attr("width", 5);
 
     hoverables.selectAll(".hoverableA")
       .on("mouseover", (d, i) => { dispatcher.emit('hoverable:mouseover', d, i, 'A')})
       .on("mouseout", (d, i) => { dispatcher.emit('hoverable:mouseout', d, i, 'A')});
+
+    hoverables.selectAll(".hoverableB")
+      .on("mouseover", (d, i) => { dispatcher.emit('hoverable:mouseover', d, i, 'B')})
+      .on("mouseout", (d, i) => { dispatcher.emit('hoverable:mouseout', d, i, 'B')});
   }
 
   getDayWidth () {
