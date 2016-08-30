@@ -5,12 +5,12 @@ import EventEmitter from 'events';
 export default class DayOfWeek {
   constructor (el, props) {
     this.w = props.w;
-    this.h = 150;
+    this.h = 110;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
-    this.rMax = 25;
+    this.rMax = 20;
     this.mg = 30;
-    this.weekdayStep = (this.w - this.mg) / 7;
+    this.weekdayStep = this.w / 7;
 
     this.el = el;
   }
@@ -82,6 +82,8 @@ export default class DayOfWeek {
 
     let bubblesB = bubbles.selectAll(".weekday-bubblesB");
 
+    let xScale = (i) => (i + 1/2) * this.weekdayStep;
+
     // Add bubbles and their classes
     bubblesA.selectAll(".bubbleA")
       .data(this.daysA)
@@ -101,14 +103,14 @@ export default class DayOfWeek {
 
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
-        let x = this.mg + i * this.weekdayStep,
+        let x = xScale(i),
             y = this.rMax;
         return `translate(${x}, ${y})`;
       });
 
     bubblesB.selectAll(".bubbleB")
       .attr("transform", (d, i) => {
-        let x = this.mg + i * this.weekdayStep,
+        let x = xScale(i),
             y = this.rScale(this.maxA) + 70;
         return `translate(${x}, ${y})`;
       });
@@ -148,7 +150,7 @@ export default class DayOfWeek {
       .text((d, i) => weekdaysIndex[i]);
 
     weekdayLabel
-      .attr("x", (d, i) => (this.mg + i * this.weekdayStep))
+      .attr("x", (d, i) => (i + 1/2) * this.weekdayStep)
       .attr("y", this.rMax + 40)
       .style("text-anchor", "middle")
       .style("text-transform", "uppercase");

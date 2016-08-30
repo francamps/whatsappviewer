@@ -11,7 +11,7 @@ export default class TimeOfDay {
     this.r = 20;
     this.rMax = 15;
     this.mg = 30;
-    this.hourStep = (this.w - this.mg) / 24;
+    this.hourStep = (this.w) / 24;
 
     this.el = el;
   }
@@ -83,6 +83,8 @@ export default class TimeOfDay {
 
     let bubblesB = bubbles.selectAll(".bubblesB");
 
+    let xScale = (i) => (i + 1/2) * this.hourStep;
+
     // Add bubbles and their classes
     bubblesA.selectAll(".bubbleA")
       .data(this.timesA)
@@ -102,14 +104,14 @@ export default class TimeOfDay {
 
     bubblesA.selectAll(".bubbleA")
       .attr("transform", (d, i) => {
-        let x = this.mg + i * this.hourStep,
+        let x = xScale(i),
             y = this.rMax;
         return `translate(${x}, ${y})`;
       });
 
     bubblesB.selectAll(".bubbleB")
       .attr("transform", (d, i) => {
-        let x = this.mg + i * this.hourStep,
+        let x = xScale(i),
             y = this.rScale(this.maxA) + 70;
         return `translate(${x}, ${y})`;
       });
@@ -150,7 +152,7 @@ export default class TimeOfDay {
       });
 
     timeLabel
-      .attr("x", (d, i) => (this.mg + i * this.hourStep))
+      .attr("x", (d, i) => (i + 1/2) * this.hourStep)
       .attr("y", this.rMax + 40)
       .style("text-anchor", "middle");
   }
