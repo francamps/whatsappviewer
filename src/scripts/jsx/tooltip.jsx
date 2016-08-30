@@ -22,6 +22,8 @@ export default class Tooltip extends React.Component {
       return this.renderDoubleRTHist();
     } else if (this.props.typeOfInfo === 'volume-time') {
       return this.renderWordsTime();
+    } else if (this.props.typeOfInfo === 'day-of-week') {
+      return this.renderWeekdayInfo();
     }
   }
 
@@ -29,21 +31,33 @@ export default class Tooltip extends React.Component {
     let messages = this.props.infoToShow[0],
         bubble = this.props.infoToShow[1],
         whichAuthor = this.props.infoToShow[2],
-        author,
-        conv = this.props.conversation;
-
-    if (whichAuthor === 'A') {
-      author = conv.authorAName;
-    } else {
-      author = conv.authorBName;
-    }
-
+        conv = this.props.conversation,
+        author = (whichAuthor === 'A') ? conv.authorAName : conv.authorBName;
 
     return (
       <div>
         <span className="variable">{author} </span>
         sent <span className="variable">{messages} </span>
         messages at {bubble}h.
+      </div>
+    );
+  }
+
+  renderWeekdayInfo () {
+    let messages = this.props.infoToShow[0],
+        dayIndex = this.props.infoToShow[1],
+        whichAuthor = this.props.infoToShow[2],
+        conv = this.props.conversation,
+        author = (whichAuthor === 'A') ? conv.authorAName : conv.authorBName;
+
+    let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+      "Saturday", "Sunday"];
+
+    return (
+      <div>
+        <span className="variable">{author} </span>
+        sent <span className="variable">{messages} </span>
+        messages on a {days[dayIndex]}.
       </div>
     );
   }

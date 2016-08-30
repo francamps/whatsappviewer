@@ -155,11 +155,18 @@ export default class Widget extends React.Component {
       dispatcher.on("bubble:mouseover", (d, i, author) => {
         this.props.handleShowTooltip('time-of-day', [d, i , author]);
       });
-      dispatcher.on("bubble:mouseout", (d, i, author) => {
-        this.props.handleHideTooltip();
+      dispatcher.on("bubble-weekday:mouseover", (d, i, author) => {
+        this.props.handleShowTooltip('day-of-week', [d, i , author]);
       });
       dispatcher.on("hoverable:mouseover", (d, i, author) => {
         this.props.handleShowTooltip('volume-time', [d, i , author]);
+      });
+
+      dispatcher.on("bubble:mouseout", (d, i, author) => {
+        this.props.handleHideTooltip();
+      });
+      dispatcher.on("bubble-weekday:mouseout", (d, i, author) => {
+        this.props.handleHideTooltip();
       });
       dispatcher.on("hoverable:mouseout", (d, i, author) => {
         this.props.handleHideTooltip();

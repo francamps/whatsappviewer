@@ -8,7 +8,7 @@ export default class DayOfWeek {
     this.h = 150;
     this.colorA = props.colorA;
     this.colorB = props.colorB;
-    this.rMax = 30;
+    this.rMax = 25;
     this.mg = 30;
     this.weekdayStep = (this.w - this.mg) / 7;
 
@@ -122,12 +122,12 @@ export default class DayOfWeek {
 
     // Event
     bubblesA.selectAll(".bubbleA")
-      .on("mouseover", (d, i) => { dispatcher.emit('bubble:mouseover', d, i, 'A')})
-      .on("mouseout", (d, i) => { dispatcher.emit('bubble:mouseout', d, i, 'A')});
+      .on("mouseover", (d, i) => { dispatcher.emit('bubble-weekday:mouseover', d, i, 'A')})
+      .on("mouseout", (d, i) => { dispatcher.emit('bubble-weekday:mouseout', d, i, 'A')});
 
     bubblesB.selectAll(".bubbleB")
-      .on("mouseover", (d, i) => { dispatcher.emit('bubble:mouseover', d, i, 'B')})
-      .on("mouseout", (d, i) => { dispatcher.emit('bubble:mouseout', d, i, 'B')});
+      .on("mouseover", (d, i) => { dispatcher.emit('bubble-weekday:mouseover', d, i, 'B')})
+      .on("mouseout", (d, i) => { dispatcher.emit('bubble-weekday:mouseout', d, i, 'B')});
 
     bubbles
       .style("transform", "translate(" + this.weekdayStep/2 + ",0)")
