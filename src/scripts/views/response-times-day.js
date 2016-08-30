@@ -46,7 +46,6 @@ export default class ResponseTimesTime {
   update (state) {
     this.computeScaleFns(state.domain);
     this.adjustSizeIfNeeded(state.domain);
-    //this.addEachResponseTime(state.data)
     this.addEachResponseTimeColumns(state.data);
     this.addEachResponseTimeLine(state.data);
     this.addSilences(state);
@@ -143,57 +142,6 @@ export default class ResponseTimesTime {
     silence
       .style("fill", "#c0c0c0")
       .style("opacity", .2);
-  }
-
-  // Add response times column bar
-  addEachResponseTime (data) {
-    /* Author A */
-    // Add RT for author A, grouped
-    let respsA = this.svg.selectAll(".respsA");
-
-    // Append columns per each day with response time daya
-    let lineA = respsA.selectAll(".lineA")
-      .data(data.authorA.filter(Boolean))
-      .enter().append("circle")
-      .attr("class", "lineA respLine")
-
-    // Positioning and sizing
-    lineA
-      .attr("cx", (d) => {
-        return this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2;
-      })
-      .attr("cy", (d) => this.yScale(d.responseTime))
-      .attr("r", this.colW / 4);
-
-    // Styling for RT columns
-    lineA
-      .style("opacity", .8)
-      .style("fill", this.colorA)
-			.style("stroke", "none");
-
-    /* Author B */
-    // Add RT for author B, grouped
-    let respsB = this.svg.selectAll(".respsB");
-
-    // Append columns per each day with response time daya
-    let lineB = respsB.selectAll(".lineB")
-      .data(data.authorB.filter(Boolean))
-      .enter().append("circle")
-      .attr("class", "lineB respLine")
-
-    // Positioning and sizing
-    lineB
-      .attr("cx", (d) => {
-        return this.timeScale(this.dayFormatParse(d.datetime)) + this.colW / 2;
-      })
-      .attr("cy", (d) => this.yScale(d.responseTime))
-      .attr("r", this.colW / 4);
-
-    // Styling for RT columns
-    lineB
-      .style("opacity", .5)
-      .style("fill", "this.colorB")
-      .style("stroke", "none");
   }
 
   // Custom line function for path
@@ -294,7 +242,7 @@ export default class ResponseTimesTime {
         allMessagesB = d3.map(data.authorBAll).entries();
 
     let r = 3,
-        x = (i) => (i + 3/2) * this.colW - 1;
+        x = (i) => (i + 5/2) * this.colW;
 
     // Add messages for author A
     // grouping them per day
@@ -310,8 +258,8 @@ export default class ResponseTimesTime {
 
       // Position and dimension
       circle
-        .attr("cx", x(i))
-        .attr("cy", (b) => this.h - this.mg - this.yScale(b))
+        .attr("cx", x(i) + 2)
+        .attr("cy", (b) => this.yScale(b))
         .attr("r", r)
 
       // Styling, please move to stylesheet
@@ -334,8 +282,8 @@ export default class ResponseTimesTime {
 
       // Position and dimension
       circle
-        .attr("cx", x(i))
-        .attr("cy", (b) => this.h - this.mg - this.yScale(b))
+        .attr("cx", x(i) - 2)
+        .attr("cy", (b) => this.yScale(b))
         .attr("r", r)
 
       // Styling, please move to stylesheet
